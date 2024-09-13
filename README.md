@@ -1,1 +1,1 @@
-# be08-fin-4team
+# be08-fin-EasyCheck-EasyStay
