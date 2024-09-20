@@ -1,5 +1,4 @@
 # 🏨 EasyStay
-![logo]()
 > [PLAYDATA] 한화시스템 BEYOND SW캠프 / EasyStay
 
 > Team - EasyCheck
@@ -47,24 +46,7 @@
 </p>
 <br>
 
-## 🗂️ Project Introduction
-### 프로젝트 소개
-**EasyStay**는
-<br>
-
-### 프로젝트 필요성
-
-<br>
-
-### 프로젝트 목표
-
-<br>
-
-### 기대 효과
-
-<br><br>
-
-## 📑 Project Planning
+## 🗂️ Project Planning
 
 ### 1. Project Proposal
 
