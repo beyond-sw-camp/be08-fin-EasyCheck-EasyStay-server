@@ -8,8 +8,8 @@ import org.springframework.http.HttpStatus;
 @ToString
 public class EasyCheckException extends RuntimeException {
 
-    private String type;
-    private HttpStatus status;
+    private final String type;
+    private final HttpStatus status;
 
     public EasyCheckException(MessageType messageType) {
         super(messageType.getMessage());
