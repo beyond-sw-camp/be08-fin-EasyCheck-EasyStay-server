@@ -16,13 +16,6 @@ public interface ThemeParkReadUseCase {
     @Getter
     @Builder
     @EqualsAndHashCode
-    class ThemeParkFindQuery {
-        private final Long id;
-    }
-
-    @Getter
-    @Builder
-    @EqualsAndHashCode
     class FindThemeParkResult {
         private final Long id;
 
