@@ -2,6 +2,7 @@ package com.beyond.easycheck.accomodations.ui.controller;
 
 import com.beyond.easycheck.accomodations.application.service.AccommodationService;
 import com.beyond.easycheck.accomodations.ui.requestbody.AccommodationCreateRequest;
+import com.beyond.easycheck.accomodations.ui.requestbody.AccommodationUpdateRequest;
 import com.beyond.easycheck.accomodations.ui.view.AccommodationView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -50,5 +51,13 @@ public class AccommodationController {
         return ResponseEntity.ok(accommodationView);
     }
 
+    @Operation(summary = "시설의 정보를 수정하는 API")
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateAccommodation(@PathVariable("id") Long id,
+                                                    @RequestBody @Valid AccommodationUpdateRequest accommodationUpdateRequest) {
 
+        accommodationService.updateAccommodation(id, accommodationUpdateRequest);
+
+        return ResponseEntity.noContent().build();
+    }
 }
