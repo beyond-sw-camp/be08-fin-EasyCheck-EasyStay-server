@@ -4,6 +4,7 @@ import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUse
 import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUseCase.ThemeParkCreateCommand;
 import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase;
 import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase.FindThemeParkResult;
+import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase.ThemeParkFindQuery;
 import com.beyond.easycheck.themeparks.ui.requestbody.ThemeParkCreateRequest;
 import com.beyond.easycheck.themeparks.ui.view.ApiResponseView;
 import com.beyond.easycheck.themeparks.ui.view.ThemeParkView;
@@ -47,5 +48,18 @@ public class ThemeParkController {
 
     return ResponseEntity.status(HttpStatus.OK)
             .body(new ApiResponseView<>(results.stream().map(ThemeParkView::new).toList()));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponseView<ThemeParkView>> getThemePark(@PathVariable Long id) {
+
+        ThemeParkFindQuery query = ThemeParkFindQuery.builder()
+                .id(id)
+                .build();
+
+        FindThemeParkResult result = themeParkReadUseCase.getFindThemePark(query);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponseView<>(new ThemeParkView(result)));
     }
 }
