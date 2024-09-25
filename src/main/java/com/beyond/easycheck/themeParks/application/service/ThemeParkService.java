@@ -25,6 +25,8 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
     @Transactional
     public FindThemeParkResult saveThemePark(ThemeParkCreateCommand command) {
 
+        command.validate();
+
         boolean exists = themeParkRepository.existsByNameAndLocation(command.getName(), command.getLocation());
         if (exists) {
             throw new EasyCheckException(ThemeParkMessageType.DUPLICATE_THEME_PARK);
