@@ -1,7 +1,6 @@
 package com.beyond.easycheck.accomodations.ui.controller;
 
 import com.beyond.easycheck.accomodations.application.service.AccommodationService;
-import com.beyond.easycheck.accomodations.infrastructure.entity.Accommodation;
 import com.beyond.easycheck.accomodations.ui.requestbody.AccommodationCreateRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

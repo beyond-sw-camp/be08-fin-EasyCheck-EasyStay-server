@@ -1,6 +1,6 @@
 package com.beyond.easycheck.accomodations.application.service;
 
-import com.beyond.easycheck.accomodations.infrastructure.entity.Accommodation;
+import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
 import com.beyond.easycheck.accomodations.ui.requestbody.AccommodationCreateRequest;
 import lombok.AccessLevel;
@@ -17,14 +17,14 @@ public class AccommodationService {
     private final AccommodationRepository accommodationRepository;
 
     @Transactional
-    public Optional<Accommodation> createAccommodation(AccommodationCreateRequest accommodationCreateRequest) {
+    public Optional<AccommodationEntity> createAccommodation(AccommodationCreateRequest accommodationCreateRequest) {
 
-        Accommodation accommodation = Accommodation.builder()
+        AccommodationEntity accommodationEntity = AccommodationEntity.builder()
                 .name(accommodationCreateRequest.getName())
                 .address(accommodationCreateRequest.getAddress())
                 .accommodationType(accommodationCreateRequest.getAccommodationType())
                 .build();
 
-        return Optional.of(accommodationRepository.save(accommodation));
+        return Optional.of(accommodationRepository.save(accommodationEntity));
     }
 }
