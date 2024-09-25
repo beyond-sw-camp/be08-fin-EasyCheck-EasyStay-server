@@ -69,4 +69,14 @@ public class AccommodationService {
 
         return Optional.empty();
     }
+
+    @Transactional
+    public void deleteAccommodation(Long id) {
+
+        AccommodationEntity accommodationEntity = accommodationRepository.findById(id).orElseThrow(
+                () -> new EasyCheckException(AccommodationMessageType.ACCOMMODATION_NOT_FOUND)
+        );
+
+        accommodationRepository.delete(accommodationEntity);
+    }
 }
