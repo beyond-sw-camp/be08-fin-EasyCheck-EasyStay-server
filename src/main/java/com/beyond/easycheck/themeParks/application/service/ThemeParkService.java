@@ -14,6 +14,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperationUseCase {
 
     private final ThemeParkRepository themeParkRepository;
@@ -28,7 +29,6 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<FindThemeParkResult> getThemeParks() {
         log.info("[ThemeParkService - getThemeParks]");
 
@@ -40,7 +40,6 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
     }
 
     @Override
-    @Transactional(readOnly = true)
     public FindThemeParkResult getFindThemePark(Long id) {
         log.info("[ThemeParkService - getThemePark] id = {}", id);
 
