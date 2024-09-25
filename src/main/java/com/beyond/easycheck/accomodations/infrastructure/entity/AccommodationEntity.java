@@ -1,11 +1,14 @@
 package com.beyond.easycheck.accomodations.infrastructure.entity;
 
+import com.beyond.easycheck.accomodations.ui.requestbody.AccommodationUpdateRequest;
 import com.beyond.easycheck.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.Optional;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,4 +31,10 @@ public class AccommodationEntity extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AccommodationType accommodationType;
+
+    public void updateAccommodation(AccommodationUpdateRequest accommodationUpdateRequest) {
+        Optional.ofNullable(accommodationUpdateRequest.getName()).ifPresent(name -> this.name = name);
+        Optional.ofNullable(accommodationUpdateRequest.getAddress()).ifPresent(address -> this.address = address);
+        Optional.ofNullable(accommodationUpdateRequest.getAccommodationType()).ifPresent(accommodationType -> this.accommodationType = accommodationType);
+    }
 }

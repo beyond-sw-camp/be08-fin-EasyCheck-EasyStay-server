@@ -1,6 +1,5 @@
 package com.beyond.easycheck.accomodations.exception;
 
-import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.common.exception.MessageType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

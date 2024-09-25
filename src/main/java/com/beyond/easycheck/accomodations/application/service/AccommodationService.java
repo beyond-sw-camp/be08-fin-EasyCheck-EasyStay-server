@@ -4,6 +4,7 @@ import com.beyond.easycheck.accomodations.exception.AccommodationMessageType;
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
 import com.beyond.easycheck.accomodations.ui.requestbody.AccommodationCreateRequest;
+import com.beyond.easycheck.accomodations.ui.requestbody.AccommodationUpdateRequest;
 import com.beyond.easycheck.accomodations.ui.view.AccommodationView;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import lombok.AccessLevel;
@@ -47,6 +48,7 @@ public class AccommodationService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public AccommodationView getAccommodationById(Long id) {
 
         AccommodationEntity accommodationEntity = accommodationRepository.findById(id).orElseThrow(
@@ -56,5 +58,15 @@ public class AccommodationService {
         return AccommodationView.of(accommodationEntity);
     }
 
+    @Transactional
+    public Optional<Void> updateAccommodation(Long id, AccommodationUpdateRequest accommodationUpdateRequest) {
 
+        AccommodationEntity accommodationEntity = accommodationRepository.findById(id).orElseThrow(
+                () -> new EasyCheckException(AccommodationMessageType.ACCOMMODATION_NOT_FOUND)
+        );
+
+        accommodationEntity.updateAccommodation(accommodationUpdateRequest);
+
+        return Optional.empty();
+    }
 }
