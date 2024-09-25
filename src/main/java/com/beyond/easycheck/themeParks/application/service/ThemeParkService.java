@@ -16,8 +16,8 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
 
     @Override
     @Transactional
-    public FindThemeParkResult saveTodo(ThemeParkCreateCommand command) {
-        log.info("[TodoService - saveTodo] command = {}", command);
+    public FindThemeParkResult saveThemePark(ThemeParkCreateCommand command) {
+        log.info("[TodoService - saveThemePark] command = {}", command);
         return FindThemeParkResult.findByThemeParkEntity(
                 themeParkRepository.save(ThemeParkEntity.createThemePark(command))
         );

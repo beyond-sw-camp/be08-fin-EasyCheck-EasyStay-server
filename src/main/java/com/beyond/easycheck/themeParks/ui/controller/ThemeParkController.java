@@ -26,7 +26,7 @@ public class ThemeParkController {
     private final ThemeParkReadUseCase themeParkReadUseCase;
 
     @PostMapping("")
-    public ResponseEntity<ApiResponseView<ThemeParkView>> createTodo(@RequestBody @Validated ThemeParkCreateRequest request) {
+    public ResponseEntity<ApiResponseView<ThemeParkView>> createThemePark(@RequestBody @Validated ThemeParkCreateRequest request) {
 
         ThemeParkCreateCommand command = ThemeParkCreateCommand.builder()
                 .name(request.getName())
