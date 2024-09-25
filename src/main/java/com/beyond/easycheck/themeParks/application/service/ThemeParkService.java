@@ -22,10 +22,15 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
     @Override
     @Transactional
     public FindThemeParkResult saveThemePark(ThemeParkCreateCommand command) {
-        log.info("[ThemeParkService - saveThemePark] command = {}", command);
-        return FindThemeParkResult.findByThemeParkEntity(
-                themeParkRepository.save(ThemeParkEntity.createThemePark(command))
-        );
+        try {
+            log.info("[ThemeParkService - saveThemePark] command = {}", command);
+            return FindThemeParkResult.findByThemeParkEntity(
+                    themeParkRepository.save(ThemeParkEntity.createThemePark(command))
+            );
+        } catch (EasyCheckException e) {
+            throw new EasyCheckException(ThemeParkMessageType.THEME_PARK_CREATION_FAILED);
+        }
+
     }
 
     @Override
