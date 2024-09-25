@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -21,5 +23,16 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
         return FindThemeParkResult.findByThemeParkEntity(
                 themeParkRepository.save(ThemeParkEntity.createThemePark(command))
         );
+    }
+
+    @Override
+    public List<FindThemeParkResult> getThemeParks() {
+        log.info("[ThemeParkService - getThemeParks]");
+
+        List<ThemeParkEntity> results = themeParkRepository.findAll();
+
+        return results.stream()
+                .map(FindThemeParkResult::findByThemeParkEntity)
+                .toList();
     }
 }

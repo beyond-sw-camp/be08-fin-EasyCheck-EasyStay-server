@@ -6,12 +6,15 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+import java.util.List;
+
 public interface ThemeParkReadUseCase {
 
+    List<FindThemeParkResult> getThemeParks();
 
     @Getter
     @Builder
-    class FindThemeParkResult extends BaseTimeEntity {
+    class FindThemeParkResult {
         private final Long id;
 
         private final String name;
