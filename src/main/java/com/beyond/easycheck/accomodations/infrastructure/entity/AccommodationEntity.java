@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Builder
+@Table(name = "Accommodation")
 public class AccommodationEntity extends BaseTimeEntity {
 
     @Id
