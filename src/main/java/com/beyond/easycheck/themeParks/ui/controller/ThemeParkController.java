@@ -35,7 +35,7 @@ public class ThemeParkController {
                 .image(request.getImage())
                 .build();
 
-        FindThemeParkResult result = themeParkOperationUseCase.saveTodo(command);
+        FindThemeParkResult result = themeParkOperationUseCase.saveThemePark(command);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponseView<>(new ThemeParkView(result)));

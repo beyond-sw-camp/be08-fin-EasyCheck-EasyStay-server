@@ -6,7 +6,7 @@ import lombok.Getter;
 
 public interface ThemeParkOperationUseCase {
 
-    FindThemeParkResult saveTodo(ThemeParkCreateCommand command);
+    FindThemeParkResult saveThemePark(ThemeParkCreateCommand command);
 
     @Getter
     @Builder
