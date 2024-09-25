@@ -56,4 +56,6 @@ public class AccommodationService {
 
         return AccommodationView.of(accommodationEntity);
     }
+
+
 }

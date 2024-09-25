@@ -49,4 +49,6 @@ public class AccommodationController {
 
         return ResponseEntity.ok(accommodationView);
     }
+
+
 }
