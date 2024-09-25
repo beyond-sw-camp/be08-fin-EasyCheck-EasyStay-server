@@ -1,6 +1,5 @@
 package com.beyond.easycheck.themeparks.application.service;
 
-import com.beyond.easycheck.common.exception.CommonMessageType;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.themeparks.exception.ThemeParkMessageType;
 import com.beyond.easycheck.themeparks.infrastructure.persistence.entity.ThemeParkEntity;
@@ -42,11 +41,11 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
 
     @Override
     @Transactional(readOnly = true)
-    public FindThemeParkResult getFindThemePark(ThemeParkFindQuery query) {
-        log.info("[ThemeParkService - getThemePark] query = {}", query);
+    public FindThemeParkResult getFindThemePark(Long id) {
+        log.info("[ThemeParkService - getThemePark] id = {}", id);
 
         return FindThemeParkResult.findByThemeParkEntity(
-                retrieveThemeParkEntityById(query.getId())
+                retrieveThemeParkEntityById(id)
         );
     }
 

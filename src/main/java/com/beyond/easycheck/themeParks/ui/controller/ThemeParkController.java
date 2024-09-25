@@ -53,11 +53,7 @@ public class ThemeParkController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponseView<ThemeParkView>> getThemePark(@PathVariable Long id) {
 
-        ThemeParkFindQuery query = ThemeParkFindQuery.builder()
-                .id(id)
-                .build();
-
-        FindThemeParkResult result = themeParkReadUseCase.getFindThemePark(query);
+        FindThemeParkResult result = themeParkReadUseCase.getFindThemePark(id);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponseView<>(new ThemeParkView(result)));

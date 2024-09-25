@@ -1,6 +1,5 @@
 package com.beyond.easycheck.themeparks.application.service;
 
-import com.beyond.easycheck.common.entity.BaseTimeEntity;
 import com.beyond.easycheck.themeparks.infrastructure.persistence.entity.ThemeParkEntity;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -12,7 +11,7 @@ public interface ThemeParkReadUseCase {
 
     List<FindThemeParkResult> getThemeParks();
 
-    FindThemeParkResult getFindThemePark(ThemeParkFindQuery query);
+    FindThemeParkResult getFindThemePark(Long id);
 
     @Getter
     @Builder
