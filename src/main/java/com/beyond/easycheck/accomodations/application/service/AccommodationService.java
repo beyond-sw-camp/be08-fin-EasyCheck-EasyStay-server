@@ -1,12 +1,11 @@
 package com.beyond.easycheck.accomodations.application.service;
 
-import com.beyond.easycheck.accomodations.exception.AccommodationException;
 import com.beyond.easycheck.accomodations.exception.AccommodationMessageType;
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
 import com.beyond.easycheck.accomodations.ui.requestbody.AccommodationCreateRequest;
 import com.beyond.easycheck.accomodations.ui.view.AccommodationView;
-import jakarta.persistence.EntityNotFoundException;
+import com.beyond.easycheck.common.exception.EasyCheckException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -51,7 +50,7 @@ public class AccommodationService {
     public AccommodationView getAccommodationById(Long id) {
 
         AccommodationEntity accommodationEntity = accommodationRepository.findById(id).orElseThrow(
-                () -> new AccommodationException(AccommodationMessageType.ACCOMMODATION_NOT_FOUND)
+                () -> new EasyCheckException(AccommodationMessageType.ACCOMMODATION_NOT_FOUND)
         );
 
         return AccommodationView.of(accommodationEntity);
