@@ -22,7 +22,7 @@ public class AccommodationController {
 
     private final AccommodationService accommodationService;
 
-    @Operation(summary = "시설 정보를 등록하는 API")
+    @Operation(summary = "시설을 등록하는 API")
     @PostMapping("")
     public ResponseEntity<Void> createAccommodation(@RequestBody @Valid AccommodationCreateRequest accommodationCreateRequest) {
 
@@ -31,7 +31,7 @@ public class AccommodationController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @Operation(summary = "모든 시설 정보의 리스트를 반환하는 API")
+    @Operation(summary = "모든 시설의 리스트를 반환하는 API")
     @GetMapping("")
     public ResponseEntity<List<AccommodationView>> getAllAccommodations(
             @RequestParam(defaultValue = "0") int page,
@@ -39,5 +39,14 @@ public class AccommodationController {
 
         List<AccommodationView> accommodation = accommodationService.getAllAccommodations(page, size);
         return ResponseEntity.ok(accommodation);
+    }
+
+    @Operation(summary = "특성 시설의 정보를 반환하는 API")
+    @GetMapping("/{id}")
+    public ResponseEntity<AccommodationView> getAccommodationById(@PathVariable("id") Long id) {
+
+        AccommodationView accommodationView = accommodationService.getAccommodationById(id);
+
+        return ResponseEntity.ok(accommodationView);
     }
 }
