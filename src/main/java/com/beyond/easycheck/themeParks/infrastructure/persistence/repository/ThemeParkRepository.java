@@ -8,4 +8,6 @@ import java.util.List;
 public interface ThemeParkRepository extends JpaRepository<ThemeParkEntity, Long> {
 
     List<ThemeParkEntity> findAll();
+
+    boolean existsByNameAndLocation(String name, String location);
 }

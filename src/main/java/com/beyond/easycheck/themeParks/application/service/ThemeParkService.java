@@ -4,8 +4,10 @@ import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.themeparks.exception.ThemeParkMessageType;
 import com.beyond.easycheck.themeparks.infrastructure.persistence.entity.ThemeParkEntity;
 import com.beyond.easycheck.themeparks.infrastructure.persistence.repository.ThemeParkRepository;
+import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,13 +24,22 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
     @Override
     @Transactional
     public FindThemeParkResult saveThemePark(ThemeParkCreateCommand command) {
+
+        boolean exists = themeParkRepository.existsByNameAndLocation(command.getName(), command.getLocation());
+        if (exists) {
+            throw new EasyCheckException(ThemeParkMessageType.DUPLICATE_THEME_PARK);
+        }
+
+
         try {
             log.info("[ThemeParkService - saveThemePark] command = {}", command);
             return FindThemeParkResult.findByThemeParkEntity(
                     themeParkRepository.save(ThemeParkEntity.createThemePark(command))
             );
-        } catch (EasyCheckException e) {
-            throw new EasyCheckException(ThemeParkMessageType.THEME_PARK_CREATION_FAILED);
+        } catch (DataAccessException | PersistenceException e) {
+            throw new EasyCheckException(ThemeParkMessageType.DATABASE_CONNECTION_FAILED);
+        } catch (Exception e) {
+            throw new EasyCheckException(ThemeParkMessageType.UNKNOWN_ERROR);
         }
 
     }
