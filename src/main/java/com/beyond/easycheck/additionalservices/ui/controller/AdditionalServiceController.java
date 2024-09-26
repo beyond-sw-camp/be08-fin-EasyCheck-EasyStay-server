@@ -55,6 +55,7 @@ public class AdditionalServiceController {
         return ResponseEntity.ok(additionalServiceView);
     }
 
+    @Operation(summary = "부가 서비스를 수정하는 API")
     @PutMapping("/{id}")
     public ResponseEntity<AdditionalServiceView> updateAdditionalService(
             @PathVariable Long id,
