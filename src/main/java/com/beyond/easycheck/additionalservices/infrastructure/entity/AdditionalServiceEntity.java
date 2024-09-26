@@ -26,7 +26,7 @@ public class AdditionalServiceEntity extends BaseTimeEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "accommodation_id", nullable = false)
     @JsonManagedReference
-    private AccommodationEntity accommodationId;
+    private AccommodationEntity accommodationEntity;
 
     @Column(nullable = false)
     private String name;

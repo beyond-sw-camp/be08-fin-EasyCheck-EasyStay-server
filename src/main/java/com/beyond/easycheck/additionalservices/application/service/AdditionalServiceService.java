@@ -29,7 +29,7 @@ public class AdditionalServiceService {
         );
 
         AdditionalServiceEntity additionalServiceEntity = AdditionalServiceEntity.builder()
-                .accommodationId(accommodationEntity)
+                .accommodationEntity(accommodationEntity)
                 .name(additionalServiceCreateRequest.getName())
                 .description(additionalServiceCreateRequest.getDescription())
                 .price(additionalServiceCreateRequest.getPrice())
