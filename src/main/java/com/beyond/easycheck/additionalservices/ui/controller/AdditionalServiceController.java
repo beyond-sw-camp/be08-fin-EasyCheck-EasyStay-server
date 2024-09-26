@@ -1,7 +1,10 @@
 package com.beyond.easycheck.additionalservices.ui.controller;
 
 import com.beyond.easycheck.additionalservices.application.service.AdditionalServiceService;
+import com.beyond.easycheck.additionalservices.infrastructure.entity.AdditionalServiceEntity;
+import com.beyond.easycheck.additionalservices.infrastructure.repository.AdditionalServiceRepository;
 import com.beyond.easycheck.additionalservices.ui.requestbody.AdditionalServiceCreateRequest;
+import com.beyond.easycheck.additionalservices.ui.requestbody.AdditionalServiceUpdateRequest;
 import com.beyond.easycheck.additionalservices.ui.view.AdditionalServiceView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,6 +24,7 @@ import java.util.List;
 public class AdditionalServiceController {
 
     private final AdditionalServiceService additionalServiceService;
+    private final AdditionalServiceRepository additionalServiceRepository;
 
     @Operation(summary = "부가 서비스를 등록하는 API")
     @PostMapping("")
@@ -49,5 +53,17 @@ public class AdditionalServiceController {
         AdditionalServiceView additionalServiceView = additionalServiceService.getAdditionalServiceById(id);
 
         return ResponseEntity.ok(additionalServiceView);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<AdditionalServiceView> updateAdditionalService(
+            @PathVariable Long id,
+            @RequestBody AdditionalServiceUpdateRequest additionalServiceUpdateRequest) {
+
+        additionalServiceService.updateAdditionalService(id, additionalServiceUpdateRequest);
+
+        AdditionalServiceView updatedService = additionalServiceService.getAdditionalServiceById(id);
+
+        return ResponseEntity.ok(updatedService);
     }
 }
