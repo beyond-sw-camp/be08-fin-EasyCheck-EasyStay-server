@@ -60,4 +60,13 @@ public class AccommodationController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "시설의 정보를 삭제하는 API")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteAccommodation(@PathVariable("id") Long id) {
+
+        accommodationService.deleteAccommodation(id);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }
