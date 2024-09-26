@@ -1,4 +1,4 @@
-package com.beyond.easycheck.infrastructure.persistence.entity;
+package com.beyond.easycheck.suggestions.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
