@@ -67,4 +67,13 @@ public class AdditionalServiceController {
 
         return ResponseEntity.ok(updatedService);
     }
+
+    @Operation(summary = "부가 서비스를 삭제하는 API")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteAdditionalService(@PathVariable Long id) {
+
+        additionalServiceService.deleteAdditionalService(id);
+
+        return ResponseEntity.noContent().build();
+    }
 }

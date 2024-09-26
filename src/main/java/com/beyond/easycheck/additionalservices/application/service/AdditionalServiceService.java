@@ -78,4 +78,14 @@ public class AdditionalServiceService {
 
         additionalServiceRepository.save(additionalServiceEntity);
     }
+
+    @Transactional
+    public void deleteAdditionalService(Long id) {
+
+        AdditionalServiceEntity additionalServiceEntity = additionalServiceRepository.findById(id).orElseThrow(
+                () -> new EasyCheckException(AdditionalServiceMessageType.ADDITIONAL_SERVICE_NOT_FOUND)
+        );
+
+        additionalServiceRepository.delete(additionalServiceEntity);
+    }
 }
