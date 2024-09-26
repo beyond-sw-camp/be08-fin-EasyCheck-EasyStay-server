@@ -1,4 +1,4 @@
-package com.beyond.easycheck.rooms.infrastructure.persistence.entity;
+package com.beyond.easycheck.room.infrastructure.persistence.entity;
 
 import com.beyond.easycheck.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;

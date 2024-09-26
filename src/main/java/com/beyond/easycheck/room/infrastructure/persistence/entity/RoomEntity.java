@@ -1,4 +1,4 @@
-package com.beyond.easycheck.rooms.infrastructure.persistence.entity;
+package com.beyond.easycheck.room.infrastructure.persistence.entity;
 
 import com.beyond.easycheck.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -19,8 +19,8 @@ public class RoomEntity extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomId;
 
-    @Column(nullable = false)
-    private Long roomTypeId;
+    @ManyToOne
+    private RoomTypeEntity roomTypeId;
 
     @Column(nullable = false)
     private String roomNumber;

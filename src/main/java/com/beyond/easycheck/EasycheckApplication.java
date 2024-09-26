@@ -8,8 +8,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableJpaAuditing
 @EnableTransactionManagement
 @SpringBootApplication
-@EnableJpaAuditing
-@EnableTransactionManagement
 public class EasycheckApplication {
 
     public static void main(String[] args) {

@@ -1,7 +1,7 @@
-package com.beyond.easycheck.rooms.ui.controller;
+package com.beyond.easycheck.room.ui.controller;
 
-import com.beyond.easycheck.rooms.application.service.RoomService;
-import com.beyond.easycheck.rooms.ui.requestbody.RoomCreateRequest;
+import com.beyond.easycheck.room.application.service.RoomService;
+import com.beyond.easycheck.room.ui.requestbody.Room.RoomCreateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
