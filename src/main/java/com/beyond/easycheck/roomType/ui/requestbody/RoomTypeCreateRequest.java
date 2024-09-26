@@ -2,13 +2,10 @@ package com.beyond.easycheck.roomType.ui.requestbody;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
-@RequiredArgsConstructor(access = lombok.AccessLevel.PUBLIC)
-@AllArgsConstructor
 @Getter
+@ToString
 public class RoomTypeCreateRequest {
 
     @NotNull
@@ -21,6 +18,6 @@ public class RoomTypeCreateRequest {
     private String description;
 
     @NotNull
-    private int maxOccupancy;
+    private Integer maxOccupancy;
 
 }

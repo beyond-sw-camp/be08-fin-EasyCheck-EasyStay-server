@@ -9,10 +9,12 @@ import com.beyond.easycheck.roomType.infrastructure.repository.RoomTypeRepositor
 import com.beyond.easycheck.roomType.ui.requestbody.RoomTypeCreateRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RoomTypeService {
@@ -23,6 +25,7 @@ public class RoomTypeService {
     @Transactional
     public Optional<RoomTypeEntity> createRoomType(RoomTypeCreateRequest roomTypeCreateRequest) {
 
+        log.info("RoomTypeRequest = {}", roomTypeCreateRequest);
         AccommodationEntity accommodationEntity = accommodationRepository.findById(roomTypeCreateRequest.getAccommodationId())
                 .orElseThrow(() -> new EasyCheckException(CommonMessageType.NOT_FOUND));
 
