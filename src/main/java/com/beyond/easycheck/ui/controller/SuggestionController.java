@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +21,7 @@ public class SuggestionController {
     private SuggestionService suggestionService;
 
     @PostMapping("")
-    public ResponseEntity<Void> createSuggestion(@RequestBody SuggestionCreateRequest suggestionCreateRequest) {
+    public ResponseEntity<Void> createSuggestion(@RequestBody @Validated SuggestionCreateRequest suggestionCreateRequest) {
 
         suggestionService.createSuggestion(suggestionCreateRequest);
 

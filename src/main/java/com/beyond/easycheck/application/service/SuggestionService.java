@@ -28,7 +28,7 @@ public class SuggestionService {
                 .email(suggestionCreateRequest.getEmail())
                 .title(suggestionCreateRequest.getTitle())
                 .content(suggestionCreateRequest.getContent())
-                .url(suggestionCreateRequest.getUrl())
+                .attachmentPath(suggestionCreateRequest.getAttachmentPath())
                 .agreementType(suggestionCreateRequest.getAgreementType())
                 .build();
 

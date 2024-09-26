@@ -19,20 +19,21 @@ public class SuggestionEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // suggestion_type : 유형
     @NotNull
     @Column(length = 20)
     private String type;
-    // suggestion_type : 유형
 
+    // 주제
     @NotNull
     @Column(length = 20)
     private String subject;
-    // 주제
 
+    // suggester_name : 건의자명
     @NotNull
     @Column(length = 10)
     private String name;
-    // suggester_name : 건의자명
+
 
     @NotNull
     @Column(length = 30)
@@ -47,9 +48,9 @@ public class SuggestionEntity {
     private String content;
 
 
-
-    private String url;
     // attachment_path : 파일 경로
+    private String attachmentPath;
+
 
     @NotNull
     @Enumerated(EnumType.STRING)

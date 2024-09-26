@@ -33,7 +33,7 @@ public class SuggestionCreateRequest {
     private String content;
 
     @NotBlank
-    private String url;
+    private String attachmentPath;
 
     @Enumerated(EnumType.STRING)
     private AgreementType agreementType;
