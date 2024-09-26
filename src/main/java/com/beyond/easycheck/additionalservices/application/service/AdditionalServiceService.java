@@ -54,4 +54,14 @@ public class AdditionalServiceService {
                 .map(AdditionalServiceView::of)
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public AdditionalServiceView getAdditionalServiceById(Long id) {
+
+        AdditionalServiceEntity additionalServiceEntity = additionalServiceRepository.findById(id).orElseThrow(
+                () -> new EasyCheckException(AdditionalServiceMessageType.ADDITIONAL_SERVICE_NOT_FOUND)
+        );
+
+        return AdditionalServiceView.of(additionalServiceEntity);
+    }
 }

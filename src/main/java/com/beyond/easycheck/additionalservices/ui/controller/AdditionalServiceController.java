@@ -42,9 +42,12 @@ public class AdditionalServiceController {
         return ResponseEntity.ok(additionalServiceViews);
     }
 
-//    @Operation(summary = "특정 부가 서비스를 조회하는 API")
-//    @GetMapping("")
-//    public ResponseEntity<AdditionalServiceView> getAdditionalServiceById() {
-//
-//    }
+    @Operation(summary = "특정 부가 서비스를 조회하는 API")
+    @GetMapping("/{id}")
+    public ResponseEntity<AdditionalServiceView> getAdditionalServiceById(@PathVariable("id") Long id) {
+
+        AdditionalServiceView additionalServiceView = additionalServiceService.getAdditionalServiceById(id);
+
+        return ResponseEntity.ok(additionalServiceView);
+    }
 }
