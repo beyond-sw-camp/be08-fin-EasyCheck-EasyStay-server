@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @EnableJpaAuditing
-@EnableTransactionManagement
 @SpringBootApplication
 public class EasycheckApplication {
 
