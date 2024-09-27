@@ -1,4 +1,4 @@
-package com.beyond.easycheck.themeparks.ui.view;
+package com.beyond.easycheck.common.ui.view;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
