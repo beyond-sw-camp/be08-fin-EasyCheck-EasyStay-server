@@ -11,10 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping ("/api/v1/parks")
@@ -38,6 +37,24 @@ public class ThemeParkController {
         FindThemeParkResult result = themeParkOperationUseCase.saveThemePark(command);
 
         return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponseView<>(new ThemeParkView(result)));
+    }
+
+    @GetMapping("")
+    public ResponseEntity<ApiResponseView<List<ThemeParkView>>> getAllThemeParks() {
+
+        List<FindThemeParkResult> results = themeParkReadUseCase.getThemeParks();
+
+    return ResponseEntity.status(HttpStatus.OK)
+            .body(new ApiResponseView<>(results.stream().map(ThemeParkView::new).toList()));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponseView<ThemeParkView>> getThemePark(@PathVariable Long id) {
+
+        FindThemeParkResult result = themeParkReadUseCase.getFindThemePark(id);
+
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponseView<>(new ThemeParkView(result)));
     }
 }
