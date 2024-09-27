@@ -38,4 +38,12 @@ public class RoomTypeService {
 
         roomTypeRepository.save(roomType);
     }
+
+    @Transactional
+    public void deleteRoomType(Long roomTypeId) {
+        RoomTypeEntity roomType = roomTypeRepository.findById(roomTypeId)
+                .orElseThrow(() -> new EasyCheckException(CommonMessageType.NOT_FOUND));
+
+        roomTypeRepository.delete(roomType);
+    }
 }
