@@ -24,7 +24,7 @@ public class RoomEntity extends BaseTimeEntity {
     @ManyToOne
     @JoinColumn(name = "room_type_id", nullable = false)
     @JsonManagedReference
-    private RoomTypeEntity roomTypeId;
+    private RoomTypeEntity roomTypeEntity;
 
     @Column(nullable = false)
     private String roomNumber;
