@@ -2,9 +2,11 @@ package com.beyond.easycheck.themeparks.ui.controller;
 
 import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUseCase;
 import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUseCase.ThemeParkCreateCommand;
+import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUseCase.ThemeParkUpdateCommand;
 import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase;
 import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase.FindThemeParkResult;
 import com.beyond.easycheck.themeparks.ui.requestbody.ThemeParkCreateRequest;
+import com.beyond.easycheck.themeparks.ui.requestbody.ThemeParkUpdateRequest;
 import com.beyond.easycheck.themeparks.ui.view.ApiResponseView;
 import com.beyond.easycheck.themeparks.ui.view.ThemeParkView;
 import lombok.RequiredArgsConstructor;
@@ -56,5 +58,29 @@ public class ThemeParkController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponseView<>(new ThemeParkView(result)));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponseView<ThemeParkView>> updateThemePark(
+            @PathVariable Long id,
+            @RequestBody @Validated ThemeParkUpdateRequest request) {
+
+        ThemeParkUpdateCommand command = ThemeParkUpdateCommand.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .location(request.getLocation())
+                .image(request.getImage())
+                .build();
+
+        FindThemeParkResult result = themeParkOperationUseCase.updateThemePark(id, command);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponseView<>(new ThemeParkView(result)));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteThemePark(@PathVariable Long id) {
+        themeParkOperationUseCase.deleteThemePark(id);
+        return ResponseEntity.noContent().build();
     }
 }
