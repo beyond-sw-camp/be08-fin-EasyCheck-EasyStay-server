@@ -10,6 +10,10 @@ public interface ThemeParkOperationUseCase {
 
     FindThemeParkResult saveThemePark(ThemeParkCreateCommand command);
 
+    FindThemeParkResult updateThemePark(Long id, ThemeParkUpdateCommand command);
+
+    void deleteThemePark(Long id);
+
     @Getter
     @Builder
     class ThemeParkCreateCommand {
@@ -26,5 +30,14 @@ public interface ThemeParkOperationUseCase {
                 throw new EasyCheckException(ThemeParkMessageType.VALIDATION_FAILED);
             }
         }
+    }
+
+    @Getter
+    @Builder
+    class ThemeParkUpdateCommand {
+        private final String name;
+        private final String description;
+        private final String location;
+        private final String image;
     }
 }
