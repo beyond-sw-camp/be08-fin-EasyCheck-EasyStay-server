@@ -1,4 +1,4 @@
-package com.beyond.easycheck.roomType.infrastructure.entity;
+package com.beyond.easycheck.roomtypes.infrastructure.entity;
 
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.common.entity.BaseTimeEntity;

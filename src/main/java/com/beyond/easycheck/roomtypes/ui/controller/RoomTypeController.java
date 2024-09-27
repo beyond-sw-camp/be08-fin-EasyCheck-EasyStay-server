@@ -1,8 +1,8 @@
-package com.beyond.easycheck.roomType.ui.controller;
+package com.beyond.easycheck.roomtypes.ui.controller;
 
-import com.beyond.easycheck.roomType.application.service.RoomTypeService;
-import com.beyond.easycheck.roomType.ui.requestbody.RoomTypeCreateRequest;
-import com.beyond.easycheck.roomType.ui.requestbody.RoomTypeReadRequest;
+import com.beyond.easycheck.roomtypes.application.service.RoomTypeService;
+import com.beyond.easycheck.roomtypes.ui.requestbody.RoomTypeCreateRequest;
+import com.beyond.easycheck.roomtypes.ui.requestbody.RoomTypeReadRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
