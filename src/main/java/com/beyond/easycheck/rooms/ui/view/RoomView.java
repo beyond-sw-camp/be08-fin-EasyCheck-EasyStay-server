@@ -1,6 +1,6 @@
-package com.beyond.easycheck.room.ui.view;
+package com.beyond.easycheck.rooms.ui.view;
 
-import com.beyond.easycheck.room.infrastructure.persistence.entity.RoomStatus;
+import com.beyond.easycheck.rooms.infrastructure.entity.RoomStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

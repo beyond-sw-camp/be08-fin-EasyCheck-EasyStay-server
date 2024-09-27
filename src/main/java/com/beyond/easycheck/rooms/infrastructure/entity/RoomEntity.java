@@ -1,6 +1,8 @@
-package com.beyond.easycheck.room.infrastructure.persistence.entity;
+package com.beyond.easycheck.rooms.infrastructure.entity;
 
 import com.beyond.easycheck.common.entity.BaseTimeEntity;
+import com.beyond.easycheck.roomtypes.infrastructure.entity.RoomTypeEntity;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +22,8 @@ public class RoomEntity extends BaseTimeEntity {
     private Long roomId;
 
     @ManyToOne
+    @JoinColumn(name = "room_type_id", nullable = false)
+    @JsonManagedReference
     private RoomTypeEntity roomTypeId;
 
     @Column(nullable = false)

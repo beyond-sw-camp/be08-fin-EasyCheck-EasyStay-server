@@ -1,6 +1,6 @@
-package com.beyond.easycheck.room.ui.requestbody.Room;
+package com.beyond.easycheck.rooms.ui.requestbody;
 
-import com.beyond.easycheck.room.infrastructure.persistence.entity.RoomStatus;
+import com.beyond.easycheck.rooms.infrastructure.entity.RoomStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
