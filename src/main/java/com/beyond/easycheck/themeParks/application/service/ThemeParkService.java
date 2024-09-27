@@ -47,6 +47,29 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
     }
 
     @Override
+    @Transactional
+    public FindThemeParkResult updateThemePark(Long id, ThemeParkUpdateCommand command) {
+        ThemeParkEntity themeParkEntity = themeParkRepository.findById(id)
+                .orElseThrow(() -> new EasyCheckException(ThemeParkMessageType.THEME_PARK_NOT_FOUND));
+
+        themeParkEntity.update(command.getName(), command.getDescription(), command.getLocation(), command.getImage());
+
+        ThemeParkEntity updatedEntity = themeParkRepository.save(themeParkEntity);
+
+        return FindThemeParkResult.findByThemeParkEntity(updatedEntity);
+    }
+
+    @Override
+    @Transactional
+    public void deleteThemePark(Long id) {
+        if (!themeParkRepository.existsById(id)) {
+            throw new EasyCheckException(ThemeParkMessageType.THEME_PARK_NOT_FOUND);
+        }
+
+        themeParkRepository.deleteById(id);
+    }
+
+    @Override
     public List<FindThemeParkResult> getThemeParks() {
         log.info("[ThemeParkService - getThemeParks]");
 

@@ -44,4 +44,11 @@ public class ThemeParkEntity extends BaseTimeEntity {
                 command.getImage()
         );
     }
+
+    public void update(String name, String description, String location, String image) {
+        this.name = name;
+        this.description = description;
+        this.location = location;
+        this.image = image;
+    }
 }
