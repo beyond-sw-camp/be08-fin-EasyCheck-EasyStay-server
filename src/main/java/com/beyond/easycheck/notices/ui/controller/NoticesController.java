@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Suggestions", description = "건의사항 관리 API")
+@Tag(name = "Notices", description = "공지사항 관리 API")
 @RestController
-@RequestMapping("/api/v1/suggestions")
+@RequestMapping("/api/v1/notices-reply")
 public class NoticesController {
 
     @Autowired

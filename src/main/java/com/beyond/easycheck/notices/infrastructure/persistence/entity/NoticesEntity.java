@@ -1,5 +1,7 @@
 package com.beyond.easycheck.notices.infrastructure.persistence.entity;
 
+import com.beyond.easycheck.common.entity.BaseTimeEntity;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -13,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Table(name = "Notices")
-public class NoticesEntity {
+public class NoticesEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -21,12 +21,12 @@ public class NoticesService {
     @Transactional
     public Optional<NoticesEntity> createNotices(NoticesCreateRequest suggestionCreateRequest) {
 
-        NoticesEntity suggestion = NoticesEntity.builder()
+        NoticesEntity notices = NoticesEntity.builder()
                 .title(suggestionCreateRequest.getTitle())
                 .content(suggestionCreateRequest.getContent())
                 .build();
 
-        return Optional.of(noticesRepository.save(suggestion));
+        return Optional.of(noticesRepository.save(notices));
 
     }
 
