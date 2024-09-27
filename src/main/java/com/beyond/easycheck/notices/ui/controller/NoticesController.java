@@ -1,7 +1,7 @@
-package com.beyond.easycheck.ui.controller;
+package com.beyond.easycheck.notices.ui.controller;
 
-import com.beyond.easycheck.application.service.SuggestionService;
-import com.beyond.easycheck.ui.requestbody.SuggestionCreateRequest;
+import com.beyond.easycheck.notices.application.service.NoticesService;
+import com.beyond.easycheck.notices.ui.requestbody.NoticesCreateRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,15 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Suggestions", description = "건의사항 관리 API")
 @RestController
 @RequestMapping("/api/v1/suggestions")
-public class SuggestionController {
+public class NoticesController {
 
     @Autowired
-    private SuggestionService suggestionService;
+    private NoticesService noticesService;
 
     @PostMapping("")
-    public ResponseEntity<Void> createSuggestion(@RequestBody @Validated SuggestionCreateRequest suggestionCreateRequest) {
+    public ResponseEntity<Void> createNotices(@RequestBody @Validated NoticesCreateRequest noticesCreateRequest) {
 
-        suggestionService.createSuggestion(suggestionCreateRequest);
+        noticesService.createNotices(noticesCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
