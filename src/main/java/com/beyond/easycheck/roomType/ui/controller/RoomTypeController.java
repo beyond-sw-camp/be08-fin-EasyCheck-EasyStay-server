@@ -7,10 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,10 +19,16 @@ public class RoomTypeController {
 
     @PostMapping("")
     @Operation(summary = "객실 유형 생성 API")
-    public ResponseEntity<Void> createRoom(@RequestBody RoomTypeCreateRequest roomTypeCreateRequest) {
+    public ResponseEntity<Void> createRoomType(@RequestBody RoomTypeCreateRequest roomTypeCreateRequest) {
         roomTypeService.createRoomType(roomTypeCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @DeleteMapping("/{id}")
+    @Operation(summary = "객실 유형 삭제 API")
+    public ResponseEntity<Void> deleteRoomType(@PathVariable Long id) {
+        roomTypeService.deleteRoomType(id);
+        return ResponseEntity.noContent().build();
+    }
 }
 
