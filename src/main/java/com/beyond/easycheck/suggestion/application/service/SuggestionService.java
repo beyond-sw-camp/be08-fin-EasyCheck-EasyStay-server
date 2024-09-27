@@ -1,8 +1,8 @@
-package com.beyond.easycheck.application.service;
+package com.beyond.easycheck.suggestion.application.service;
 
-import com.beyond.easycheck.infrastructure.persistence.entity.SuggestionEntity;
-import com.beyond.easycheck.infrastructure.persistence.repository.SuggestionsRepository;
-import com.beyond.easycheck.ui.requestbody.SuggestionCreateRequest;
+import com.beyond.easycheck.suggestion.infrastructure.persistence.entity.SuggestionEntity;
+import com.beyond.easycheck.suggestion.infrastructure.persistence.repository.SuggestionsRepository;
+import com.beyond.easycheck.suggestion.ui.requestbody.SuggestionCreateRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
