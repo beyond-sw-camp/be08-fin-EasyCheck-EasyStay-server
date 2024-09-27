@@ -1,17 +1,22 @@
 package com.beyond.easycheck.themeparks.application.service;
 
-import com.beyond.easycheck.common.entity.BaseTimeEntity;
 import com.beyond.easycheck.themeparks.infrastructure.persistence.entity.ThemeParkEntity;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+import java.util.List;
+
 public interface ThemeParkReadUseCase {
 
+    List<FindThemeParkResult> getThemeParks();
+
+    FindThemeParkResult getFindThemePark(Long id);
 
     @Getter
     @Builder
-    class FindThemeParkResult extends BaseTimeEntity {
+    @EqualsAndHashCode
+    class FindThemeParkResult {
         private final Long id;
 
         private final String name;

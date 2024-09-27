@@ -3,7 +3,7 @@ package com.beyond.easycheck.themeparks.ui.requestbody;
 import lombok.Getter;
 
 @Getter
-public class ThemeParkCreateRequest {
+public class ThemeParkUpdateRequest {
 
     public String name;
 
