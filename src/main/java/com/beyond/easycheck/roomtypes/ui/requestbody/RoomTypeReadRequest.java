@@ -1,4 +1,4 @@
-package com.beyond.easycheck.roomType.ui.requestbody;
+package com.beyond.easycheck.roomtypes.ui.requestbody;
 
 import lombok.Builder;
 import lombok.Getter;

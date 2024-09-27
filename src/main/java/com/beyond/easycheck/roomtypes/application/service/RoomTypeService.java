@@ -1,13 +1,13 @@
-package com.beyond.easycheck.roomType.application.service;
+package com.beyond.easycheck.roomtypes.application.service;
 
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
 import com.beyond.easycheck.common.exception.CommonMessageType;
 import com.beyond.easycheck.common.exception.EasyCheckException;
-import com.beyond.easycheck.roomType.infrastructure.entity.RoomTypeEntity;
-import com.beyond.easycheck.roomType.infrastructure.repository.RoomTypeRepository;
-import com.beyond.easycheck.roomType.ui.requestbody.RoomTypeCreateRequest;
-import com.beyond.easycheck.roomType.ui.requestbody.RoomTypeReadRequest;
+import com.beyond.easycheck.roomtypes.infrastructure.entity.RoomTypeEntity;
+import com.beyond.easycheck.roomtypes.infrastructure.repository.RoomTypeRepository;
+import com.beyond.easycheck.roomtypes.ui.requestbody.RoomTypeCreateRequest;
+import com.beyond.easycheck.roomtypes.ui.requestbody.RoomTypeReadRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
