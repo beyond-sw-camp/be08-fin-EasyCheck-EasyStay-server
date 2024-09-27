@@ -2,6 +2,7 @@ package com.beyond.easycheck.roomType.application.service;
 
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
+import com.beyond.easycheck.common.entity.BaseTimeEntity;
 import com.beyond.easycheck.common.exception.CommonMessageType;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.roomType.infrastructure.entity.RoomTypeEntity;
@@ -23,9 +24,8 @@ public class RoomTypeService {
     private final AccommodationRepository accommodationRepository;
 
     @Transactional
-    public Optional<RoomTypeEntity> createRoomType(RoomTypeCreateRequest roomTypeCreateRequest) {
+    public void createRoomType(RoomTypeCreateRequest roomTypeCreateRequest) {
 
-        log.info("RoomTypeRequest = {}", roomTypeCreateRequest);
         AccommodationEntity accommodationEntity = accommodationRepository.findById(roomTypeCreateRequest.getAccommodationId())
                 .orElseThrow(() -> new EasyCheckException(CommonMessageType.NOT_FOUND));
 
@@ -36,6 +36,6 @@ public class RoomTypeService {
                 .maxOccupancy(roomTypeCreateRequest.getMaxOccupancy())
                 .build();
 
-        return Optional.of(roomTypeRepository.save(roomType));
+        roomTypeRepository.save(roomType);
     }
 }
