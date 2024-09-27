@@ -54,9 +54,7 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
 
         themeParkEntity.update(command.getName(), command.getDescription(), command.getLocation(), command.getImage());
 
-        ThemeParkEntity updatedEntity = themeParkRepository.save(themeParkEntity);
-
-        return FindThemeParkResult.findByThemeParkEntity(updatedEntity);
+        return FindThemeParkResult.findByThemeParkEntity(themeParkEntity);
     }
 
     @Override
