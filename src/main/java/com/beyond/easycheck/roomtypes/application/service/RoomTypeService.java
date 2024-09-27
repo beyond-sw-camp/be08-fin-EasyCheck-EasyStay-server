@@ -8,6 +8,7 @@ import com.beyond.easycheck.roomtypes.infrastructure.entity.RoomTypeEntity;
 import com.beyond.easycheck.roomtypes.infrastructure.repository.RoomTypeRepository;
 import com.beyond.easycheck.roomtypes.ui.requestbody.RoomTypeCreateRequest;
 import com.beyond.easycheck.roomtypes.ui.requestbody.RoomTypeReadRequest;
+import com.beyond.easycheck.roomtypes.ui.requestbody.RoomTypeUpdateRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -78,6 +79,16 @@ public class RoomTypeService {
                 )).collect(Collectors.toList());
 
         return roomTypeReadRequests;
+    }
+
+    @Transactional
+    public void updateRoomType(Long roomTypeId, RoomTypeUpdateRequest roomTypeUpdateRequest) {
+
+        RoomTypeEntity roomType = roomTypeRepository.findById(roomTypeId)
+                .orElseThrow(() -> new EasyCheckException(CommonMessageType.NOT_FOUND));
+
+        roomType.update(roomTypeUpdateRequest);
+
     }
 
     @Transactional

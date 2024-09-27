@@ -3,6 +3,7 @@ package com.beyond.easycheck.roomtypes.ui.controller;
 import com.beyond.easycheck.roomtypes.application.service.RoomTypeService;
 import com.beyond.easycheck.roomtypes.ui.requestbody.RoomTypeCreateRequest;
 import com.beyond.easycheck.roomtypes.ui.requestbody.RoomTypeReadRequest;
+import com.beyond.easycheck.roomtypes.ui.requestbody.RoomTypeUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,13 @@ public class RoomTypeController {
     public ResponseEntity<List<RoomTypeReadRequest>> readRoomTypes() {
         List<RoomTypeReadRequest> roomTypeReadRequests = roomTypeService.readRoomTypes();
         return ResponseEntity.ok().body(roomTypeReadRequests);
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "객실 유형 수정 API")
+    public ResponseEntity<Void> updateRoomType(@PathVariable Long id, @RequestBody RoomTypeUpdateRequest roomTypeUpdateRequest) {
+        roomTypeService.updateRoomType(id, roomTypeUpdateRequest);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")

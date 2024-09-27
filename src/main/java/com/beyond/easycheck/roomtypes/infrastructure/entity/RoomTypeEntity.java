@@ -2,6 +2,7 @@ package com.beyond.easycheck.roomtypes.infrastructure.entity;
 
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.common.entity.BaseTimeEntity;
+import com.beyond.easycheck.roomtypes.ui.requestbody.RoomTypeUpdateRequest;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -36,5 +37,11 @@ public class RoomTypeEntity extends BaseTimeEntity {
 
     @Column(nullable = false)
     private int maxOccupancy;
+
+    public void update(RoomTypeUpdateRequest roomTypeUpdateRequest) {
+        typeName = roomTypeUpdateRequest.getTypeName();
+        description = roomTypeUpdateRequest.getDescription();
+        maxOccupancy = roomTypeUpdateRequest.getMaxOccupancy();
+    }
 
 }
