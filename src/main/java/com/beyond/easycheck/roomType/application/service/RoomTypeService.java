@@ -2,18 +2,19 @@ package com.beyond.easycheck.roomType.application.service;
 
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
-import com.beyond.easycheck.common.entity.BaseTimeEntity;
 import com.beyond.easycheck.common.exception.CommonMessageType;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.roomType.infrastructure.entity.RoomTypeEntity;
 import com.beyond.easycheck.roomType.infrastructure.repository.RoomTypeRepository;
 import com.beyond.easycheck.roomType.ui.requestbody.RoomTypeCreateRequest;
+import com.beyond.easycheck.roomType.ui.requestbody.RoomTypeReadRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -37,6 +38,46 @@ public class RoomTypeService {
                 .build();
 
         roomTypeRepository.save(roomType);
+    }
+
+    @Transactional
+    public RoomTypeReadRequest readRoomType(Long roomTypeId) {
+
+        RoomTypeEntity roomTypeEntity = roomTypeRepository.findById(roomTypeId)
+                .orElseThrow(() -> new EasyCheckException(CommonMessageType.NOT_FOUND));
+
+        AccommodationEntity accommodationEntity = accommodationRepository.findById(roomTypeEntity.getAccommodationEntity().getId())
+                .orElseThrow(() -> new EasyCheckException(CommonMessageType.NOT_FOUND));
+
+        RoomTypeReadRequest roomTypeReadRequest = RoomTypeReadRequest.builder()
+                .accomodationId(accommodationEntity.getId())
+                .roomTypeId(roomTypeEntity.getRoomTypeId())
+                .typeName(roomTypeEntity.getTypeName())
+                .description(roomTypeEntity.getDescription())
+                .maxOccupancy(roomTypeEntity.getMaxOccupancy())
+                .build();
+
+        return roomTypeReadRequest;
+    }
+
+    @Transactional
+    public List<RoomTypeReadRequest> readRoomTypes() {
+
+        List<RoomTypeEntity> roomTypeEntities = roomTypeRepository.findAll();
+
+        if (roomTypeEntities.isEmpty()) {
+            throw new EasyCheckException(CommonMessageType.NOT_FOUND);
+        }
+        List<RoomTypeReadRequest> roomTypeReadRequests = roomTypeEntities.stream()
+                .map(roomTypeEntity -> new RoomTypeReadRequest(
+                        roomTypeEntity.getRoomTypeId(),
+                        roomTypeEntity.getAccommodationEntity().getId(),
+                        roomTypeEntity.getTypeName(),
+                        roomTypeEntity.getDescription(),
+                        roomTypeEntity.getMaxOccupancy()
+                )).collect(Collectors.toList());
+
+        return roomTypeReadRequests;
     }
 
     @Transactional
