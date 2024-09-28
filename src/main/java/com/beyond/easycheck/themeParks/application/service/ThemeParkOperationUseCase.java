@@ -1,8 +1,8 @@
-package com.beyond.easycheck.themeparks.application.service;
+package com.beyond.easycheck.themeParks.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
-import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase.FindThemeParkResult;
-import com.beyond.easycheck.themeparks.exception.ThemeParkMessageType;
+import com.beyond.easycheck.themeParks.application.service.ThemeParkReadUseCase.FindThemeParkResult;
+import com.beyond.easycheck.themeParks.exception.ThemeParkMessageType;
 import lombok.Builder;
 import lombok.Getter;
 
