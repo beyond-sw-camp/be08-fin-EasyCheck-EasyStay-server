@@ -1,9 +1,9 @@
-package com.beyond.easycheck.themeparks.application.service;
+package com.beyond.easycheck.themeParks.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
-import com.beyond.easycheck.themeparks.exception.ThemeParkMessageType;
-import com.beyond.easycheck.themeparks.infrastructure.persistence.entity.ThemeParkEntity;
-import com.beyond.easycheck.themeparks.infrastructure.persistence.repository.ThemeParkRepository;
+import com.beyond.easycheck.themeParks.exception.ThemeParkMessageType;
+import com.beyond.easycheck.themeParks.infrastructure.persistence.entity.ThemeParkEntity;
+import com.beyond.easycheck.themeParks.infrastructure.persistence.repository.ThemeParkRepository;
 import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
