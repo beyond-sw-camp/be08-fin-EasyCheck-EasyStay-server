@@ -1,4 +1,4 @@
-package com.beyond.easycheck.suggestions.exception;
+package com.beyond.easycheck.suggestion.exception;
 
 import com.beyond.easycheck.common.exception.MessageType;
 import lombok.Getter;
