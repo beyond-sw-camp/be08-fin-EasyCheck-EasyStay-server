@@ -1,6 +1,7 @@
 package com.beyond.easycheck.rooms.infrastructure.entity;
 
 import com.beyond.easycheck.common.entity.BaseTimeEntity;
+import com.beyond.easycheck.rooms.ui.requestbody.RoomUpdateRequest;
 import com.beyond.easycheck.roomtypes.infrastructure.entity.RoomTypeEntity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -36,4 +37,9 @@ public class RoomEntity extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private RoomStatus status;
 
+    public void update(RoomUpdateRequest roomUpdateRequest) {
+        roomNumber = roomUpdateRequest.getRoomNumber();
+        roomPic = roomUpdateRequest.getRoomPic();
+        status = roomUpdateRequest.getStatus();
+    }
 }
