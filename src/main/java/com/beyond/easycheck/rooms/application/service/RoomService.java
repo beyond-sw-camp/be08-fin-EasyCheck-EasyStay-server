@@ -25,7 +25,7 @@ public class RoomService {
                 .orElseThrow(() -> new EasyCheckException(CommonMessageType.NOT_FOUND));
 
         RoomEntity room = RoomEntity.builder()
-                .roomTypeId(roomType)
+                .roomTypeEntity(roomType)
                 .roomNumber(roomCreateRequest.getRoomNumber())
                 .roomPic(roomCreateRequest.getRoomPic())
                 .status(roomCreateRequest.getStatus())
