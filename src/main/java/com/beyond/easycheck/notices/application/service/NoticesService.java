@@ -56,4 +56,13 @@ public class NoticesService {
 
         return NoticesView.of(noticesEntity);
     }
+
+    public void deleteNotices(Long id) {
+
+        NoticesEntity noticesEntity = noticesRepository.findById(id).orElseThrow(
+                () -> new EasyCheckException(NoticesMessageType.NOTICES_NOT_FOUND)
+        );
+
+        noticesRepository.delete(noticesEntity);
+    }
 }
