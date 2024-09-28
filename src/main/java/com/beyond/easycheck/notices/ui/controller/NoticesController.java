@@ -47,4 +47,14 @@ public class NoticesController {
 
         return ResponseEntity.ok(noticesView);
     }
+
+    @Operation(summary = "공지사항을 삭제하는 API")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteNotices(@PathVariable("id") Long id) {
+
+        noticesService.deleteNotices(id);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 }
