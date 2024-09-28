@@ -1,4 +1,4 @@
-package com.beyond.easycheck.themeparks.ui.requestbody;
+package com.beyond.easycheck.themeParks.ui.requestbody;
 
 import lombok.Getter;
 
