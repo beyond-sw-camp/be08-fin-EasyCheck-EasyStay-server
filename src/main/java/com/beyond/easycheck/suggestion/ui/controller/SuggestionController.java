@@ -1,7 +1,7 @@
-package com.beyond.easycheck.ui.controller;
+package com.beyond.easycheck.suggestion.ui.controller;
 
-import com.beyond.easycheck.application.service.SuggestionService;
-import com.beyond.easycheck.ui.requestbody.SuggestionCreateRequest;
+import com.beyond.easycheck.suggestion.application.service.SuggestionService;
+import com.beyond.easycheck.suggestion.ui.requestbody.SuggestionCreateRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

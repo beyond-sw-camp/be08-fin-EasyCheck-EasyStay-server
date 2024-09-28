@@ -1,6 +1,6 @@
-package com.beyond.easycheck.ui.requestbody;
+package com.beyond.easycheck.suggestion.ui.requestbody;
 
-import com.beyond.easycheck.infrastructure.persistence.entity.AgreementType;
+import com.beyond.easycheck.suggestion.infrastructure.persistence.entity.AgreementType;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
