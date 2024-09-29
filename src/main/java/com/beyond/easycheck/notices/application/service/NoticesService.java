@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 @Transactional
 public class NoticesService {
 
-    @Autowired
     private final NoticesRepository noticesRepository;
 
     public Optional<NoticesEntity> createNotices(NoticesCreateRequest suggestionCreateRequest) {
