@@ -5,6 +5,7 @@ import com.beyond.easycheck.notices.exception.NoticesMessageType;
 import com.beyond.easycheck.notices.infrastructure.persistence.entity.NoticesEntity;
 import com.beyond.easycheck.notices.infrastructure.persistence.repository.NoticesRepository;
 import com.beyond.easycheck.notices.ui.requestbody.NoticesCreateRequest;
+import com.beyond.easycheck.notices.ui.requestbody.NoticesUpdateRequest;
 import com.beyond.easycheck.notices.ui.view.NoticesView;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +22,12 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
+@Transactional
 public class NoticesService {
 
     @Autowired
     private final NoticesRepository noticesRepository;
 
-    @Transactional
     public Optional<NoticesEntity> createNotices(NoticesCreateRequest suggestionCreateRequest) {
 
         NoticesEntity notices = NoticesEntity.builder()
@@ -64,5 +65,18 @@ public class NoticesService {
         );
 
         noticesRepository.delete(noticesEntity);
+    }
+
+    public Optional<Void> updateNotices(Long id, NoticesUpdateRequest noticesUpdateRequest) {
+
+        // 공지사항을 ID로 조회
+        NoticesEntity noticesEntity = noticesRepository.findById(id).orElseThrow(
+                () -> new EasyCheckException(NoticesMessageType.NOTICES_NOT_FOUND)
+        );
+
+        // 업데이트할 필드 설정
+        noticesEntity.updateNotices(noticesUpdateRequest);
+
+        return Optional.empty();
     }
 }
