@@ -2,12 +2,15 @@ package com.beyond.easycheck.notices.infrastructure.persistence.entity;
 
 import com.beyond.easycheck.common.entity.BaseTimeEntity;
 
+import com.beyond.easycheck.notices.ui.requestbody.NoticesUpdateRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.Optional;
 
 @Getter
 @Entity
@@ -30,4 +33,10 @@ public class NoticesEntity extends BaseTimeEntity {
     private String content;
 
 
+    public void updateNotices(NoticesUpdateRequest noticesUpdateRequest) {
+
+        Optional.ofNullable(noticesUpdateRequest.getTitle()).ifPresent(title -> this.title = title);
+        Optional.ofNullable(noticesUpdateRequest.getContent()).ifPresent(content -> this.content = content);
+
+    }
 }

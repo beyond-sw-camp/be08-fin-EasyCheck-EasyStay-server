@@ -2,9 +2,11 @@ package com.beyond.easycheck.notices.ui.controller;
 
 import com.beyond.easycheck.notices.application.service.NoticesService;
 import com.beyond.easycheck.notices.ui.requestbody.NoticesCreateRequest;
+import com.beyond.easycheck.notices.ui.requestbody.NoticesUpdateRequest;
 import com.beyond.easycheck.notices.ui.view.NoticesView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,11 +43,20 @@ public class NoticesController {
 
     @Operation(summary = "특정 공지사항의 정보를 반환하는 API")
     @GetMapping("/{id}")
-    public ResponseEntity<NoticesView> getNotices(@PathVariable("id") long id) {
+    public ResponseEntity<NoticesView> getNotices(@PathVariable("id") Long id) {
 
         NoticesView noticesView = noticesService.getNotices(id);
 
         return ResponseEntity.ok(noticesView);
+    }
+
+    @Operation(summary = "공지사항 정보를 수정하는 API")
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateNotices(@PathVariable("id") Long id, @RequestBody @Valid NoticesUpdateRequest noticesUpdateRequest){
+
+        noticesService.updateNotices(id, noticesUpdateRequest);
+
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "공지사항을 삭제하는 API")
