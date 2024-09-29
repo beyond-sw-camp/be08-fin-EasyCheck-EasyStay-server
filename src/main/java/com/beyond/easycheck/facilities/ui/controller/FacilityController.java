@@ -1,7 +1,10 @@
 package com.beyond.easycheck.facilities.ui.controller;
 
+import com.beyond.easycheck.additionalservices.ui.requestbody.AdditionalServiceUpdateRequest;
+import com.beyond.easycheck.additionalservices.ui.view.AdditionalServiceView;
 import com.beyond.easycheck.facilities.application.service.FacilityService;
 import com.beyond.easycheck.facilities.ui.requestbody.FacilityCreateRequest;
+import com.beyond.easycheck.facilities.ui.requestbody.FacilityUpdateRequest;
 import com.beyond.easycheck.facilities.ui.view.FacilityView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -49,5 +52,18 @@ public class FacilityController {
         FacilityView facilityView = facilityService.getFacilityById(id);
 
         return ResponseEntity.ok(facilityView);
+    }
+
+    @Operation(summary = "부대시설을 수정하는 API")
+    @PutMapping("/{id}")
+    public ResponseEntity<FacilityView> updateFacility(
+            @PathVariable Long id,
+            @RequestBody FacilityUpdateRequest facilityUpdateRequest) {
+
+        facilityService.updateFacility(id, facilityUpdateRequest);
+
+        FacilityView updatedFacility = facilityService.getFacilityById(id);
+
+        return ResponseEntity.ok(updatedFacility);
     }
 }
