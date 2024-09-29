@@ -3,9 +3,6 @@ package com.beyond.easycheck.facilities.application.service;
 import com.beyond.easycheck.accomodations.exception.AccommodationMessageType;
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
-import com.beyond.easycheck.additionalservices.exception.AdditionalServiceMessageType;
-import com.beyond.easycheck.additionalservices.infrastructure.entity.AdditionalServiceEntity;
-import com.beyond.easycheck.additionalservices.ui.requestbody.AdditionalServiceUpdateRequest;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.facilities.exception.FacilityMessageType;
 import com.beyond.easycheck.facilities.infrastructure.entity.FacilityEntity;
@@ -80,5 +77,15 @@ public class FacilityService {
         facilityEntity.updateFacility(facilityUpdateRequest);
 
         facilityRepository.save(facilityEntity);
+    }
+
+    @Transactional
+    public void deleteFacility(Long id) {
+
+        FacilityEntity facilityEntity = facilityRepository.findById(id).orElseThrow(
+                () -> new EasyCheckException(FacilityMessageType.FACILITY_NOT_FOUND)
+        );
+
+        facilityRepository.delete(facilityEntity);
     }
 }

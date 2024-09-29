@@ -3,7 +3,6 @@ package com.beyond.easycheck.facilities.infrastructure.entity;
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.common.entity.BaseTimeEntity;
 import com.beyond.easycheck.facilities.ui.requestbody.FacilityUpdateRequest;
-import com.beyond.easycheck.facilities.ui.view.FacilityView;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
