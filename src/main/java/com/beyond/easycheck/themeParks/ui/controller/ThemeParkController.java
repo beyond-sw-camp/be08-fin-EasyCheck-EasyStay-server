@@ -18,16 +18,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping ("/api/v1/parks")
+@RequestMapping ("/api/v1/accommodations/{accommodationId}/parks")
 @RequiredArgsConstructor
 public class ThemeParkController {
 
     private final ThemeParkOperationUseCase themeParkOperationUseCase;
-
     private final ThemeParkReadUseCase themeParkReadUseCase;
 
     @PostMapping("")
-    public ResponseEntity<ApiResponseView<ThemeParkView>> createThemePark(@RequestBody @Validated ThemeParkCreateRequest request) {
+    public ResponseEntity<ApiResponseView<ThemeParkView>> createThemePark(
+            @PathVariable Long accommodationId,
+            @RequestBody @Validated ThemeParkCreateRequest request) {
 
         ThemeParkCreateCommand command = ThemeParkCreateCommand.builder()
                 .name(request.getName())
@@ -36,25 +37,28 @@ public class ThemeParkController {
                 .image(request.getImage())
                 .build();
 
-        FindThemeParkResult result = themeParkOperationUseCase.saveThemePark(command);
+        FindThemeParkResult result = themeParkOperationUseCase.saveThemePark(command, accommodationId);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponseView<>(new ThemeParkView(result)));
     }
 
     @GetMapping("")
-    public ResponseEntity<ApiResponseView<List<ThemeParkView>>> getAllThemeParks() {
+    public ResponseEntity<ApiResponseView<List<ThemeParkView>>> getAllThemeParks(
+            @PathVariable Long accommodationId) {
 
-        List<FindThemeParkResult> results = themeParkReadUseCase.getThemeParks();
+        List<FindThemeParkResult> results = themeParkReadUseCase.getThemeParks(accommodationId);
 
-    return ResponseEntity.status(HttpStatus.OK)
-            .body(new ApiResponseView<>(results.stream().map(ThemeParkView::new).toList()));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponseView<>(results.stream().map(ThemeParkView::new).toList()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponseView<ThemeParkView>> getThemePark(@PathVariable Long id) {
+    public ResponseEntity<ApiResponseView<ThemeParkView>> getThemePark(
+            @PathVariable Long accommodationId,
+            @PathVariable Long id) {
 
-        FindThemeParkResult result = themeParkReadUseCase.getFindThemePark(id);
+        FindThemeParkResult result = themeParkReadUseCase.getFindThemePark(id, accommodationId);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponseView<>(new ThemeParkView(result)));
@@ -62,6 +66,7 @@ public class ThemeParkController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponseView<ThemeParkView>> updateThemePark(
+            @PathVariable Long accommodationId,
             @PathVariable Long id,
             @RequestBody @Validated ThemeParkUpdateRequest request) {
 
@@ -72,15 +77,18 @@ public class ThemeParkController {
                 .image(request.getImage())
                 .build();
 
-        FindThemeParkResult result = themeParkOperationUseCase.updateThemePark(id, command);
+        FindThemeParkResult result = themeParkOperationUseCase.updateThemePark(id, command, accommodationId);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponseView<>(new ThemeParkView(result)));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteThemePark(@PathVariable Long id) {
-        themeParkOperationUseCase.deleteThemePark(id);
+    public ResponseEntity<Void> deleteThemePark(
+            @PathVariable Long accommodationId,
+            @PathVariable Long id) {
+
+        themeParkOperationUseCase.deleteThemePark(id, accommodationId);
         return ResponseEntity.noContent().build();
     }
 }
