@@ -2,8 +2,8 @@ package com.beyond.easycheck.rooms.ui.controller;
 
 import com.beyond.easycheck.rooms.application.service.RoomService;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomCreateRequest;
-import com.beyond.easycheck.rooms.ui.requestbody.RoomReadRequest;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomUpdateRequest;
+import com.beyond.easycheck.rooms.ui.views.RoomView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -31,16 +31,16 @@ public class RoomController {
 
     @GetMapping("/{id}")
     @Operation(summary = "객실 단일 조회 API")
-    public ResponseEntity<RoomReadRequest> readRoom(@PathVariable Long id) {
-        RoomReadRequest roomReadRequest = roomService.readRoom(id);
-        return ResponseEntity.ok().body(roomReadRequest);
+    public ResponseEntity<RoomView> readRoom(@PathVariable Long id) {
+        RoomView roomView = roomService.readRoom(id);
+        return ResponseEntity.ok().body(roomView);
     }
 
     @GetMapping("")
     @Operation(summary = "객실 전체 조회 API")
-    public ResponseEntity<List<RoomReadRequest>> readRooms() {
-        List<RoomReadRequest> roomReadRequest = roomService.readRooms();
-        return ResponseEntity.ok().body(roomReadRequest);
+    public ResponseEntity<List<RoomView>> readRooms() {
+        List<RoomView> roomViews = roomService.readRooms();
+        return ResponseEntity.ok().body(roomViews);
     }
 
     @PutMapping("/{id}")

@@ -1,4 +1,4 @@
-package com.beyond.easycheck.rooms.ui.requestbody;
+package com.beyond.easycheck.rooms.ui.views;
 
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomStatus;
 import jakarta.validation.constraints.Min;
@@ -6,12 +6,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 @Getter
+@Setter
 @Builder
 @ToString
-public class RoomReadRequest {
+public class RoomView {
 
     @NotNull
     private Long roomId;
@@ -40,7 +42,7 @@ public class RoomReadRequest {
     @Min(1)
     private int maxOccupancy;
 
-    public RoomReadRequest(Long roomId, String roomNumber, String roomPic, RoomStatus status, Long roomTypeId, Long accomodationId, String typeName, String description, int maxOccupancy) {
+    public RoomView(Long roomId, String roomNumber, String roomPic, RoomStatus status, Long roomTypeId, Long accomodationId, String typeName, String description, int maxOccupancy) {
         this.roomId = roomId;
         this.roomNumber = roomNumber;
         this.roomPic = roomPic;
@@ -51,4 +53,5 @@ public class RoomReadRequest {
         this.description = description;
         this.maxOccupancy = maxOccupancy;
     }
+
 }

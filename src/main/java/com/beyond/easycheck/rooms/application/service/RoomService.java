@@ -5,8 +5,8 @@ import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
 import com.beyond.easycheck.rooms.infrastructure.repository.RoomRepository;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomCreateRequest;
-import com.beyond.easycheck.rooms.ui.requestbody.RoomReadRequest;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomUpdateRequest;
+import com.beyond.easycheck.rooms.ui.views.RoomView;
 import com.beyond.easycheck.roomtypes.infrastructure.entity.RoomTypeEntity;
 import com.beyond.easycheck.roomtypes.infrastructure.repository.RoomTypeRepository;
 import jakarta.transaction.Transactional;
@@ -39,14 +39,14 @@ public class RoomService {
         room = roomRepository.save(room);
     }
 
-    public RoomReadRequest readRoom(Long id) {
+    public RoomView readRoom(Long id) {
 
         RoomEntity room = roomRepository.findById(id)
                 .orElseThrow(() -> new EasyCheckException(CommonMessageType.NOT_FOUND));
 
         RoomTypeEntity roomType = room.getRoomTypeEntity();
 
-        RoomReadRequest roomReadRequest = RoomReadRequest.builder()
+        RoomView roomView = RoomView.builder()
                 .roomId(room.getRoomId())
                 .roomNumber(room.getRoomNumber())
                 .roomPic(room.getRoomPic())
@@ -58,19 +58,19 @@ public class RoomService {
                 .maxOccupancy(roomType.getMaxOccupancy())
                 .build();
 
-        return roomReadRequest;
+        return roomView;
     }
 
     @Transactional
-    public List<RoomReadRequest> readRooms() {
+    public List<RoomView> readRooms() {
 
         List<RoomEntity> roomEntities = roomRepository.findAll();
 
         if (roomEntities.isEmpty()) {
             throw new EasyCheckException(CommonMessageType.NOT_FOUND);
         }
-        List<RoomReadRequest> roomReadRequests = roomEntities.stream()
-                .map(roomEntity -> new RoomReadRequest(
+        List<RoomView> roomViews = roomEntities.stream()
+                .map(roomEntity -> new RoomView(
                         roomEntity.getRoomId(),
                         roomEntity.getRoomNumber(),
                         roomEntity.getRoomPic(),
@@ -82,7 +82,7 @@ public class RoomService {
                         roomEntity.getRoomTypeEntity().getMaxOccupancy()
                 )).collect(Collectors.toList());
 
-        return roomReadRequests;
+        return roomViews;
     }
 
     @Transactional
