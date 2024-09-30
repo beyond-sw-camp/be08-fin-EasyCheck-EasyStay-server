@@ -2,7 +2,6 @@ package com.beyond.easycheck.common.security.config;
 
 import com.beyond.easycheck.common.security.filter.JwtAuthenticationFilter;
 import com.beyond.easycheck.common.security.provider.JwtAuthenticationProvider;
-import com.beyond.easycheck.common.security.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +24,7 @@ public class EasyCheckSecurityConfig {
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -34,6 +34,7 @@ public class EasyCheckSecurityConfig {
         // api endpoint
         http
                 .authorizeHttpRequests(registry -> {
+                    registry.requestMatchers("/api/v1/users/auth-test").authenticated();
                     registry.anyRequest().permitAll();
                 });
 
@@ -44,7 +45,7 @@ public class EasyCheckSecurityConfig {
     // 비밀번호 암호화용 인코더 설정
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(10);
     }
 
     @Bean

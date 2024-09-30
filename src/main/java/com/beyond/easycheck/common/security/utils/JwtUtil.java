@@ -44,15 +44,15 @@ public class JwtUtil {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
-                .get("userNo", String.class);
+                .get("userId", String.class);
     }
 
-    public String parseUsername(String token) {
+    public String parseEmail(String token) {
         return Jwts.parser().verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
-                .get("username", String.class);
+                .get("email", String.class);
     }
 
     public Collection<? extends GrantedAuthority> parseAuthorities(String token) {
@@ -62,7 +62,7 @@ public class JwtUtil {
                 .parseSignedClaims(token)
                 .getPayload()
                 .get("authorities", String.class);
-
+        log.info("[parseAuthorities] = {}", authorities);
         return stringToAuthorities(authorities);
 
     }
