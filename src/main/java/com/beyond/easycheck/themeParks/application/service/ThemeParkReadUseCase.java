@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface ThemeParkReadUseCase {
 
-    List<FindThemeParkResult> getThemeParks();
+    List<FindThemeParkResult> getThemeParks(Long accommodationId);
 
-    FindThemeParkResult getFindThemePark(Long id);
+    FindThemeParkResult getFindThemePark(Long id, Long accommodationId);
 
     @Getter
     @Builder

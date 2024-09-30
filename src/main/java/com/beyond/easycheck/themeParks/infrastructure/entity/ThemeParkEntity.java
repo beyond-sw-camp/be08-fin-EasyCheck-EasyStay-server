@@ -1,6 +1,7 @@
 package com.beyond.easycheck.themeparks.infrastructure.entity;
 
 
+import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.common.entity.BaseTimeEntity;
 import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUseCase.ThemeParkCreateCommand;
 import jakarta.persistence.*;
@@ -31,17 +32,19 @@ public class ThemeParkEntity extends BaseTimeEntity {
 
     private String image;
 
-//    @ManyToOne
-//    @JoinColumn
-//    private int accomodationId;
+    // 숙박 시설과의 연관관계 설정
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "accommodation_id", nullable = false)
+    private AccommodationEntity accommodation;
 
-    public static ThemeParkEntity createThemePark(ThemeParkCreateCommand command) {
+    public static ThemeParkEntity createThemePark(ThemeParkCreateCommand command, AccommodationEntity accommodation) {
         return new ThemeParkEntity(
                 null,
                 command.getName(),
                 command.getDescription(),
                 command.getLocation(),
-                command.getImage()
+                command.getImage(),
+                accommodation
         );
     }
 

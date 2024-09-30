@@ -8,11 +8,11 @@ import lombok.Getter;
 
 public interface ThemeParkOperationUseCase {
 
-    FindThemeParkResult saveThemePark(ThemeParkCreateCommand command);
+    FindThemeParkResult saveThemePark(ThemeParkCreateCommand command, Long accommodationId);
 
-    FindThemeParkResult updateThemePark(Long id, ThemeParkUpdateCommand command);
+    FindThemeParkResult updateThemePark(Long id, ThemeParkUpdateCommand command, Long accommodationId);
 
-    void deleteThemePark(Long id);
+    void deleteThemePark(Long id, Long accommodationId);
 
     @Getter
     @Builder
