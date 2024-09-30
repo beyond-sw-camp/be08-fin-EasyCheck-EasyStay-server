@@ -3,11 +3,13 @@ package com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.perm
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @Entity
 @NoArgsConstructor
 @Table(name = "permission")
+@ToString(of = {"id", "name", "description"})
 public class PermissionEntity {
 
     @Id

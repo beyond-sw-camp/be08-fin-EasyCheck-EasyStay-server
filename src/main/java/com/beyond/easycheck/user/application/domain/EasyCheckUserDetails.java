@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class EasyCheckUserDetails implements UserDetails {
 
+    private final Long id;
     private final String email;
     private final String password;
     private final String status;
@@ -30,17 +31,17 @@ public class EasyCheckUserDetails implements UserDetails {
     private Set<String> permissions;
 
     public EasyCheckUserDetails(UserEntity user) {
+        this.id = user.getId();
         this.email = user.getEmail();
         this.password = user.getPassword();
         this.status = user.getStatus();
         this.role = user.getRole().getName();
 
-        this.permissions = user.getUserPermission()
+        this.permissions = user.getUserPermissions()
                 .stream()
                 .map(UserPermissionEntity::getPermission)
                 .map(PermissionEntity::getName)
                 .collect(Collectors.toSet());
-
     }
 
 
