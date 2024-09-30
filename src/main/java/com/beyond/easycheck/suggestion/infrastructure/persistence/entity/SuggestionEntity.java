@@ -1,11 +1,15 @@
 package com.beyond.easycheck.suggestion.infrastructure.persistence.entity;
 
+import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import static jakarta.persistence.FetchType.LAZY;
 
 @Getter
 @Entity
@@ -18,6 +22,11 @@ public class SuggestionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "accommodation_id", nullable = false)
+    @JsonManagedReference
+    private AccommodationEntity accommodationEntity;
 
     // suggestion_type : 유형
     @NotNull
@@ -32,7 +41,7 @@ public class SuggestionEntity {
     // suggester_name : 건의자명
     @NotNull
     @Column(length = 10)
-    private String name;
+    private String suggesterName;
 
 
     @NotNull
