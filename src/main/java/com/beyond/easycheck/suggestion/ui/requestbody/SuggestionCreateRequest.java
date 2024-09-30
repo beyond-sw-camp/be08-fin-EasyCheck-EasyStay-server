@@ -4,6 +4,7 @@ import com.beyond.easycheck.suggestion.infrastructure.persistence.entity.Agreeme
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public class SuggestionCreateRequest {
 
+    @NotNull
+    private Long accommodationId;
+
     @NotBlank
     private String type;
 
@@ -21,7 +25,7 @@ public class SuggestionCreateRequest {
     private String subject;
 
     @NotBlank
-    private String name;
+    private String suggesterName;
 
     @NotBlank
     private String email;
@@ -32,7 +36,6 @@ public class SuggestionCreateRequest {
     @NotBlank
     private String content;
 
-    @NotBlank
     private String attachmentPath;
 
     @Enumerated(EnumType.STRING)
