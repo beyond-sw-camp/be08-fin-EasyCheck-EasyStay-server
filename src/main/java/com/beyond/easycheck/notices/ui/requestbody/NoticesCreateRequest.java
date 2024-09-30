@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 public class NoticesCreateRequest {
 
     @NotNull
-    private Long id;
+    private Long accommodationId;
 
     @NotBlank
     private String title;

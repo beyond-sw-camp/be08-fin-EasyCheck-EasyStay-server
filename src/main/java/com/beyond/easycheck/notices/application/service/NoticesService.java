@@ -1,5 +1,8 @@
 package com.beyond.easycheck.notices.application.service;
 
+import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
+import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
+import com.beyond.easycheck.additionalservices.exception.AdditionalServiceMessageType;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.notices.exception.NoticesMessageType;
 import com.beyond.easycheck.notices.infrastructure.persistence.entity.NoticesEntity;
@@ -26,12 +29,18 @@ import java.util.stream.Collectors;
 public class NoticesService {
 
     private final NoticesRepository noticesRepository;
+    private final AccommodationRepository accommodationRepository;
 
-    public Optional<NoticesEntity> createNotices(NoticesCreateRequest suggestionCreateRequest) {
+    public Optional<NoticesEntity> createNotices(NoticesCreateRequest noticesCreateRequest) {
+
+        AccommodationEntity accommodationEntity = accommodationRepository.findById(noticesCreateRequest.getAccommodationId()).orElseThrow(
+                () -> new EasyCheckException(AdditionalServiceMessageType.ADDITIONAL_SERVICE_NOT_FOUND)
+        );
 
         NoticesEntity notices = NoticesEntity.builder()
-                .title(suggestionCreateRequest.getTitle())
-                .content(suggestionCreateRequest.getContent())
+                .accommodationEntity(accommodationEntity)
+                .title(noticesCreateRequest.getTitle())
+                .content(noticesCreateRequest.getContent())
                 .build();
 
         return Optional.of(noticesRepository.save(notices));
