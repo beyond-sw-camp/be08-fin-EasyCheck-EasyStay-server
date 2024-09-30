@@ -1,8 +1,5 @@
 package com.beyond.easycheck.reservationroom.application.service;
 
-import com.beyond.easycheck.additionalservices.exception.AdditionalServiceMessageType;
-import com.beyond.easycheck.additionalservices.infrastructure.entity.AdditionalServiceEntity;
-import com.beyond.easycheck.additionalservices.ui.requestbody.AdditionalServiceUpdateRequest;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.reservationroom.exception.ReservationRoomMessageType;
 import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationRoomEntity;
@@ -10,6 +7,9 @@ import com.beyond.easycheck.reservationroom.infrastructure.repository.Reservatio
 import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomCreateRequest;
 import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomUpdateRequest;
 import com.beyond.easycheck.reservationroom.ui.view.ReservationRoomView;
+import com.beyond.easycheck.rooms.exception.RoomMessageType;
+import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
+import com.beyond.easycheck.rooms.infrastructure.repository.RoomRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,11 +27,17 @@ import java.util.stream.Collectors;
 public class ReservationRoomService {
 
     private final ReservationRoomRepository reservationRoomRepository;
+    private final RoomRepository roomRepository;
 
     @Transactional
     public ReservationRoomEntity createReservation(ReservationRoomCreateRequest reservationRoomCreateRequest) {
 
+        RoomEntity roomEntity = roomRepository.findById(reservationRoomCreateRequest.getRoomId()).orElseThrow(
+                () -> new EasyCheckException(RoomMessageType.ROOM_NOT_FOUND)
+        );
+
         ReservationRoomEntity reservationRoomEntity = ReservationRoomEntity.builder()
+                .roomEntity(roomEntity)
                 .reservationDate(LocalDateTime.now())
                 .checkinDate(reservationRoomCreateRequest.getCheckinDate())
                 .checkoutDate(reservationRoomCreateRequest.getCheckoutDate())
@@ -59,7 +64,7 @@ public class ReservationRoomService {
     public ReservationRoomView getReservationById(Long id) {
 
         ReservationRoomEntity reservationRoomEntity = reservationRoomRepository.findById(id).orElseThrow(
-                () -> new EasyCheckException(ReservationRoomMessageType.RESERVATION_ROOM_NOT_FOUND)
+                () -> new EasyCheckException(ReservationRoomMessageType.RESERVATION_NOT_FOUND)
         );
 
         return ReservationRoomView.of(reservationRoomEntity);
@@ -69,7 +74,7 @@ public class ReservationRoomService {
     public void cancelReservation(Long id, ReservationRoomUpdateRequest reservationRoomUpdateRequest) {
 
         ReservationRoomEntity reservationRoomEntity = reservationRoomRepository.findById(id).orElseThrow(
-                () -> new EasyCheckException(ReservationRoomMessageType.RESERVATION_ROOM_NOT_FOUND)
+                () -> new EasyCheckException(ReservationRoomMessageType.RESERVATION_NOT_FOUND)
         );
 
         reservationRoomEntity.updateReservationRoom(reservationRoomUpdateRequest);

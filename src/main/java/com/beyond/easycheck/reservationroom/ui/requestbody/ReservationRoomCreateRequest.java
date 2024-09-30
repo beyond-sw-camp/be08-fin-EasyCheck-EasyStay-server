@@ -21,6 +21,9 @@ import java.time.LocalDateTime;
 public class ReservationRoomCreateRequest {
 
     @NotNull
+    private Long roomId;
+
+    @NotNull
     private LocalDateTime reservationDate;
 
     @NotNull(message = "체크인 날짜를 지정해야 합니다.")
