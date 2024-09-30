@@ -23,6 +23,7 @@ public class NoticesController {
     @Autowired
     private NoticesService noticesService;
 
+
     @Operation(summary = "공지사항을 등록하는 API")
     @PostMapping("")
     public ResponseEntity<Void> createNotices(@RequestBody @Validated NoticesCreateRequest noticesCreateRequest) {
