@@ -9,6 +9,8 @@ import com.beyond.easycheck.tickets.application.service.TicketReadUseCase.FindTi
 import com.beyond.easycheck.tickets.infrastructure.entity.TicketEntity;
 import com.beyond.easycheck.tickets.ui.requestbody.TicketRequest;
 import com.beyond.easycheck.tickets.ui.view.TicketView;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Ticket", description = "입장권 정보 관리 API")
 @RestController
 @RequestMapping("/api/v1/parks/{themeParkId}/tickets")
 @RequiredArgsConstructor
@@ -24,6 +27,7 @@ public class TicketController {
     private final TicketOperationUseCase ticketOperationUseCase;
     private final TicketReadUseCase ticketReadUseCase;
 
+    @Operation(summary = "입장권 종류를 등록하는 API")
     @PostMapping("")
     public ResponseEntity<ApiResponseView<TicketView>> createTicket(@PathVariable Long themeParkId,
                                                                     @RequestBody TicketRequest request) {
@@ -43,6 +47,7 @@ public class TicketController {
                 .body(new ApiResponseView<>(new TicketView(ticket)));
     }
 
+    @Operation(summary = "입장권 종류를 수정하는 API")
     @PutMapping("/{ticketId}")
     public ResponseEntity<ApiResponseView<TicketView>> updateTicket(@PathVariable Long themeParkId,
                                                                     @PathVariable Long ticketId,
@@ -63,6 +68,7 @@ public class TicketController {
                 .body(new ApiResponseView<>(new TicketView(updatedTicket)));
     }
 
+    @Operation(summary = "입장권 종류를 삭제하는 API")
     @DeleteMapping("/{ticketId}")
     public ResponseEntity<Void> deleteTicket(@PathVariable Long themeParkId, @PathVariable Long ticketId) {
 
@@ -71,6 +77,7 @@ public class TicketController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @Operation(summary = "해당 테마파크 내 입장권 종류를 조회하는 API")
     @GetMapping("")
     public ResponseEntity<ApiResponseView<List<TicketView>>> getAllTicketsByThemePark(@PathVariable Long themeParkId) {
         List<FindTicketResult> results = ticketReadUseCase.getTicketsByThemePark(themeParkId);
@@ -83,6 +90,7 @@ public class TicketController {
                 .body(new ApiResponseView<>(ticketViews));
     }
 
+    @Operation(summary = "해당 테마파크 내 현재시점에서 판매하고 있는 입장권 조회 API")
     @GetMapping("/on-sale")
     public ResponseEntity<ApiResponseView<List<TicketView>>> getTicketsByThemeParkOnSale(@PathVariable Long themeParkId) {
         List<FindTicketResult> results = ticketReadUseCase.getTicketsByThemeParkOnSale(themeParkId);
@@ -95,6 +103,7 @@ public class TicketController {
                 .body(new ApiResponseView<>(ticketViews));
     }
 
+    @Operation(summary = "입장권 종류를 삭제하는 API")
     @GetMapping("/{ticketId}")
     public ResponseEntity<ApiResponseView<TicketView>> getTicketById(@PathVariable Long ticketId) {
         FindTicketResult result = ticketReadUseCase.getTicketById(ticketId);
