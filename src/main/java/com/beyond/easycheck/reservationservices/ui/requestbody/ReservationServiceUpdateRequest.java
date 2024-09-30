@@ -1,7 +1,8 @@
 package com.beyond.easycheck.reservationservices.ui.requestbody;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import com.beyond.easycheck.reservationservices.infrastructure.entity.ReservationServiceStatus;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -11,11 +12,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReservationServiceUpdateRequest {
 
-    @NotNull
-    @Min(value = 0, message = "price must be greater than or equal to 0")
-    private Integer quantity;
-
-    @NotNull
-    @Min(value = 0, message = "price must be greater than or equal to 0")
-    private Integer totalPrice;
+    @Enumerated(EnumType.STRING)
+    private ReservationServiceStatus reservationServiceStatus;
 }

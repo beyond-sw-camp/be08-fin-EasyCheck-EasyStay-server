@@ -1,6 +1,7 @@
 package com.beyond.easycheck.reservationservices.ui.view;
 
 import com.beyond.easycheck.reservationservices.infrastructure.entity.ReservationServiceEntity;
+import com.beyond.easycheck.reservationservices.infrastructure.entity.ReservationServiceStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,8 @@ public class ReservationServiceView {
 
     private Integer totalPrice;
 
+    private ReservationServiceStatus reservationServiceStatus;
+
     public static ReservationServiceView of(ReservationServiceEntity reservationServiceEntity) {
 
         return new ReservationServiceView(
@@ -28,7 +31,8 @@ public class ReservationServiceView {
                 reservationServiceEntity.getReservationRoomEntity().getId(),
                 reservationServiceEntity.getAdditionalServiceEntity().getId(),
                 reservationServiceEntity.getQuantity(),
-                reservationServiceEntity.getTotalPrice()
+                reservationServiceEntity.getTotalPrice(),
+                reservationServiceEntity.getReservationServiceStatus()
         );
     }
 }

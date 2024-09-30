@@ -47,6 +47,7 @@ public class ReservationServiceService {
                 .additionalServiceEntity(additionalServiceEntity)
                 .quantity(reservationServiceCreateRequest.getQuantity())
                 .totalPrice(reservationServiceCreateRequest.getTotalPrice())
+                .reservationServiceStatus(reservationServiceCreateRequest.getReservationServiceStatus())
                 .build();
 
         return reservationServiceRepository.save(reservationServiceEntity);
@@ -79,7 +80,7 @@ public class ReservationServiceService {
         ReservationServiceEntity reservationServiceEntity = reservationServiceRepository.findById(id).orElseThrow(
                 () -> new EasyCheckException(ReservationServiceMessageType.RESERVATION_SERVICE_NOT_FOUND)
         );
-        
+
         reservationServiceEntity.cancelReservationService(reservationServiceUpdateRequest);
 
         reservationServiceRepository.save(reservationServiceEntity);

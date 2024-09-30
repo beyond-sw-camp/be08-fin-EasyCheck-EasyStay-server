@@ -43,8 +43,11 @@ public class ReservationServiceEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer totalPrice;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReservationServiceStatus reservationServiceStatus;
+
     public void cancelReservationService(ReservationServiceUpdateRequest reservationServiceUpdateRequest) {
-        Optional.ofNullable(reservationServiceUpdateRequest.getQuantity()).ifPresent(quantity -> this.quantity = quantity);
-        Optional.ofNullable(reservationServiceUpdateRequest.getTotalPrice()).ifPresent(totalPrice -> this.totalPrice = totalPrice);
+        Optional.ofNullable(reservationServiceUpdateRequest.getReservationServiceStatus()).ifPresent(reservationServiceStatus -> this.reservationServiceStatus = reservationServiceStatus);
     }
 }
