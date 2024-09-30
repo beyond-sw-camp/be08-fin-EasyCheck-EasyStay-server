@@ -15,7 +15,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.beyond.easycheck.themeparks.exception.ThemeParkMessageType.THEME_PARK_NOT_FOUND;
+import static com.beyond.easycheck.tickets.exception.TicketMessageType.TICKET_NOT_BELONG_TO_THEME_PARK;
 import static com.beyond.easycheck.tickets.exception.TicketMessageType.TICKET_NOT_FOUND;
+import static com.beyond.easycheck.tickets.exception.TicketMessageType.DUPLICATE_TICKET;
+import static com.beyond.easycheck.tickets.exception.TicketMessageType.MISSING_REQUIRED_FIELD;
 
 @Service
 @RequiredArgsConstructor
@@ -31,17 +34,30 @@ public class TicketService implements TicketOperationUseCase, TicketReadUseCase 
         ThemeParkEntity themePark = themeParkRepository.findById(command.getThemeParkId())
                 .orElseThrow(() -> new EasyCheckException(THEME_PARK_NOT_FOUND));
 
-        TicketEntity ticket = TicketEntity.createTicket(command, themePark);
+        if (command.getTicketName() == null || command.getPrice() == null) {
+            throw new EasyCheckException(MISSING_REQUIRED_FIELD);
+        }
 
+        if (ticketRepository.existsByTicketName(command.getTicketName())) {
+            throw new EasyCheckException(DUPLICATE_TICKET);
+        }
+
+        TicketEntity ticket = TicketEntity.createTicket(command, themePark);
         return ticketRepository.save(ticket);
     }
 
     @Override
     @Transactional
-    public TicketEntity updateTicket(Long ticketId, TicketUpdateCommand command) {
+    public TicketEntity updateTicket(Long themeParkId, Long ticketId, TicketUpdateCommand command) {
+        ThemeParkEntity themePark = themeParkRepository.findById(themeParkId)
+                .orElseThrow(() -> new EasyCheckException(THEME_PARK_NOT_FOUND));
 
         TicketEntity ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new EasyCheckException(TICKET_NOT_FOUND));
+
+        if (!ticket.getThemePark().getId().equals(themePark.getId())) {
+            throw new EasyCheckException(TICKET_NOT_BELONG_TO_THEME_PARK);
+        }
 
         ticket.update(
                 command.getTicketName(),
@@ -57,9 +73,16 @@ public class TicketService implements TicketOperationUseCase, TicketReadUseCase 
 
     @Override
     @Transactional
-    public void deleteTicket(Long ticketId) {
+    public void deleteTicket(Long themeParkId, Long ticketId) {
+        ThemeParkEntity themePark = themeParkRepository.findById(themeParkId)
+                .orElseThrow(() -> new EasyCheckException(THEME_PARK_NOT_FOUND));
+
         TicketEntity ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new EasyCheckException(TICKET_NOT_FOUND));
+
+        if (!ticket.getThemePark().getId().equals(themePark.getId())) {
+            throw new EasyCheckException(TICKET_NOT_BELONG_TO_THEME_PARK);
+        }
 
         ticketRepository.delete(ticket);
     }

@@ -10,9 +10,9 @@ public interface TicketOperationUseCase {
 
     TicketEntity createTicket(TicketCreateCommand command);
 
-    TicketEntity updateTicket(Long ticketId, TicketUpdateCommand command);
+    TicketEntity updateTicket(Long themeParkId, Long ticketId, TicketUpdateCommand command);
 
-    void deleteTicket(Long ticketId);
+    void deleteTicket(Long themeParkId, Long ticketId);
 
     @Getter
     @Builder

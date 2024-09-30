@@ -57,7 +57,7 @@ public class TicketController {
                 .validToDate(request.getValidToDate())
                 .build();
 
-        TicketEntity updatedTicket = ticketOperationUseCase.updateTicket(ticketId, command);
+        TicketEntity updatedTicket = ticketOperationUseCase.updateTicket(themeParkId, ticketId, command);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponseView<>(new TicketView(updatedTicket)));
@@ -66,7 +66,7 @@ public class TicketController {
     @DeleteMapping("/{ticketId}")
     public ResponseEntity<Void> deleteTicket(@PathVariable Long themeParkId, @PathVariable Long ticketId) {
 
-        ticketOperationUseCase.deleteTicket(ticketId);
+        ticketOperationUseCase.deleteTicket(themeParkId, ticketId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

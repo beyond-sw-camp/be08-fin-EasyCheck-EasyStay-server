@@ -7,4 +7,6 @@ import java.util.List;
 public interface TicketRepository extends JpaRepository<TicketEntity, Long> {
 
     List<TicketEntity> findByThemeParkId(Long themeParkId);
+
+    boolean existsByTicketName(String ticketName);
 }
