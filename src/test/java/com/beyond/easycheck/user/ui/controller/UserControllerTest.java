@@ -59,4 +59,5 @@ class UserControllerTest {
         // then
         perform_200.andExpect(status().isCreated());
     }
+
 }
