@@ -1,7 +1,6 @@
 package com.beyond.easycheck.seasons.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
-import com.beyond.easycheck.seasons.exception.SeasonMessageType;
 import com.beyond.easycheck.seasons.infrastructure.entity.SeasonEntity;
 import com.beyond.easycheck.seasons.infrastructure.repository.SeasonRepository;
 import com.beyond.easycheck.seasons.ui.requestbody.SeasonCreateRequest;
@@ -13,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.beyond.easycheck.seasons.exception.SeasonMessageType.SEASON_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +38,7 @@ public class SeasonService {
     public SeasonView readSeason(Long seasonId) {
 
         SeasonEntity season = seasonRepository.findById(seasonId)
-                .orElseThrow(() -> new EasyCheckException(SeasonMessageType.SEASON_NOT_FOUND));
+                .orElseThrow(() -> new EasyCheckException(SEASON_NOT_FOUND));
 
         SeasonView seasonView = SeasonView.builder()
                 .id(season.getId())
@@ -56,7 +57,7 @@ public class SeasonService {
         List<SeasonEntity> seasonEntities = seasonRepository.findAll();
 
         if (seasonEntities.isEmpty()) {
-            throw new EasyCheckException(SeasonMessageType.SEASON_NOT_FOUND);
+            throw new EasyCheckException(SEASON_NOT_FOUND);
         }
         List<SeasonView> seasonViews = seasonEntities.stream()
                 .map(seasonEntity -> new SeasonView(
@@ -74,7 +75,7 @@ public class SeasonService {
     public void updateSeason(Long seasonId, SeasonUpdateRequest seasonUpdateRequest) {
 
         SeasonEntity season = seasonRepository.findById(seasonId)
-                .orElseThrow(() -> new EasyCheckException(SeasonMessageType.SEASON_NOT_FOUND));
+                .orElseThrow(() -> new EasyCheckException(SEASON_NOT_FOUND));
 
         season.update(seasonUpdateRequest);
     }
@@ -83,7 +84,7 @@ public class SeasonService {
     public void deleteSeason(Long seasonId) {
 
         SeasonEntity season = seasonRepository.findById(seasonId)
-                .orElseThrow(() -> new EasyCheckException(SeasonMessageType.SEASON_NOT_FOUND));
+                .orElseThrow(() -> new EasyCheckException(SEASON_NOT_FOUND));
 
         seasonRepository.delete(season);
     }
