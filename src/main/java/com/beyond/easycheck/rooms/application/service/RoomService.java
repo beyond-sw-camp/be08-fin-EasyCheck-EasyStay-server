@@ -1,7 +1,7 @@
 package com.beyond.easycheck.rooms.application.service;
 
-import com.beyond.easycheck.common.exception.CommonMessageType;
 import com.beyond.easycheck.common.exception.EasyCheckException;
+import com.beyond.easycheck.rooms.exception.RoomMessageType;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
 import com.beyond.easycheck.rooms.infrastructure.repository.RoomRepository;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomCreateRequest;
@@ -27,7 +27,7 @@ public class RoomService {
     public void createRoom(RoomCreateRequest roomCreateRequest) {
 
         RoomTypeEntity roomType = roomTypeRepository.findById(roomCreateRequest.getRoomTypeId())
-                .orElseThrow(() -> new EasyCheckException(CommonMessageType.NOT_FOUND));
+                .orElseThrow(() -> new EasyCheckException(RoomMessageType.ROOM_NOT_FOUND));
 
         RoomEntity room = RoomEntity.builder()
                 .roomTypeEntity(roomType)
@@ -42,7 +42,7 @@ public class RoomService {
     public RoomView readRoom(Long id) {
 
         RoomEntity room = roomRepository.findById(id)
-                .orElseThrow(() -> new EasyCheckException(CommonMessageType.NOT_FOUND));
+                .orElseThrow(() -> new EasyCheckException(RoomMessageType.ROOM_NOT_FOUND));
 
         RoomTypeEntity roomType = room.getRoomTypeEntity();
 
@@ -67,7 +67,7 @@ public class RoomService {
         List<RoomEntity> roomEntities = roomRepository.findAll();
 
         if (roomEntities.isEmpty()) {
-            throw new EasyCheckException(CommonMessageType.NOT_FOUND);
+            throw new EasyCheckException(RoomMessageType.ROOM_NOT_FOUND);
         }
         List<RoomView> roomViews = roomEntities.stream()
                 .map(roomEntity -> new RoomView(
@@ -89,7 +89,7 @@ public class RoomService {
     public void updateRoom(Long roomId, RoomUpdateRequest roomUpdateRequest) {
 
         RoomEntity room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new EasyCheckException(CommonMessageType.NOT_FOUND));
+                .orElseThrow(() -> new EasyCheckException(RoomMessageType.ROOM_NOT_FOUND));
 
         room.update(roomUpdateRequest);
     }
@@ -97,7 +97,7 @@ public class RoomService {
     @Transactional
     public void deleteRoom(Long roomId) {
         RoomEntity room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new EasyCheckException(CommonMessageType.NOT_FOUND));
+                .orElseThrow(() -> new EasyCheckException(RoomMessageType.ROOM_NOT_FOUND));
 
         roomRepository.delete(room);
     }
