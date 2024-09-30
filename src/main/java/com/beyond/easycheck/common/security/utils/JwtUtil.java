@@ -39,12 +39,14 @@ public class JwtUtil {
         this.refreshTokenExpTime = refreshTokenExpTime;
     }
 
-    public String parseUserId(String token) {
-        return Jwts.parser().verifyWith(secretKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .get("userId", String.class);
+    public Long parseUserId(String token) {
+        return Long.parseLong(
+                Jwts.parser().verifyWith(secretKey)
+                        .build()
+                        .parseSignedClaims(token)
+                        .getPayload()
+                        .get("userId", String.class)
+        );
     }
 
     public String parseEmail(String token) {
