@@ -2,6 +2,7 @@ package com.beyond.easycheck.payments.ui.controller;
 
 import com.beyond.easycheck.payments.application.service.PaymentService;
 import com.beyond.easycheck.payments.ui.requestbody.PaymentCreateRequest;
+import com.beyond.easycheck.payments.ui.requestbody.PaymentUpdateRequest;
 import com.beyond.easycheck.payments.ui.view.PaymentView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -50,5 +51,15 @@ public class PaymentController {
         PaymentView paymentView = paymentService.getPaymentById(id);
 
         return ResponseEntity.ok(paymentView);
+    }
+
+    @Operation(summary = "결제를 취소하는 API")
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> cancelPayment(@PathVariable("id") Long id,
+                                              @RequestBody @Valid PaymentUpdateRequest paymentUpdateRequest) {
+
+        paymentService.cancelPayment(id, paymentUpdateRequest);
+
+        return ResponseEntity.noContent().build();
     }
 }

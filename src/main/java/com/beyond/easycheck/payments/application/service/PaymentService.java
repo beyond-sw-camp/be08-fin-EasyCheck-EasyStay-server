@@ -5,6 +5,7 @@ import com.beyond.easycheck.payments.exception.PaymentMessageType;
 import com.beyond.easycheck.payments.infrastructure.entity.PaymentEntity;
 import com.beyond.easycheck.payments.infrastructure.repository.PaymentRepository;
 import com.beyond.easycheck.payments.ui.requestbody.PaymentCreateRequest;
+import com.beyond.easycheck.payments.ui.requestbody.PaymentUpdateRequest;
 import com.beyond.easycheck.payments.ui.view.PaymentView;
 import com.beyond.easycheck.reservationroom.exception.ReservationRoomMessageType;
 import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationRoomEntity;
@@ -63,5 +64,17 @@ public class PaymentService {
         );
 
         return PaymentView.of(paymentEntity);
+    }
+
+    @Transactional
+    public void cancelPayment(Long id, PaymentUpdateRequest paymentUpdateRequest) {
+
+        PaymentEntity paymentEntity = paymentRepository.findById(id).orElseThrow(
+                () -> new EasyCheckException(PaymentMessageType.PAYMENT_NOT_FOUND)
+        );
+
+        paymentEntity.updatePayment(paymentUpdateRequest);
+
+        paymentRepository.save(paymentEntity);
     }
 }
