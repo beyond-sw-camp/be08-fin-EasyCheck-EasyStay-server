@@ -3,12 +3,15 @@ package com.beyond.easycheck.reservationservices.infrastructure.entity;
 import com.beyond.easycheck.additionalservices.infrastructure.entity.AdditionalServiceEntity;
 import com.beyond.easycheck.common.entity.BaseTimeEntity;
 import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationRoomEntity;
+import com.beyond.easycheck.reservationservices.ui.requestbody.ReservationServiceUpdateRequest;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.Optional;
 
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -39,4 +42,9 @@ public class ReservationServiceEntity extends BaseTimeEntity {
 
     @Column(nullable = false)
     private Integer totalPrice;
+
+    public void cancelReservationService(ReservationServiceUpdateRequest reservationServiceUpdateRequest) {
+        Optional.ofNullable(reservationServiceUpdateRequest.getQuantity()).ifPresent(quantity -> this.quantity = quantity);
+        Optional.ofNullable(reservationServiceUpdateRequest.getTotalPrice()).ifPresent(totalPrice -> this.totalPrice = totalPrice);
+    }
 }

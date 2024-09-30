@@ -11,6 +11,7 @@ import com.beyond.easycheck.reservationservices.exception.ReservationServiceMess
 import com.beyond.easycheck.reservationservices.infrastructure.entity.ReservationServiceEntity;
 import com.beyond.easycheck.reservationservices.infrastructure.repository.ReservationServiceRepository;
 import com.beyond.easycheck.reservationservices.ui.requestbody.ReservationServiceCreateRequest;
+import com.beyond.easycheck.reservationservices.ui.requestbody.ReservationServiceUpdateRequest;
 import com.beyond.easycheck.reservationservices.ui.view.ReservationServiceView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -70,5 +71,17 @@ public class ReservationServiceService {
         );
 
         return ReservationServiceView.of(reservationServiceEntity);
+    }
+
+    @Transactional
+    public void cancelReservationService(Long id, ReservationServiceUpdateRequest reservationServiceUpdateRequest) {
+
+        ReservationServiceEntity reservationServiceEntity = reservationServiceRepository.findById(id).orElseThrow(
+                () -> new EasyCheckException(ReservationServiceMessageType.RESERVATION_SERVICE_NOT_FOUND)
+        );
+        
+        reservationServiceEntity.cancelReservationService(reservationServiceUpdateRequest);
+
+        reservationServiceRepository.save(reservationServiceEntity);
     }
 }

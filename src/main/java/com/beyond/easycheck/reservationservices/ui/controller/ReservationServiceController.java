@@ -2,6 +2,7 @@ package com.beyond.easycheck.reservationservices.ui.controller;
 
 import com.beyond.easycheck.reservationservices.application.service.ReservationServiceService;
 import com.beyond.easycheck.reservationservices.ui.requestbody.ReservationServiceCreateRequest;
+import com.beyond.easycheck.reservationservices.ui.requestbody.ReservationServiceUpdateRequest;
 import com.beyond.easycheck.reservationservices.ui.view.ReservationServiceView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -50,5 +51,15 @@ public class ReservationServiceController {
         ReservationServiceView reservationServiceView = reservationServiceService.getReservationServiceById(id);
 
         return ResponseEntity.ok(reservationServiceView);
+    }
+
+    @Operation(summary = "부가 서비스 예약을 취소하는 API")
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> cancelReservationService(@PathVariable("id") Long id,
+                                                         @RequestBody @Valid ReservationServiceUpdateRequest reservationServiceUpdateRequest) {
+
+        reservationServiceService.cancelReservationService(id, reservationServiceUpdateRequest);
+
+        return ResponseEntity.noContent().build();
     }
 }
