@@ -2,6 +2,8 @@ package com.beyond.easycheck.reservationroom.infrastructure.entity;
 
 import com.beyond.easycheck.common.entity.BaseTimeEntity;
 import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomUpdateRequest;
+import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +13,8 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
+
+import static jakarta.persistence.FetchType.LAZY;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,6 +27,11 @@ public class ReservationRoomEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "room_id", nullable = false)
+    @JsonManagedReference
+    private RoomEntity roomEntity;
 
     @Column(nullable = false)
     private LocalDateTime reservationDate;
