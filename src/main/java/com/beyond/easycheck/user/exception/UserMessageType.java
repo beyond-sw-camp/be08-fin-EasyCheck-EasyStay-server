@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum UserMessageType implements MessageType {
 
+    USER_NOT_FOUND("No matching user found", HttpStatus.NOT_FOUND),
     USER_ALREADY_REGISTERED("This user is already registered.", HttpStatus.CONFLICT),
     USER_ROLE_NOT_FOUND("The role for this user does not exist.", HttpStatus.INTERNAL_SERVER_ERROR),
 
