@@ -8,8 +8,8 @@ import com.beyond.easycheck.roomrates.ui.requestbody.RoomrateUpdateRequest;
 import com.beyond.easycheck.roomrates.ui.view.RoomrateView;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
 import com.beyond.easycheck.rooms.infrastructure.repository.RoomRepository;
-import com.beyond.easycheck.roomtypes.infrastructure.entity.RoomTypeEntity;
-import com.beyond.easycheck.roomtypes.infrastructure.repository.RoomTypeRepository;
+import com.beyond.easycheck.roomtypes.infrastructure.entity.RoomtypeEntity;
+import com.beyond.easycheck.roomtypes.infrastructure.repository.RoomtypeRepository;
 import com.beyond.easycheck.seasons.infrastructure.entity.SeasonEntity;
 import com.beyond.easycheck.seasons.infrastructure.repository.SeasonRepository;
 import jakarta.transaction.Transactional;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 import static com.beyond.easycheck.roomrates.exception.RoomrateMessageType.ROOM_RATE_NOT_FOUND;
 import static com.beyond.easycheck.rooms.exception.RoomMessageType.ROOM_NOT_FOUND;
-import static com.beyond.easycheck.roomtypes.exception.RoomTypeMessageType.ROOM_TYPE_NOT_FOUND;
+import static com.beyond.easycheck.roomtypes.exception.RoomtypeMessageType.ROOM_TYPE_NOT_FOUND;
 import static com.beyond.easycheck.seasons.exception.SeasonMessageType.SEASON_NOT_FOUND;
 
 @Service
@@ -31,7 +31,7 @@ public class RoomrateService {
     private final RoomrateRepository roomrateRepository;
     private final RoomRepository roomRepository;
     private final SeasonRepository seasonRepository;
-    private final RoomTypeRepository roomTypeRepository;
+    private final RoomtypeRepository roomTypeRepository;
 
     @Transactional
     public void createRoomrate(RoomrateCreateRequest roomrateCreateRequest) {
@@ -57,13 +57,13 @@ public class RoomrateService {
         RoomrateEntity roomrate = roomrateRepository.findById(id)
                 .orElseThrow(() -> new EasyCheckException(ROOM_RATE_NOT_FOUND));
 
-        RoomEntity room = roomRepository.findById(id)
+        RoomEntity room = roomRepository.findById(roomrate.getRoomEntity().getRoomId())
                 .orElseThrow(() -> new EasyCheckException(ROOM_NOT_FOUND));
 
         SeasonEntity season = seasonRepository.findById(roomrate.getSeasonEntity().getId())
                 .orElseThrow(() -> new EasyCheckException(SEASON_NOT_FOUND));
 
-        RoomTypeEntity roomtype = roomTypeRepository.findById(roomrate.getRoomEntity().getRoomTypeEntity().getRoomTypeId())
+        RoomtypeEntity roomtype = roomTypeRepository.findById(roomrate.getRoomEntity().getRoomTypeEntity().getRoomTypeId())
                 .orElseThrow(() -> new EasyCheckException(ROOM_TYPE_NOT_FOUND));
 
         RoomrateView roomrateView = RoomrateView.builder()

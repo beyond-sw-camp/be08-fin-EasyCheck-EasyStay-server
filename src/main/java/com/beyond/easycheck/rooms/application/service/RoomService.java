@@ -5,9 +5,9 @@ import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
 import com.beyond.easycheck.rooms.infrastructure.repository.RoomRepository;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomCreateRequest;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomUpdateRequest;
-import com.beyond.easycheck.rooms.ui.views.RoomView;
-import com.beyond.easycheck.roomtypes.infrastructure.entity.RoomTypeEntity;
-import com.beyond.easycheck.roomtypes.infrastructure.repository.RoomTypeRepository;
+import com.beyond.easycheck.rooms.ui.view.RoomView;
+import com.beyond.easycheck.roomtypes.infrastructure.entity.RoomtypeEntity;
+import com.beyond.easycheck.roomtypes.infrastructure.repository.RoomtypeRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,12 +22,12 @@ import static com.beyond.easycheck.rooms.exception.RoomMessageType.ROOM_NOT_FOUN
 public class RoomService {
 
     private final RoomRepository roomRepository;
-    private final RoomTypeRepository roomTypeRepository;
+    private final RoomtypeRepository roomTypeRepository;
 
     @Transactional
     public void createRoom(RoomCreateRequest roomCreateRequest) {
 
-        RoomTypeEntity roomType = roomTypeRepository.findById(roomCreateRequest.getRoomTypeId())
+        RoomtypeEntity roomType = roomTypeRepository.findById(roomCreateRequest.getRoomTypeId())
                 .orElseThrow(() -> new EasyCheckException(ROOM_NOT_FOUND));
 
         RoomEntity room = RoomEntity.builder()
@@ -45,7 +45,7 @@ public class RoomService {
         RoomEntity room = roomRepository.findById(id)
                 .orElseThrow(() -> new EasyCheckException(ROOM_NOT_FOUND));
 
-        RoomTypeEntity roomType = room.getRoomTypeEntity();
+        RoomtypeEntity roomType = room.getRoomTypeEntity();
 
         RoomView roomView = RoomView.builder()
                 .roomId(room.getRoomId())
