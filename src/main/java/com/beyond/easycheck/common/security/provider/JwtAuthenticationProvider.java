@@ -1,5 +1,8 @@
 package com.beyond.easycheck.common.security.provider;
 
+import com.beyond.easycheck.common.exception.EasyCheckException;
+import com.beyond.easycheck.common.security.exception.JwtMessageType;
+import com.beyond.easycheck.common.security.infrastructure.persistence.repository.ExpiredAccessTokenJpaRepository;
 import com.beyond.easycheck.common.security.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,16 +19,16 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     private final JwtUtil jwtUtil;
 
-//    private final ExpiredAccessTokenRepository expiredAccessTokenRepository;
+    private final ExpiredAccessTokenJpaRepository expiredAccessTokenJpaRepository;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
         String accessToken = (String) authentication.getPrincipal();
 
-//        if (jwtUtil.isExpired(accessToken) || bannedToken(accessToken)) {
-//            throw new EasyCheckException(JwtMessageType.TOKEN_EXPIRED);
-//        }
+        if (jwtUtil.isExpired(accessToken) || bannedToken(accessToken)) {
+            throw new EasyCheckException(JwtMessageType.TOKEN_EXPIRED);
+        }
 
         return new UsernamePasswordAuthenticationToken(
                 jwtUtil.parseUserId(accessToken),
@@ -39,7 +42,9 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         return authentication.equals(UsernamePasswordAuthenticationToken.class);
     }
 
-//    private boolean bannedToken(String accessToken) {
-//        return expiredAccessTokenRepository.findById(accessToken).isPresent();
-//    }
+    private boolean bannedToken(String accessToken) {
+        return expiredAccessTokenJpaRepository
+                .findById(accessToken)
+                .isPresent();
+    }
 }
