@@ -1,5 +1,6 @@
 package com.beyond.easycheck.tickets.infrastructure.entity;
 
+import com.beyond.easycheck.common.entity.BaseTimeEntity;
 import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
 import com.beyond.easycheck.tickets.application.service.TicketOperationUseCase.TicketCreateCommand;
 import jakarta.persistence.*;
@@ -12,10 +13,11 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @Table(name = "ticket")
-public class TicketEntity {
+public class TicketEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ticket_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
