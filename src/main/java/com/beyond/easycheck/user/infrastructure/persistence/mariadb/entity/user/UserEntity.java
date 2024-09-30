@@ -53,7 +53,7 @@ public class UserEntity {
     private RoleEntity role;
 
     @OneToMany(mappedBy = "user")
-    private List<UserPermissionEntity> userPermission;
+    private List<UserPermissionEntity> userPermissions;
 
     private UserEntity(String email, String name, String phone, String addr, String addrDetail, char marketingConsent) {
         this.email = email;
