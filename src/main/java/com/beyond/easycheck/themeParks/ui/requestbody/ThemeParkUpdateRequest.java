@@ -1,15 +1,15 @@
-package com.beyond.easycheck.themeParks.ui.requestbody;
+package com.beyond.easycheck.themeparks.ui.requestbody;
 
 import lombok.Getter;
 
 @Getter
 public class ThemeParkUpdateRequest {
 
-    public String name;
+    private String name;
 
-    public String description;
+    private String description;
 
-    public String location;
+    private String location;
 
-    public String image;
+    private String image;
 }

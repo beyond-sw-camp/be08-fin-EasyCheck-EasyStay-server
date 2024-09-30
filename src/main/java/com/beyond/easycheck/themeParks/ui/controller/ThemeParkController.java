@@ -5,8 +5,8 @@ import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUse
 import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUseCase.ThemeParkUpdateCommand;
 import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase;
 import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase.FindThemeParkResult;
-import com.beyond.easycheck.themeParks.ui.requestbody.ThemeParkCreateRequest;
-import com.beyond.easycheck.themeParks.ui.requestbody.ThemeParkUpdateRequest;
+import com.beyond.easycheck.themeparks.ui.requestbody.ThemeParkCreateRequest;
+import com.beyond.easycheck.themeparks.ui.requestbody.ThemeParkUpdateRequest;
 import com.beyond.easycheck.common.ui.view.ApiResponseView;
 import com.beyond.easycheck.themeparks.ui.view.ThemeParkView;
 import lombok.RequiredArgsConstructor;
