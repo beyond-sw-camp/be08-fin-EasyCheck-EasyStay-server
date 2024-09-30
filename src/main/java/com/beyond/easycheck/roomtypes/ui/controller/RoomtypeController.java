@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Roomtype", description = "객실 유형 관리 API")
-@RequestMapping("/api/v1/roomtype")
+@RequestMapping("/api/v1/roomtypes")
 public class RoomtypeController {
 
     private final RoomtypeService roomTypeService;
