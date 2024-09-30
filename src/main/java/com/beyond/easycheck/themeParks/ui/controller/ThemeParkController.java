@@ -1,14 +1,14 @@
-package com.beyond.easycheck.themeParks.ui.controller;
+package com.beyond.easycheck.themeparks.ui.controller;
 
-import com.beyond.easycheck.themeParks.application.service.ThemeParkOperationUseCase;
-import com.beyond.easycheck.themeParks.application.service.ThemeParkOperationUseCase.ThemeParkCreateCommand;
-import com.beyond.easycheck.themeParks.application.service.ThemeParkOperationUseCase.ThemeParkUpdateCommand;
-import com.beyond.easycheck.themeParks.application.service.ThemeParkReadUseCase;
-import com.beyond.easycheck.themeParks.application.service.ThemeParkReadUseCase.FindThemeParkResult;
+import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUseCase;
+import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUseCase.ThemeParkCreateCommand;
+import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUseCase.ThemeParkUpdateCommand;
+import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase;
+import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase.FindThemeParkResult;
 import com.beyond.easycheck.themeParks.ui.requestbody.ThemeParkCreateRequest;
 import com.beyond.easycheck.themeParks.ui.requestbody.ThemeParkUpdateRequest;
 import com.beyond.easycheck.common.ui.view.ApiResponseView;
-import com.beyond.easycheck.themeParks.ui.view.ThemeParkView;
+import com.beyond.easycheck.themeparks.ui.view.ThemeParkView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
