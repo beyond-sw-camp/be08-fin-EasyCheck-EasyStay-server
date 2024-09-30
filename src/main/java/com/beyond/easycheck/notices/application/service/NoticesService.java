@@ -34,7 +34,7 @@ public class NoticesService {
     public Optional<NoticesEntity> createNotices(NoticesCreateRequest noticesCreateRequest) {
 
         AccommodationEntity accommodationEntity = accommodationRepository.findById(noticesCreateRequest.getAccommodationId()).orElseThrow(
-                () -> new EasyCheckException(AdditionalServiceMessageType.ADDITIONAL_SERVICE_NOT_FOUND)
+                () -> new EasyCheckException(NoticesMessageType.NOTICES_NOT_FOUND)
         );
 
         NoticesEntity notices = NoticesEntity.builder()
