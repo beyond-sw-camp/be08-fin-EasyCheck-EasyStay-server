@@ -1,6 +1,6 @@
-package com.beyond.easycheck.themeParks.ui.view;
+package com.beyond.easycheck.themeparks.ui.view;
 
-import com.beyond.easycheck.themeParks.application.service.ThemeParkReadUseCase.FindThemeParkResult;
+import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase.FindThemeParkResult;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 

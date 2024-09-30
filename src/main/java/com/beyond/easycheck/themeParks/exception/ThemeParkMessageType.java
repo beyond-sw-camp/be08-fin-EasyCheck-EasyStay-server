@@ -1,4 +1,4 @@
-package com.beyond.easycheck.themeParks.exception;
+package com.beyond.easycheck.themeparks.exception;
 
 import com.beyond.easycheck.common.exception.MessageType;
 import lombok.Getter;
