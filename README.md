@@ -69,9 +69,14 @@
 
 ### 1. Relation Schema
 
+[Relation Schema 바로가기](https://drive.google.com/file/d/1b9qb4NH73q_uvFCdYt1Y-oWx6rU-Mcpv/view)
+![easycheck drawio](https://github.com/user-attachments/assets/e31efa72-314f-490c-a9c5-5ff562653d8c)
+
 <br>
 
 ### 2. E-R Diagram
+
+![EasyCheck](https://github.com/user-attachments/assets/f71fc3da-97b3-48c0-8066-e8b5ec8671c2)
 
 <br>
 
