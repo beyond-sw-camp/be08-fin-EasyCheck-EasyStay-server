@@ -15,6 +15,8 @@ public class AccommodationView {
 
     private Long id;
 
+    private Long userId;
+
     private String name;
 
     private String address;
@@ -32,6 +34,7 @@ public class AccommodationView {
         return new AccommodationView(
 
                 accommodationEntity.getId(),
+                accommodationEntity.getUserEntity().getId(),
                 accommodationEntity.getName(),
                 accommodationEntity.getAddress(),
                 accommodationEntity.getAccommodationType()
