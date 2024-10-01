@@ -15,7 +15,10 @@ public enum TicketMessageType implements MessageType {
     MISSING_REQUIRED_FIELD("필수 입력 항목이 누락되었습니다.", HttpStatus.BAD_REQUEST),
     TICKET_NOT_BELONG_TO_THEME_PARK("입장권이 해당 테마파크에 속하지 않습니다.", HttpStatus.BAD_REQUEST),
     TICKET_SALE_PERIOD_INVALID("입장권의 판매 기간이 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
-    INVALID_QUANTITY("주문 수량이 유효하지 않습니다.", HttpStatus.BAD_REQUEST);
+    INVALID_QUANTITY("주문 수량이 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_USER_OR_GUEST("사용자 ID 또는 게스트 ID 중 하나는 필수입니다.", HttpStatus.BAD_REQUEST),
+
+    ;
 
     private final String message;
     private final HttpStatus status;

@@ -7,6 +7,7 @@ import com.beyond.easycheck.tickets.infrastructure.entity.TicketEntity;
 import com.beyond.easycheck.tickets.infrastructure.repository.TicketRepository;
 import com.beyond.easycheck.themeparks.infrastructure.repository.ThemeParkRepository;
 import com.beyond.easycheck.tickets.ui.requestbody.TicketOrderRequest;
+import com.beyond.easycheck.tickets.ui.view.TicketOrderDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,10 +26,14 @@ public class TicketOrderService {
     private final ThemeParkRepository themeParkRepository;
 
     @Transactional
-    public TicketOrderEntity createTicketOrder(Long themeParkId, TicketOrderRequest request) {
+    public TicketOrderDTO createTicketOrder(Long themeParkId, TicketOrderRequest request) {
 
         if (!themeParkRepository.existsById(themeParkId)) {
             throw new EasyCheckException(THEME_PARK_NOT_FOUND);
+        }
+
+        if (request.getUserId() == null && request.getGuestId() == null) {
+            throw new EasyCheckException(INVALID_USER_OR_GUEST);
         }
 
         TicketEntity ticket = ticketRepository.findById(request.getTicketId())
@@ -56,6 +61,14 @@ public class TicketOrderService {
                 request.getCollectionAgreement()
         );
 
-        return ticketOrderRepository.save(ticketOrder);
+        ticketOrderRepository.save(ticketOrder);
+
+        return new TicketOrderDTO(
+                ticketOrder.getId(),
+                ticketOrder.getTicket().getTicketName(),
+                ticketOrder.getQuantity(),
+                ticketOrder.getUserId(),
+                ticketOrder.getPurchaseTimestamp()
+        );
     }
 }
