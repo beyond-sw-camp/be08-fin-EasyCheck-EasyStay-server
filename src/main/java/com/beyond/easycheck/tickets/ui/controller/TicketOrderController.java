@@ -25,7 +25,7 @@ public class TicketOrderController {
             @PathVariable Long themeParkId,
             @RequestBody TicketOrderRequest request) {
 
-        TicketOrderEntity ticketOrder = ticketOrderService.createTicketOrder(request);
+        TicketOrderEntity ticketOrder = ticketOrderService.createTicketOrder(themeParkId,request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponseView<>(ticketOrder));
     }
