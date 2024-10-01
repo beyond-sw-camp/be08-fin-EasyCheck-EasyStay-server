@@ -84,6 +84,8 @@
 
 ### 1. WireFrame
 
+[WireFrame 바로가기] (https://docs.google.com/spreadsheets/d/1Vqk9uPfJh2YJlPmghDuVuqGf8T6JbJRY/edit?gid=543705097#gid=543705097)
+
 <br>
 
 ## 💾 Project Implementation
