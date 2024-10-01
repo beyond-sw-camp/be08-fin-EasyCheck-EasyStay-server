@@ -4,27 +4,27 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "user_order_ticket")
+@Table(name = "ticket_order")
 public class TicketOrderEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "ticket_type_id", nullable = false)
-    private TicketEntity ticketType;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ticket_id", nullable = false)
+    private TicketEntity ticket;
 
     @Column(nullable = false)
     private int quantity;
 
-    @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "guest_id")
     private Long guestId;
 
     @Enumerated(EnumType.STRING)
@@ -33,21 +33,18 @@ public class TicketOrderEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private CollectionAggrementType collectionAgreement;
+    private CollectionAgreementType collectionAgreement;
 
     @Column(nullable = false)
-    private String paymentStatus;
+    private LocalDateTime purchaseTimestamp;
 
-    public static TicketOrderEntity createTicketOrder(TicketEntity ticketType, int quantity, Long userId, Long guestId,
-                                                      ReceiptMethodType receiptMethod, CollectionAggrementType collectionAgreement) {
-        TicketOrderEntity ticketOrder = new TicketOrderEntity();
-        ticketOrder.ticketType = ticketType;
-        ticketOrder.quantity = quantity;
-        ticketOrder.userId = userId;
-        ticketOrder.guestId = guestId;
-        ticketOrder.receiptMethod = receiptMethod;
-        ticketOrder.collectionAgreement = collectionAgreement;
-        return ticketOrder;
+    public TicketOrderEntity(TicketEntity ticket, int quantity, Long userId, Long guestId, ReceiptMethodType receiptMethod, CollectionAgreementType collectionAgreement) {
+        this.ticket = ticket;
+        this.quantity = quantity;
+        this.userId = userId;
+        this.guestId = guestId;
+        this.receiptMethod = receiptMethod;
+        this.collectionAgreement = collectionAgreement;
+        this.purchaseTimestamp = LocalDateTime.now();
     }
-
 }
