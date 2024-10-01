@@ -1,8 +1,8 @@
 package com.beyond.easycheck.tickets.ui.controller;
 
+import com.beyond.easycheck.common.ui.view.ApiResponseView;
 import com.beyond.easycheck.tickets.application.service.TicketPaymentService;
 import com.beyond.easycheck.tickets.infrastructure.entity.TicketPaymentEntity;
-import com.beyond.easycheck.common.ui.view.ApiResponseView;
 import com.beyond.easycheck.tickets.ui.requestbody.TicketPaymentRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,5 +28,15 @@ public class TicketPaymentController {
         TicketPaymentEntity payment = paymentService.processPayment(orderId, request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponseView<>(payment));
+    }
+
+    @Operation(summary = "입장권 결제 취소 API")
+    @PostMapping("/cancel")
+    public ResponseEntity<ApiResponseView<TicketPaymentEntity>> cancelPayment(
+            @PathVariable Long orderId,
+            @RequestBody String cancelReason) {
+
+        paymentService.cancelPayment(orderId, cancelReason);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
