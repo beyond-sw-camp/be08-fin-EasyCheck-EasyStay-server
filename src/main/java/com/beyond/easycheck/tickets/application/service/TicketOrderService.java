@@ -32,15 +32,15 @@ public class TicketOrderService {
             throw new EasyCheckException(THEME_PARK_NOT_FOUND);
         }
 
-        if (request.getUserId() == null && request.getGuestId() == null) {
-            throw new EasyCheckException(INVALID_USER_OR_GUEST);
-        }
-
         TicketEntity ticket = ticketRepository.findById(request.getTicketId())
                 .orElseThrow(() -> new EasyCheckException(TICKET_NOT_FOUND));
 
         if (!ticket.getThemePark().getId().equals(themeParkId)) {
             throw new EasyCheckException(TICKET_NOT_BELONG_TO_THEME_PARK);
+        }
+
+        if (request.getUserId() == null && request.getGuestId() == null) {
+            throw new EasyCheckException(INVALID_USER_OR_GUEST);
         }
 
         LocalDateTime now = LocalDateTime.now();

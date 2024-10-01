@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "TicketOrder", description = "입장권 주문 정보 관리 API")
@@ -23,7 +24,7 @@ public class TicketOrderController {
     @PostMapping("")
     public ResponseEntity<ApiResponseView<TicketOrderDTO>> createTicketOrder(
             @PathVariable Long themeParkId,
-            @RequestBody TicketOrderRequest request) {
+            @RequestBody @Validated TicketOrderRequest request) {
 
         TicketOrderDTO ticketOrder = ticketOrderService.createTicketOrder(themeParkId,request);
         return ResponseEntity.status(HttpStatus.CREATED)
