@@ -4,6 +4,7 @@ import com.beyond.easycheck.common.ui.view.ApiResponseView;
 import com.beyond.easycheck.tickets.application.service.TicketOrderService;
 import com.beyond.easycheck.tickets.infrastructure.entity.TicketOrderEntity;
 import com.beyond.easycheck.tickets.ui.requestbody.TicketOrderRequest;
+import com.beyond.easycheck.tickets.ui.view.TicketOrderDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +22,11 @@ public class TicketOrderController {
 
     @Operation(summary = "입장권 주문 추가하는 API")
     @PostMapping("")
-    public ResponseEntity<ApiResponseView<TicketOrderEntity>> createTicketOrder(
+    public ResponseEntity<ApiResponseView<TicketOrderDTO>> createTicketOrder(
             @PathVariable Long themeParkId,
             @RequestBody TicketOrderRequest request) {
 
-        TicketOrderEntity ticketOrder = ticketOrderService.createTicketOrder(themeParkId,request);
+        TicketOrderDTO ticketOrder = ticketOrderService.createTicketOrder(themeParkId,request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponseView<>(ticketOrder));
     }
