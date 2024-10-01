@@ -11,5 +11,5 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class TicketPaymentRequest {
     private String paymentMethod;
-    private BigDecimal amount;
+    private BigDecimal paymentAmount;
 }
