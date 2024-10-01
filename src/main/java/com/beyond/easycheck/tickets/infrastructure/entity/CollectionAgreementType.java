@@ -1,6 +1,6 @@
 package com.beyond.easycheck.tickets.infrastructure.entity;
 
-public enum CollectionAggrementType {
+public enum CollectionAgreementType {
     Y,
     N
 }

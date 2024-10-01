@@ -1,6 +1,6 @@
 package com.beyond.easycheck.tickets.ui.requestbody;
 
-import com.beyond.easycheck.tickets.infrastructure.entity.CollectionAggrementType;
+import com.beyond.easycheck.tickets.infrastructure.entity.CollectionAgreementType;
 import com.beyond.easycheck.tickets.infrastructure.entity.ReceiptMethodType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,5 +15,5 @@ public class TicketOrderRequest {
     private Long userId;  // 회원일 경우
     private Long guestId;  // 비회원일 경우
     private ReceiptMethodType receiptMethod;
-    private CollectionAggrementType collectionAgreement;
+    private CollectionAgreementType collectionAgreement;
 }
