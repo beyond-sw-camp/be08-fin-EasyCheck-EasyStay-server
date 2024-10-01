@@ -3,14 +3,14 @@ package com.beyond.easycheck.roomtypes.ui.requestbody;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
-@Setter
 @ToString
-public class RoomTypeUpdateRequest {
+public class RoomtypeCreateRequest {
+
+    @NotNull
+    private Long accommodationId;
 
     @NotBlank
     private String typeName;

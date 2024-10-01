@@ -3,7 +3,7 @@ package com.beyond.easycheck.rooms.ui.controller;
 import com.beyond.easycheck.rooms.application.service.RoomService;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomCreateRequest;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomUpdateRequest;
-import com.beyond.easycheck.rooms.ui.views.RoomView;
+import com.beyond.easycheck.rooms.ui.view.RoomView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
