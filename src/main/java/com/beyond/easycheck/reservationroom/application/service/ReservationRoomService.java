@@ -42,7 +42,7 @@ public class ReservationRoomService {
             throw new EasyCheckException(ReservationRoomMessageType.ROOM_NOT_AVAILABLE);
         }
 
-        if (reservationRoomCreateRequest.getCheckinDate().isBefore(LocalDate.now())) {
+        if (reservationRoomCreateRequest.getCheckinDate().isBefore(LocalDateTime.now())) {
             throw new EasyCheckException(ReservationRoomMessageType.INVALID_CHECKIN_DATE);
         }
 
@@ -97,7 +97,7 @@ public class ReservationRoomService {
         ReservationRoomEntity reservationRoomEntity = reservationRoomRepository.findById(id)
                 .orElseThrow(() -> new EasyCheckException(ReservationRoomMessageType.RESERVATION_NOT_FOUND));
 
-        if (reservationRoomEntity.getCheckinDate().isBefore(LocalDate.now())) {
+        if (reservationRoomEntity.getCheckinDate().isBefore(LocalDateTime.now())) {
             throw new EasyCheckException(ReservationRoomMessageType.CANNOT_CANCEL_CHECKED_IN_RESERVATION);
         }
 
