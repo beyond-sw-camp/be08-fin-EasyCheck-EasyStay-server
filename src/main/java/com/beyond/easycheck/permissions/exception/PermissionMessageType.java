@@ -9,11 +9,10 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum PermissionMessageType implements MessageType {
 
-    PERMISSION_ALREADY_EXISTS("", HttpStatus.CONFLICT),
-    PERMISSION_NOT_FOUND("", HttpStatus.NOT_FOUND),
-    PERMISSION_ALREADY_GRANTED("", HttpStatus.CONFLICT),
-
-    CANNOT_REVOKE_NONEXISTENT_PERMISSION("", HttpStatus.BAD_REQUEST),
+    PERMISSION_ALREADY_EXISTS("The specified permission already exists", HttpStatus.CONFLICT),
+    PERMISSION_NOT_FOUND("The requested permission could not be found", HttpStatus.NOT_FOUND),
+    PERMISSION_ALREADY_GRANTED("The permission has already been granted to this entity", HttpStatus.CONFLICT),
+    CANNOT_REVOKE_NONEXISTENT_PERMISSION("Cannot revoke a permission that has not been granted", HttpStatus.BAD_REQUEST),
     ;
 
     private final String message;
