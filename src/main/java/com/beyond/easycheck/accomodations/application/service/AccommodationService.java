@@ -7,8 +7,6 @@ import com.beyond.easycheck.accomodations.ui.requestbody.AccommodationCreateRequ
 import com.beyond.easycheck.accomodations.ui.requestbody.AccommodationUpdateRequest;
 import com.beyond.easycheck.accomodations.ui.view.AccommodationView;
 import com.beyond.easycheck.common.exception.EasyCheckException;
-import com.beyond.easycheck.user.exception.UserMessageType;
-import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.repository.UserJpaRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -30,14 +28,9 @@ public class AccommodationService {
     private final UserJpaRepository userJpaRepository;
 
     @Transactional
-    public Optional<AccommodationEntity> createAccommodation(AccommodationCreateRequest accommodationCreateRequest) {
-
-        UserEntity userEntity = userJpaRepository.findById(accommodationCreateRequest.getUserId()).orElseThrow(
-                () -> new EasyCheckException(UserMessageType.USER_NOT_FOUND)
-        );
+    public Optional<AccommodationEntity> createAccommodation(Long userId, AccommodationCreateRequest accommodationCreateRequest) {
 
         AccommodationEntity accommodationEntity = AccommodationEntity.builder()
-                .userEntity(userEntity)
                 .name(accommodationCreateRequest.getName())
                 .address(accommodationCreateRequest.getAddress())
                 .accommodationType(accommodationCreateRequest.getAccommodationType())
@@ -68,7 +61,7 @@ public class AccommodationService {
     }
 
     @Transactional
-    public void updateAccommodation(Long id, AccommodationUpdateRequest accommodationUpdateRequest) {
+    public void updateAccommodation(Long userId, Long id, AccommodationUpdateRequest accommodationUpdateRequest) {
 
         AccommodationEntity accommodationEntity = accommodationRepository.findById(id).orElseThrow(
                 () -> new EasyCheckException(AccommodationMessageType.ACCOMMODATION_NOT_FOUND)
@@ -80,7 +73,7 @@ public class AccommodationService {
     }
 
     @Transactional
-    public void deleteAccommodation(Long id) {
+    public void deleteAccommodation(Long userId, Long id) {
 
         AccommodationEntity accommodationEntity = accommodationRepository.findById(id).orElseThrow(
                 () -> new EasyCheckException(AccommodationMessageType.ACCOMMODATION_NOT_FOUND)
