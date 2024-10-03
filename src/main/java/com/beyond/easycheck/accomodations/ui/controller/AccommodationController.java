@@ -27,10 +27,10 @@ public class AccommodationController {
 
     @Operation(summary = "시설을 등록하는 API")
     @PostMapping("")
-    public ResponseEntity<Void> createAccommodation(@AuthenticationPrincipal EasyCheckUserDetails easyCheckUserDetails,
+    public ResponseEntity<Void> createAccommodation(@AuthenticationPrincipal Long userId,
                                                     @RequestBody @Valid AccommodationCreateRequest accommodationCreateRequest) {
 
-        accommodationService.createAccommodation(easyCheckUserDetails.getId(), accommodationCreateRequest);
+        accommodationService.createAccommodation(userId, accommodationCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -56,21 +56,21 @@ public class AccommodationController {
 
     @Operation(summary = "시설의 정보를 수정하는 API")
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateAccommodation(@AuthenticationPrincipal EasyCheckUserDetails easyCheckUserDetails,
+    public ResponseEntity<Void> updateAccommodation(@AuthenticationPrincipal Long userId,
                                                     @PathVariable("id") Long id,
                                                     @RequestBody @Valid AccommodationUpdateRequest accommodationUpdateRequest) {
 
-        accommodationService.updateAccommodation(easyCheckUserDetails.getId(), id, accommodationUpdateRequest);
+        accommodationService.updateAccommodation(userId, id, accommodationUpdateRequest);
 
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "시설의 정보를 삭제하는 API")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAccommodation(@AuthenticationPrincipal EasyCheckUserDetails easyCheckUserDetails,
+    public ResponseEntity<Void> deleteAccommodation(@AuthenticationPrincipal Long userId,
                                                     @PathVariable("id") Long id) {
 
-        accommodationService.deleteAccommodation(easyCheckUserDetails.getId(), id);
+        accommodationService.deleteAccommodation(userId, id);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
