@@ -3,12 +3,14 @@ package com.beyond.easycheck.reservationroom.application.service;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.reservationroom.exception.ReservationRoomMessageType;
 import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationRoomEntity;
+import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationStatus;
 import com.beyond.easycheck.reservationroom.infrastructure.repository.ReservationRoomRepository;
 import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomCreateRequest;
 import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomUpdateRequest;
 import com.beyond.easycheck.reservationroom.ui.view.ReservationRoomView;
 import com.beyond.easycheck.rooms.exception.RoomMessageType;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
+import com.beyond.easycheck.rooms.infrastructure.entity.RoomStatus;
 import com.beyond.easycheck.rooms.infrastructure.repository.RoomRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,16 +35,34 @@ public class ReservationRoomService {
     @Transactional
     public ReservationRoomEntity createReservation(ReservationRoomCreateRequest reservationRoomCreateRequest) {
 
-        RoomEntity roomEntity = roomRepository.findById(reservationRoomCreateRequest.getRoomId()).orElseThrow(
-                () -> new EasyCheckException(RoomMessageType.ROOM_NOT_FOUND)
-        );
+        RoomEntity roomEntity = roomRepository.findById(reservationRoomCreateRequest.getRoomId())
+                .orElseThrow(() -> new EasyCheckException(RoomMessageType.ROOM_NOT_FOUND));
+
+        if (!roomEntity.getStatus().equals(RoomStatus.예약가능)) {
+            throw new EasyCheckException(ReservationRoomMessageType.ROOM_NOT_AVAILABLE);
+        }
+
+        if (reservationRoomCreateRequest.getCheckinDate().isBefore(LocalDateTime.now())) {
+            throw new EasyCheckException(ReservationRoomMessageType.INVALID_CHECKIN_DATE);
+        }
+
+        if (reservationRoomCreateRequest.getCheckoutDate().isBefore(reservationRoomCreateRequest.getCheckinDate())) {
+            throw new EasyCheckException(ReservationRoomMessageType.INVALID_CHECKOUT_DATE);
+        }
+
+        boolean isRoomAlreadyBooked = reservationRoomRepository.existsByRoomEntityAndCheckinDateLessThanEqualAndCheckoutDateGreaterThanEqual(
+                roomEntity, reservationRoomCreateRequest.getCheckoutDate(), reservationRoomCreateRequest.getCheckinDate());
+
+        if (isRoomAlreadyBooked) {
+            throw new EasyCheckException(ReservationRoomMessageType.ROOM_ALREADY_BOOKED);
+        }
 
         ReservationRoomEntity reservationRoomEntity = ReservationRoomEntity.builder()
                 .roomEntity(roomEntity)
                 .reservationDate(LocalDateTime.now())
                 .checkinDate(reservationRoomCreateRequest.getCheckinDate())
                 .checkoutDate(reservationRoomCreateRequest.getCheckoutDate())
-                .reservationStatus(reservationRoomCreateRequest.getReservationStatus())
+                .reservationStatus(ReservationStatus.POSSIBLE)
                 .totalPrice(reservationRoomCreateRequest.getTotalPrice())
                 .paymentStatus(reservationRoomCreateRequest.getPaymentStatus())
                 .build();
@@ -73,9 +94,16 @@ public class ReservationRoomService {
     @Transactional
     public void cancelReservation(Long id, ReservationRoomUpdateRequest reservationRoomUpdateRequest) {
 
-        ReservationRoomEntity reservationRoomEntity = reservationRoomRepository.findById(id).orElseThrow(
-                () -> new EasyCheckException(ReservationRoomMessageType.RESERVATION_NOT_FOUND)
-        );
+        ReservationRoomEntity reservationRoomEntity = reservationRoomRepository.findById(id)
+                .orElseThrow(() -> new EasyCheckException(ReservationRoomMessageType.RESERVATION_NOT_FOUND));
+
+        if (reservationRoomEntity.getCheckinDate().isBefore(LocalDateTime.now())) {
+            throw new EasyCheckException(ReservationRoomMessageType.CANNOT_CANCEL_CHECKED_IN_RESERVATION);
+        }
+
+        if (reservationRoomUpdateRequest.getCheckoutDate().isBefore(reservationRoomUpdateRequest.getCheckinDate())) {
+            throw new EasyCheckException(ReservationRoomMessageType.INVALID_CHECKOUT_DATE);
+        }
 
         reservationRoomEntity.updateReservationRoom(reservationRoomUpdateRequest);
 

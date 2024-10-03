@@ -37,10 +37,10 @@ public class ReservationRoomEntity extends BaseTimeEntity {
     private LocalDateTime reservationDate;
 
     @Column(nullable = false)
-    private LocalDate checkinDate;
+    private LocalDateTime checkinDate;
 
     @Column(nullable = false)
-    private LocalDate checkoutDate;
+    private LocalDateTime checkoutDate;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
