@@ -1,6 +1,7 @@
 package com.beyond.easycheck.payments.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
+import com.beyond.easycheck.payments.application.validator.PaymentValidator;
 import com.beyond.easycheck.payments.exception.PaymentMessageType;
 import com.beyond.easycheck.payments.infrastructure.entity.PaymentEntity;
 import com.beyond.easycheck.payments.infrastructure.repository.PaymentRepository;
@@ -10,6 +11,7 @@ import com.beyond.easycheck.payments.ui.view.PaymentView;
 import com.beyond.easycheck.reservationroom.exception.ReservationRoomMessageType;
 import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationRoomEntity;
 import com.beyond.easycheck.reservationroom.infrastructure.repository.ReservationRoomRepository;
+import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +28,21 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final ReservationRoomRepository reservationRoomRepository;
+
+    @Transactional
+    public void processReservationPayment(Long reservationId, PaymentCreateRequest paymentCreateRequest) {
+
+        ReservationRoomEntity reservationRoomEntity = reservationRoomRepository.findById(reservationId)
+                .orElseThrow(() -> new EasyCheckException(ReservationRoomMessageType.RESERVATION_NOT_FOUND));
+
+        PaymentEntity paymentEntity = createPayment(paymentCreateRequest);
+
+        PaymentValidator.validatePayment(paymentEntity, reservationRoomEntity);
+
+        reservationRoomEntity.updateReservationRoomAndProcessPayment(new ReservationRoomUpdateRequest(), paymentEntity);
+
+        reservationRoomRepository.save(reservationRoomEntity);
+    }
 
     @Transactional
     public PaymentEntity createPayment(PaymentCreateRequest paymentCreateRequest) {

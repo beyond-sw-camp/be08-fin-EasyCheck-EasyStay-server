@@ -1,6 +1,8 @@
 package com.beyond.easycheck.reservationroom.infrastructure.entity;
 
 import com.beyond.easycheck.common.entity.BaseTimeEntity;
+import com.beyond.easycheck.payments.infrastructure.entity.CompletionStatus;
+import com.beyond.easycheck.payments.infrastructure.entity.PaymentEntity;
 import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomUpdateRequest;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -59,5 +61,18 @@ public class ReservationRoomEntity extends BaseTimeEntity {
         Optional.ofNullable(reservationRoomUpdateRequest.getReservationStatus()).ifPresent(reservationStatus -> this.reservationStatus = reservationStatus);
         Optional.ofNullable(reservationRoomUpdateRequest.getTotalPrice()).ifPresent(totalPrice -> this.totalPrice = totalPrice);
         Optional.ofNullable(reservationRoomUpdateRequest.getPaymentStatus()).ifPresent(paymentStatus -> this.paymentStatus = paymentStatus);
+    }
+
+    public void processPayment(PaymentEntity paymentEntity) {
+        if (this.totalPrice.equals(paymentEntity.getAmount()) && paymentEntity.getCompletionStatus() == CompletionStatus.COMPLETE) {
+            this.paymentStatus = PaymentStatus.PAID;
+        } else {
+            throw new IllegalArgumentException("결제 금액이 맞지 않거나 결제가 완료되지 않았습니다.");
+        }
+    }
+
+    public void updateReservationRoomAndProcessPayment(ReservationRoomUpdateRequest reservationRoomUpdateRequest, PaymentEntity paymentEntity) {
+        this.updateReservationRoom(reservationRoomUpdateRequest);
+        this.processPayment(paymentEntity);
     }
 }
