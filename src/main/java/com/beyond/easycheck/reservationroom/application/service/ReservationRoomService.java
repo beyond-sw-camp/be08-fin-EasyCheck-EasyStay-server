@@ -94,9 +94,16 @@ public class ReservationRoomService {
     @Transactional
     public void cancelReservation(Long id, ReservationRoomUpdateRequest reservationRoomUpdateRequest) {
 
-        ReservationRoomEntity reservationRoomEntity = reservationRoomRepository.findById(id).orElseThrow(
-                () -> new EasyCheckException(ReservationRoomMessageType.RESERVATION_NOT_FOUND)
-        );
+        ReservationRoomEntity reservationRoomEntity = reservationRoomRepository.findById(id)
+                .orElseThrow(() -> new EasyCheckException(ReservationRoomMessageType.RESERVATION_NOT_FOUND));
+
+        if (reservationRoomEntity.getCheckinDate().isBefore(LocalDate.now())) {
+            throw new EasyCheckException(ReservationRoomMessageType.CANNOT_CANCEL_CHECKED_IN_RESERVATION);
+        }
+
+        if (reservationRoomUpdateRequest.getCheckoutDate().isBefore(reservationRoomUpdateRequest.getCheckinDate())) {
+            throw new EasyCheckException(ReservationRoomMessageType.INVALID_CHECKOUT_DATE);
+        }
 
         reservationRoomEntity.updateReservationRoom(reservationRoomUpdateRequest);
 
