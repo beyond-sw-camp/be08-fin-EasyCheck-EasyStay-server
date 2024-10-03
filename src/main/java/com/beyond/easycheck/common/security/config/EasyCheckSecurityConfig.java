@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,6 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableWebSecurity
 @RequiredArgsConstructor
 public class EasyCheckSecurityConfig {
 
@@ -34,8 +36,22 @@ public class EasyCheckSecurityConfig {
         // api endpoint
         http
                 .authorizeHttpRequests(registry -> {
-                    registry.requestMatchers("/api/v1/users/auth-test").authenticated();
-                    registry.anyRequest().permitAll();
+
+                    registry.requestMatchers(
+                                    "/api/v1/users",
+                                    "/api/v1/users/login",
+                                    "/api/v1/users/change-password",
+                                    "/api/v1/verification-code",
+                                    "/api/v1/verify-code",
+                                    "/api/v1/sms/**"
+                            )
+                            .permitAll();
+
+                    // 권한 생성은 SUPER_ADMIN만 가능
+                    registry.requestMatchers("/api/v1/permissions/**")
+                            .hasRole("SUPER_ADMIN");
+
+                    registry.anyRequest().authenticated();
                 });
 
 
