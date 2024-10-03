@@ -37,7 +37,7 @@ public class PermissionController {
 
         permissionOperationUseCase.createPermission(command);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .build();
     }
 
@@ -56,7 +56,7 @@ public class PermissionController {
 
         permissionOperationUseCase.grantPermission(command);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .build();
     }
 
@@ -73,7 +73,7 @@ public class PermissionController {
 
         permissionOperationUseCase.revokePermission(command);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .build();
     }
 
@@ -83,7 +83,7 @@ public class PermissionController {
 
         permissionOperationUseCase.deletePermission(permissionId);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
+        return ResponseEntity.status(HttpStatus.OK)
                 .build();
     }
 }
