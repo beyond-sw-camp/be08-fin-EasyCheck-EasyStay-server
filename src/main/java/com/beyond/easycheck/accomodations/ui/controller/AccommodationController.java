@@ -4,7 +4,6 @@ import com.beyond.easycheck.accomodations.application.service.AccommodationServi
 import com.beyond.easycheck.accomodations.ui.requestbody.AccommodationCreateRequest;
 import com.beyond.easycheck.accomodations.ui.requestbody.AccommodationUpdateRequest;
 import com.beyond.easycheck.accomodations.ui.view.AccommodationView;
-import com.beyond.easycheck.user.application.domain.EasyCheckUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -27,10 +26,9 @@ public class AccommodationController {
 
     @Operation(summary = "시설을 등록하는 API")
     @PostMapping("")
-    public ResponseEntity<Void> createAccommodation(@AuthenticationPrincipal Long userId,
-                                                    @RequestBody @Valid AccommodationCreateRequest accommodationCreateRequest) {
+    public ResponseEntity<Void> createAccommodation(@RequestBody @Valid AccommodationCreateRequest accommodationCreateRequest) {
 
-        accommodationService.createAccommodation(userId, accommodationCreateRequest);
+        accommodationService.createAccommodation(accommodationCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
