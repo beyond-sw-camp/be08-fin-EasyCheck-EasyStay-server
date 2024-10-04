@@ -7,6 +7,7 @@ import com.beyond.easycheck.mail.infrastructure.persistence.redis.entity.Verific
 import com.beyond.easycheck.mail.infrastructure.persistence.redis.entity.VerifiedEmailEntity;
 import com.beyond.easycheck.mail.infrastructure.persistence.redis.repository.VerificationCodeRepository;
 import com.beyond.easycheck.mail.infrastructure.persistence.redis.repository.VerifiedEmailRepository;
+import com.beyond.easycheck.reservationroom.application.util.ReservationFormatUtil;
 import com.beyond.easycheck.reservationroom.ui.view.ReservationRoomView;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
@@ -25,6 +26,7 @@ import java.security.SecureRandom;
 public class MailServiceImpl implements MailService{
 
     private static final String MAIL_SUBJECT = "EasyCheck 이메일 인증코드";
+    private static final String MAIL_RESERVATION = "EasyCheck 예약 안내";
 
     public static final Long VERIFICATION_EXPIRED_TIME = 300L;
 
@@ -102,7 +104,7 @@ public class MailServiceImpl implements MailService{
             message.setRecipients(MimeMessage.RecipientType.TO, email);
 
             // 메일 제목 설정
-            message.setSubject(MAIL_SUBJECT);
+            message.setSubject(MAIL_RESERVATION);
 
             // 메일 본문 내용 생성
             String htmlContent = generateReservationConfirmationEmailContent(reservationDetails);
@@ -139,12 +141,11 @@ public class MailServiceImpl implements MailService{
                 "<p>다음과 같이 예약 내역을 확인해주세요:</p>" +
                 "<ul>" +
                 "<li>객실 이름: " + reservationDetails.getTypeName() + "</li>" +
-                "<li>예약 생성 날짜: " + reservationDetails.getReservationDate() + "</li>" +
-                "<li>체크인 날짜: " + reservationDetails.getCheckinDate() + "</li>" +
-                "<li>체크아웃 날짜: " + reservationDetails.getCheckoutDate() + "</li>" +
-                "<li>예약 상태: " + reservationDetails.getReservationStatus() + "</li>" +
+                "<li>체크인 날짜: " + ReservationFormatUtil.formatLocalDateTime(reservationDetails.getCheckinDate()) + "</li>" +
+                "<li>체크아웃 날짜: " + ReservationFormatUtil.formatLocalDateTime(reservationDetails.getCheckoutDate()) + "</li>" +
+                "<li>예약 상태: " + ReservationFormatUtil.formatReservationStatus(reservationDetails.getReservationStatus()) + "</li>" +
                 "<li>총 가격: " + reservationDetails.getTotalPrice() + "원</li>" +
-                "<li>결제 상태: " + reservationDetails.getPaymentStatus() + "</li>" +
+                "<li>결제 상태: " + ReservationFormatUtil.formatPaymentStatus(reservationDetails.getPaymentStatus()) + "</li>" +
                 "</ul>" +
                 "<p>감사합니다, EasyCheck 팀.</p>";
 
