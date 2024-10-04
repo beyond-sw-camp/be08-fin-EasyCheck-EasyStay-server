@@ -28,9 +28,9 @@ public class ReservationRoomView {
 
     private LocalDateTime reservationDate;
 
-    private LocalDate checkinDate;
+    private LocalDateTime checkinDate;
 
-    private LocalDate checkoutDate;
+    private LocalDateTime checkoutDate;
 
     private ReservationStatus reservationStatus;
 
@@ -48,8 +48,8 @@ public class ReservationRoomView {
                 reservationRoomEntity.getRoomEntity().getRoomPic(),
                 reservationRoomEntity.getRoomEntity().getStatus(),
                 reservationRoomEntity.getReservationDate(),
-                reservationRoomEntity.getCheckinDate().toLocalDate(),
-                reservationRoomEntity.getCheckoutDate().toLocalDate(),
+                reservationRoomEntity.getCheckinDate().toLocalDate().atStartOfDay(),
+                reservationRoomEntity.getCheckoutDate().toLocalDate().atStartOfDay(),
                 reservationRoomEntity.getReservationStatus(),
                 reservationRoomEntity.getTotalPrice(),
                 reservationRoomEntity.getPaymentStatus()
