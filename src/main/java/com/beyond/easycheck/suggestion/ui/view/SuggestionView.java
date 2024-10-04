@@ -15,11 +15,11 @@ public class SuggestionView {
 
     private String accommodationName;
 
+    private String userName;
+
     private String type;
 
     private String subject;
-
-    private String name;
 
     private String email;
 
@@ -37,9 +37,9 @@ public class SuggestionView {
 
                 suggestionEntity.getId(),
                 suggestionEntity.getAccommodationEntity().getName(),
+                suggestionEntity.getUserEntity().getName(),
                 suggestionEntity.getType(),
                 suggestionEntity.getSubject(),
-                suggestionEntity.getSuggesterName(),
                 suggestionEntity.getEmail(),
                 suggestionEntity.getTitle(),
                 suggestionEntity.getContent(),

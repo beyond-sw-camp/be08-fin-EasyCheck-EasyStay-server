@@ -2,19 +2,22 @@ package com.beyond.easycheck.suggestion.application.service;
 
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
-import com.beyond.easycheck.additionalservices.exception.AdditionalServiceMessageType;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.suggestion.exception.SuggestionMessageType;
 import com.beyond.easycheck.suggestion.infrastructure.persistence.entity.SuggestionEntity;
 import com.beyond.easycheck.suggestion.infrastructure.persistence.repository.SuggestionsRepository;
 import com.beyond.easycheck.suggestion.ui.requestbody.SuggestionCreateRequest;
 import com.beyond.easycheck.suggestion.ui.view.SuggestionView;
+import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
+import com.beyond.easycheck.user.infrastructure.persistence.mariadb.repository.UserJpaRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,19 +32,25 @@ public class SuggestionService {
     @Autowired
     private final SuggestionsRepository suggestionsRepository;
     private final AccommodationRepository accommodationRepository;
+    private final UserJpaRepository userJpaRepository;
 
     @Transactional
-    public Optional<SuggestionEntity> createSuggestion(SuggestionCreateRequest suggestionCreateRequest) {
+    public Optional<SuggestionEntity> createSuggestion(Long userId, SuggestionCreateRequest suggestionCreateRequest) {
 
         AccommodationEntity accommodationEntity = accommodationRepository.findById(suggestionCreateRequest.getAccommodationId()).orElseThrow(
                 () -> new EasyCheckException(SuggestionMessageType.SUGGESTION_NOT_FOUND)
         );
 
+        UserEntity userEntity = userJpaRepository.findById(userId).orElseThrow(
+                () -> new EasyCheckException(SuggestionMessageType.SUGGESTION_NOT_FOUND)
+        );
+
+
         SuggestionEntity suggestion = SuggestionEntity.builder()
                 .accommodationEntity(accommodationEntity)
+                .userEntity(userEntity)
                 .type(suggestionCreateRequest.getType())
                 .subject(suggestionCreateRequest.getSubject())
-                .suggesterName(suggestionCreateRequest.getSuggesterName())
                 .email(suggestionCreateRequest.getEmail())
                 .title(suggestionCreateRequest.getTitle())
                 .content(suggestionCreateRequest.getContent())

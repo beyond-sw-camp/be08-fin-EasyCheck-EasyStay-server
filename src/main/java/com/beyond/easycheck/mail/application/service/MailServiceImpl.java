@@ -53,7 +53,8 @@ public class MailServiceImpl implements MailService{
             verificationCodeRepository.save(verificationCodeEntity);
 
             // 메일 내용 html로 생성
-            String htmlContent = generateEmailContent(verificationCode);
+            String htmlContent = generateVerificationCodeEmailContent(verificationCode);
+
             // 수신자 이메일 주소 설정
             message.setRecipients(MimeMessage.RecipientType.TO, email);
             // 메일 제목 설정
@@ -98,28 +99,34 @@ public class MailServiceImpl implements MailService{
 
     }
 
-    private String generateEmailContent(String verificationCode) {
+    private String generateCustomerInquiryResponseContent(String customerName, String inquirySubject, String responseContent) {
+        String title = "EasyCheck 고객 건의사항 답변";
+        String mainContent =
+                "<h1 style=\"color: #FF6B35; font-size: 24px; margin: 0 0 15px 0; text-align: center; font-weight: bold;\">고객 건의사항 답변</h1>" +
+                        "<p style=\"color: #333333; font-size: 16px; line-height: 1.4; margin: 0 0 20px 0; text-align: left;\">" +
+                        "안녕하세요 " + customerName + "님,<br><br>" +
+                        "귀하의 소중한 의견에 감사드립니다. 아래와 같이 답변 드립니다." +
+                        "</p>" +
+                        "<div style=\"background-color: #f8f8f8; border-radius: 8px; padding: 20px; margin-bottom: 20px;\">" +
+                        "<h2 style=\"color: #FF6B35; font-size: 18px; margin: 0 0 10px 0;\">건의사항: " + inquirySubject + "</h2>" +
+                        "<p style=\"color: #333333; font-size: 16px; line-height: 1.6; margin: 0;\">" +
+                        responseContent +
+                        "</p>" +
+                        "</div>" +
+                        "<p style=\"color: #666666; font-size: 14px; line-height: 1.4; margin: 0 0 15px 0; text-align: left;\">" +
+                        "추가 문의사항이 있으시면 언제든 연락 주시기 바랍니다." +
+                        "</p>" +
+                        "<p style=\"color: #333333; font-size: 14px; line-height: 1.4; margin: 0; text-align: left;\">" +
+                        "감사합니다,<br>" +
+                        "<strong>EasyCheck 고객지원팀</strong>" +
+                        "</p>";
 
-        return "<!DOCTYPE html>" +
-                "<html lang=\"ko\">" +
-                "<head>" +
-                "<meta charset=\"UTF-8\">" +
-                "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
-                "<title>EasyCheck 인증 코드</title>" +
-                "</head>" +
-                "<body style=\"font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;\">" +
-                "<table role=\"presentation\" style=\"width: 100%; border-collapse: collapse;\">" +
-                "<tr>" +
-                "<td align=\"center\" style=\"padding: 20px 0;\">" +
-                "<table role=\"presentation\" style=\"width: 100%; max-width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);\">" +
-                "<tr>" +
-                "<td style=\"padding: 20px 20px 10px 20px;\">" +
-                "<img src=\"https://beyond-easycheck.s3.us-east-1.amazonaws.com/logos/email-logo.png\" alt=\"EasyCheck\" style=\"max-width: 100%; height: auto; border-radius: 8px;\">" +
-                "</td>" +
-                "</tr>" +
-                "<tr>" +
-                "<td style=\"padding: 10px 20px;\">" +
-                "<h1 style=\"color: #FF6B35; font-size: 24px; margin: 0 0 15px 0; text-align: center; font-weight: bold;\">인증 코드 안내</h1>" +
+        return generateEmailTemplate(title, mainContent);
+    }
+
+    private String generateVerificationCodeEmailContent(String verificationCode) {
+        String title = "EasyCheck 인증 코드";
+        String mainContent = "<h1 style=\"color: #FF6B35; font-size: 24px; margin: 0 0 15px 0; text-align: center; font-weight: bold;\">인증 코드 안내</h1>" +
                 "<p style=\"color: #333333; font-size: 16px; line-height: 1.4; margin: 0 0 10px 0; text-align: center;\">" +
                 "안녕하세요,<br>" +
                 "아래의 인증 코드를 입력해 주세요." +
@@ -135,7 +142,35 @@ public class MailServiceImpl implements MailService{
                 "<p style=\"color: #333333; font-size: 14px; line-height: 1.4; margin: 0; text-align: left;\">" +
                 "감사합니다,<br>" +
                 "<strong>EasyCheck 팀</strong>" +
-                "</p>" +
+                "</p>";
+
+        return generateEmailTemplate(title, mainContent);
+    }
+
+    private String generateEmailTemplate(String title, String mainContent) {
+        final String FOOTER_CONTENT = "© 2024 EasyCheck. All rights reserved.<br>" +
+                "서울특별시 강남구 테헤란로 123, EasyStay 타워";
+
+        return "<!DOCTYPE html>" +
+                "<html lang=\"ko\">" +
+                "<head>" +
+                "<meta charset=\"UTF-8\">" +
+                "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
+                "<title>EasyCheck 인증 코드</title>" +
+                "</head>" +
+                "<body style=\"font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;\">" +
+                "<table role=\"presentation\" style=\"width: 100%; border-collapse: collapse;\">" +
+                "<tr>" +
+                "<td align=\"center\" style=\"padding: 40px 0;\">" +
+                "<table role=\"presentation\" style=\"width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);\">" +
+                "<tr>" +
+                "<td style=\"padding: 40px 40px 20px 40px; text-align: center;\">" +
+                "<img src=\"https://example.com/ticketlink-logo.png\" alt=\"티켓링크 로고\" style=\"max-width: 200px; height: auto;\">" +
+                "</td>" +
+                "</tr>" +
+                "<tr>" +
+                "<td style=\"padding: 10px 20px;\">" +
+                mainContent +
                 "</td>" +
                 "</tr>" +
                 "</table>" +
@@ -143,8 +178,7 @@ public class MailServiceImpl implements MailService{
                 "<tr>" +
                 "<td style=\"padding: 20px 0; text-align: center;\">" +
                 "<p style=\"color: #999999; font-size: 12px; margin: 0; line-height: 1.4;\">" +
-                "© 2024 EasyCheck. All rights reserved.<br>" +
-                "서울특별시 강남구 테헤란로 123, EasyStay 타워" +
+                FOOTER_CONTENT +
                 "</p>" +
                 "</td>" +
                 "</tr>" +
@@ -155,7 +189,6 @@ public class MailServiceImpl implements MailService{
                 "</body>" +
                 "</html>";
     }
-
 
 
 
