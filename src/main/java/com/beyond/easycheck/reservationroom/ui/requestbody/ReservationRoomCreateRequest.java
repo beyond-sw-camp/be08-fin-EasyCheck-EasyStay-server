@@ -21,9 +21,6 @@ import java.time.LocalDateTime;
 public class ReservationRoomCreateRequest {
 
     @NotNull
-    private Long userId;
-
-    @NotNull
     private Long roomId;
 
     @NotNull
