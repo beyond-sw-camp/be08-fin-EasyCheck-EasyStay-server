@@ -12,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -28,9 +29,10 @@ public class ReservationRoomController {
     @Operation(summary = "객실을 예약하는 API")
     @PostMapping("")
     public ResponseEntity<ReservationRoomEntity> createReservation(
+            @AuthenticationPrincipal Long userId,
             @RequestBody @Valid ReservationRoomCreateRequest reservationRoomCreateRequest) {
 
-        reservationRoomService.createReservation(reservationRoomCreateRequest);
+        reservationRoomService.createReservation(userId, reservationRoomCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

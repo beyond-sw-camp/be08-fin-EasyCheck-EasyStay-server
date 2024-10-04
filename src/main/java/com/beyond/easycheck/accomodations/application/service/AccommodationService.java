@@ -7,9 +7,6 @@ import com.beyond.easycheck.accomodations.ui.requestbody.AccommodationCreateRequ
 import com.beyond.easycheck.accomodations.ui.requestbody.AccommodationUpdateRequest;
 import com.beyond.easycheck.accomodations.ui.view.AccommodationView;
 import com.beyond.easycheck.common.exception.EasyCheckException;
-import com.beyond.easycheck.user.exception.UserMessageType;
-import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
-import com.beyond.easycheck.user.infrastructure.persistence.mariadb.repository.UserJpaRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,17 +24,11 @@ import java.util.stream.Collectors;
 public class AccommodationService {
 
     private final AccommodationRepository accommodationRepository;
-    private final UserJpaRepository userJpaRepository;
 
     @Transactional
     public Optional<AccommodationEntity> createAccommodation(AccommodationCreateRequest accommodationCreateRequest) {
 
-        UserEntity userEntity = userJpaRepository.findById(accommodationCreateRequest.getUserId()).orElseThrow(
-                () -> new EasyCheckException(UserMessageType.USER_NOT_FOUND)
-        );
-
         AccommodationEntity accommodationEntity = AccommodationEntity.builder()
-                .userEntity(userEntity)
                 .name(accommodationCreateRequest.getName())
                 .address(accommodationCreateRequest.getAddress())
                 .accommodationType(accommodationCreateRequest.getAccommodationType())

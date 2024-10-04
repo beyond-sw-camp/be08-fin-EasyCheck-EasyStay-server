@@ -41,6 +41,8 @@ public class PaymentEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private LocalDateTime paymentDate;
 
+    private LocalDateTime cancelDate;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CompletionStatus completionStatus;
