@@ -107,46 +107,42 @@ public class MailServiceImpl implements MailService{
                 "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
                 "<title>EasyCheck 인증 코드</title>" +
                 "</head>" +
-                "<body style=\"font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;\">" +
+                "<body style=\"font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;\">" +
                 "<table role=\"presentation\" style=\"width: 100%; border-collapse: collapse;\">" +
                 "<tr>" +
-                "<td align=\"center\" style=\"padding: 40px 0;\">" +
-                "<table role=\"presentation\" style=\"width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);\">" +
+                "<td align=\"center\" style=\"padding: 20px 0;\">" +
+                "<table role=\"presentation\" style=\"width: 100%; max-width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);\">" +
                 "<tr>" +
-                "<td style=\"padding: 40px 40px 20px 40px; text-align: center;\">" +
-                "<img src=\"https://example.com/ticketlink-logo.png\" alt=\"티켓링크 로고\" style=\"max-width: 200px; height: auto;\">" +
+                "<td style=\"padding: 20px 20px 10px 20px;\">" +
+                "<img src=\"https://beyond-easycheck.s3.us-east-1.amazonaws.com/logos/email-logo.png\" alt=\"EasyCheck\" style=\"max-width: 100%; height: auto; border-radius: 8px;\">" +
                 "</td>" +
                 "</tr>" +
                 "<tr>" +
-                "<td style=\"padding: 0 40px;\">" +
-                "<h1 style=\"color: #333333; font-size: 24px; margin-bottom: 20px; text-align: center;\">인증 코드 안내</h1>" +
-                "<p style=\"color: #666666; font-size: 16px; line-height: 1.5; margin-bottom: 20px;\">" +
-                "안녕하세요,<br><br>" +
-                "EasyCheck를 이용해 주셔서 감사합니다. 아래의 인증 코드를 입력하여 본인 확인을 완료해 주세요." +
+                "<td style=\"padding: 10px 20px;\">" +
+                "<h1 style=\"color: #FF6B35; font-size: 24px; margin: 0 0 15px 0; text-align: center; font-weight: bold;\">인증 코드 안내</h1>" +
+                "<p style=\"color: #333333; font-size: 16px; line-height: 1.4; margin: 0 0 10px 0; text-align: center;\">" +
+                "안녕하세요,<br>" +
+                "아래의 인증 코드를 입력해 주세요." +
                 "</p>" +
-                "<div style=\"background-color: #f8f8f8; border-radius: 4px; padding: 20px; text-align: center; margin-bottom: 20px;\">" +
-                "<h2 style=\"color: #e74c3c; font-size: 32px; margin: 0; letter-spacing: 5px;\">" +
+                "<div style=\"background-color: #f8f8f8; border-radius: 8px; padding: 15px; text-align: center; margin-bottom: 15px;\">" +
+                "<h2 style=\"color: #FF6B35; font-size: 32px; margin: 0; letter-spacing: 5px; font-weight: bold;\">" +
                 verificationCode +
                 "</h2>" +
                 "</div>" +
-                "<p style=\"color: #666666; font-size: 14px; line-height: 1.5; margin-bottom: 30px;\">" +
-                "이 인증 코드는 5분 동안 유효합니다. 본 메일을 요청하지 않으셨다면, 이 메일을 무시해 주세요." +
+                "<p style=\"color: #666666; font-size: 14px; line-height: 1.4; margin: 0 0 15px 0; text-align: left;\">" +
+                "* 인증 코드는 5분간 유효합니다." +
                 "</p>" +
-                "</td>" +
-                "</tr>" +
-                "<tr>" +
-                "<td style=\"padding: 20px 40px 40px 40px;\">" +
-                "<p style=\"color: #666666; font-size: 16px; line-height: 1.5; margin-bottom: 10px;\">" +
+                "<p style=\"color: #333333; font-size: 14px; line-height: 1.4; margin: 0; text-align: left;\">" +
                 "감사합니다,<br>" +
-                "티켓링크 팀" +
+                "<strong>EasyCheck 팀</strong>" +
                 "</p>" +
                 "</td>" +
                 "</tr>" +
                 "</table>" +
-                "<table role=\"presentation\" style=\"width: 600px; border-collapse: collapse;\">" +
+                "<table role=\"presentation\" style=\"width: 100%; max-width: 600px; border-collapse: collapse;\">" +
                 "<tr>" +
                 "<td style=\"padding: 20px 0; text-align: center;\">" +
-                "<p style=\"color: #999999; font-size: 12px; margin: 0;\">" +
+                "<p style=\"color: #999999; font-size: 12px; margin: 0; line-height: 1.4;\">" +
                 "© 2024 EasyCheck. All rights reserved.<br>" +
                 "서울특별시 강남구 테헤란로 123, EasyStay 타워" +
                 "</p>" +
