@@ -25,9 +25,6 @@ public class SuggestionCreateRequest {
     private String subject;
 
     @NotBlank
-    private String suggesterName;
-
-    @NotBlank
     private String email;
 
     @NotBlank
