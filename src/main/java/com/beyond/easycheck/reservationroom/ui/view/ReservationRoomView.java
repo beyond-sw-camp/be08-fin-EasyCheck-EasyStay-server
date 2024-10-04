@@ -18,6 +18,8 @@ public class ReservationRoomView {
 
     private Long id;
 
+    private String userName;
+
     private String typeName;
 
     private String roomPic;
@@ -41,6 +43,7 @@ public class ReservationRoomView {
         return new ReservationRoomView(
 
                 reservationRoomEntity.getId(),
+                reservationRoomEntity.getUserEntity().getName(),
                 reservationRoomEntity.getRoomEntity().getRoomTypeEntity().getTypeName(),
                 reservationRoomEntity.getRoomEntity().getRoomPic(),
                 reservationRoomEntity.getRoomEntity().getStatus(),

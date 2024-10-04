@@ -12,6 +12,9 @@ import com.beyond.easycheck.rooms.exception.RoomMessageType;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomStatus;
 import com.beyond.easycheck.rooms.infrastructure.repository.RoomRepository;
+import com.beyond.easycheck.user.exception.UserMessageType;
+import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
+import com.beyond.easycheck.user.infrastructure.persistence.mariadb.repository.UserJpaRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,7 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,12 +33,18 @@ public class ReservationRoomService {
 
     private final ReservationRoomRepository reservationRoomRepository;
     private final RoomRepository roomRepository;
+    private final UserJpaRepository userJpaRepository;
 
     @Transactional
-    public ReservationRoomEntity createReservation(ReservationRoomCreateRequest reservationRoomCreateRequest) {
+    public ReservationRoomEntity createReservation(Long userId, ReservationRoomCreateRequest reservationRoomCreateRequest) {
 
-        RoomEntity roomEntity = roomRepository.findById(reservationRoomCreateRequest.getRoomId())
-                .orElseThrow(() -> new EasyCheckException(RoomMessageType.ROOM_NOT_FOUND));
+        UserEntity userEntity = userJpaRepository.findById(userId).orElseThrow(
+                () -> new EasyCheckException(UserMessageType.USER_NOT_FOUND)
+        );
+
+        RoomEntity roomEntity = roomRepository.findById(reservationRoomCreateRequest.getRoomId()).orElseThrow(
+                () -> new EasyCheckException(RoomMessageType.ROOM_NOT_FOUND)
+        );
 
         if (!roomEntity.getStatus().equals(RoomStatus.예약가능)) {
             throw new EasyCheckException(ReservationRoomMessageType.ROOM_NOT_AVAILABLE);
@@ -59,6 +67,7 @@ public class ReservationRoomService {
 
         ReservationRoomEntity reservationRoomEntity = ReservationRoomEntity.builder()
                 .roomEntity(roomEntity)
+                .userEntity(userEntity)
                 .reservationDate(LocalDateTime.now())
                 .checkinDate(reservationRoomCreateRequest.getCheckinDate())
                 .checkoutDate(reservationRoomCreateRequest.getCheckoutDate())
