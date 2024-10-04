@@ -54,21 +54,19 @@ public class AccommodationController {
 
     @Operation(summary = "시설의 정보를 수정하는 API")
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateAccommodation(@AuthenticationPrincipal Long userId,
-                                                    @PathVariable("id") Long id,
+    public ResponseEntity<Void> updateAccommodation(@PathVariable("id") Long id,
                                                     @RequestBody @Valid AccommodationUpdateRequest accommodationUpdateRequest) {
 
-        accommodationService.updateAccommodation(userId, id, accommodationUpdateRequest);
+        accommodationService.updateAccommodation(id, accommodationUpdateRequest);
 
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "시설의 정보를 삭제하는 API")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAccommodation(@AuthenticationPrincipal Long userId,
-                                                    @PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteAccommodation(@PathVariable("id") Long id) {
 
-        accommodationService.deleteAccommodation(userId, id);
+        accommodationService.deleteAccommodation(id);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

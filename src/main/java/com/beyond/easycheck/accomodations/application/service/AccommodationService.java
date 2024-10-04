@@ -32,10 +32,6 @@ public class AccommodationService {
     @Transactional
     public Optional<AccommodationEntity> createAccommodation(AccommodationCreateRequest accommodationCreateRequest) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Long userId = (Long) authentication.getPrincipal();
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-
         AccommodationEntity accommodationEntity = AccommodationEntity.builder()
                 .name(accommodationCreateRequest.getName())
                 .address(accommodationCreateRequest.getAddress())
@@ -67,7 +63,7 @@ public class AccommodationService {
     }
 
     @Transactional
-    public void updateAccommodation(Long userId, Long id, AccommodationUpdateRequest accommodationUpdateRequest) {
+    public void updateAccommodation(Long id, AccommodationUpdateRequest accommodationUpdateRequest) {
 
         AccommodationEntity accommodationEntity = accommodationRepository.findById(id).orElseThrow(
                 () -> new EasyCheckException(AccommodationMessageType.ACCOMMODATION_NOT_FOUND)
@@ -79,7 +75,7 @@ public class AccommodationService {
     }
 
     @Transactional
-    public void deleteAccommodation(Long userId, Long id) {
+    public void deleteAccommodation(Long id) {
 
         AccommodationEntity accommodationEntity = accommodationRepository.findById(id).orElseThrow(
                 () -> new EasyCheckException(AccommodationMessageType.ACCOMMODATION_NOT_FOUND)
