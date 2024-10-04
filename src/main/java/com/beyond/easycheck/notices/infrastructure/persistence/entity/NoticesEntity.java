@@ -4,6 +4,7 @@ import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEnt
 import com.beyond.easycheck.common.entity.BaseTimeEntity;
 
 import com.beyond.easycheck.notices.ui.requestbody.NoticesUpdateRequest;
+import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -32,6 +33,11 @@ public class NoticesEntity extends BaseTimeEntity {
     @JoinColumn(name = "accommodation_id", nullable = false)
     @JsonManagedReference
     private AccommodationEntity accommodationEntity;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonManagedReference
+    private UserEntity userEntity;
 
     @NotNull
     @Column(length = 100)

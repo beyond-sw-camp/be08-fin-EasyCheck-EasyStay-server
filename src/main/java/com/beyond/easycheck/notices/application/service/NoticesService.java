@@ -10,6 +10,8 @@ import com.beyond.easycheck.notices.infrastructure.persistence.repository.Notice
 import com.beyond.easycheck.notices.ui.requestbody.NoticesCreateRequest;
 import com.beyond.easycheck.notices.ui.requestbody.NoticesUpdateRequest;
 import com.beyond.easycheck.notices.ui.view.NoticesView;
+import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
+import com.beyond.easycheck.user.infrastructure.persistence.mariadb.repository.UserJpaRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +32,22 @@ public class NoticesService {
 
     private final NoticesRepository noticesRepository;
     private final AccommodationRepository accommodationRepository;
+    private final UserJpaRepository userJpaRepository;
 
-    public Optional<NoticesEntity> createNotices(NoticesCreateRequest noticesCreateRequest) {
+    public Optional<NoticesEntity> createNotices(Long userId ,NoticesCreateRequest noticesCreateRequest) {
 
         AccommodationEntity accommodationEntity = accommodationRepository.findById(noticesCreateRequest.getAccommodationId()).orElseThrow(
                 () -> new EasyCheckException(NoticesMessageType.NOTICES_NOT_FOUND)
         );
 
+        UserEntity userEntity = userJpaRepository.findById(userId).orElseThrow(
+                () -> new EasyCheckException(NoticesMessageType.NOTICES_NOT_FOUND)
+        );
+
+
         NoticesEntity notices = NoticesEntity.builder()
                 .accommodationEntity(accommodationEntity)
+                .userEntity(userEntity)
                 .title(noticesCreateRequest.getTitle())
                 .content(noticesCreateRequest.getContent())
                 .build();

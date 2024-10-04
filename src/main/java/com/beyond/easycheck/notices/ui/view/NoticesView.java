@@ -18,6 +18,8 @@ public class NoticesView {
 
     private String accommodationName;
 
+    private String userName;
+
     private String title;
 
     private String content;
@@ -34,6 +36,7 @@ public class NoticesView {
         return new NoticesView(
                 noticesEntity.getId(),
                 noticesEntity.getAccommodationEntity().getName(),
+                noticesEntity.getUserEntity().getName(),
                 noticesEntity.getTitle(),
                 noticesEntity.getContent());
     }
