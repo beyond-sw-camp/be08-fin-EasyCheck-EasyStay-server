@@ -71,7 +71,7 @@ public class ReservationRoomService {
                 .reservationDate(LocalDateTime.now())
                 .checkinDate(reservationRoomCreateRequest.getCheckinDate())
                 .checkoutDate(reservationRoomCreateRequest.getCheckoutDate())
-                .reservationStatus(ReservationStatus.POSSIBLE)
+                .reservationStatus(reservationRoomCreateRequest.getReservationStatus())
                 .totalPrice(reservationRoomCreateRequest.getTotalPrice())
                 .paymentStatus(reservationRoomCreateRequest.getPaymentStatus())
                 .build();
@@ -105,14 +105,6 @@ public class ReservationRoomService {
 
         ReservationRoomEntity reservationRoomEntity = reservationRoomRepository.findById(id)
                 .orElseThrow(() -> new EasyCheckException(ReservationRoomMessageType.RESERVATION_NOT_FOUND));
-
-        if (reservationRoomEntity.getCheckinDate().isBefore(LocalDateTime.now())) {
-            throw new EasyCheckException(ReservationRoomMessageType.CANNOT_CANCEL_CHECKED_IN_RESERVATION);
-        }
-
-        if (reservationRoomUpdateRequest.getCheckoutDate().isBefore(reservationRoomUpdateRequest.getCheckinDate())) {
-            throw new EasyCheckException(ReservationRoomMessageType.INVALID_CHECKOUT_DATE);
-        }
 
         reservationRoomEntity.updateReservationRoom(reservationRoomUpdateRequest);
 

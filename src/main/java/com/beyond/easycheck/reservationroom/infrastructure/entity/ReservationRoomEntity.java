@@ -60,10 +60,6 @@ public class ReservationRoomEntity extends BaseTimeEntity {
     private PaymentStatus paymentStatus;
 
     public void updateReservationRoom(ReservationRoomUpdateRequest reservationRoomUpdateRequest) {
-        Optional.ofNullable(reservationRoomUpdateRequest.getCheckinDate()).ifPresent(checkinDate -> this.checkinDate = checkinDate);
-        Optional.ofNullable(reservationRoomUpdateRequest.getCheckoutDate()).ifPresent(checkoutDate -> this.checkoutDate = checkoutDate);
         Optional.ofNullable(reservationRoomUpdateRequest.getReservationStatus()).ifPresent(reservationStatus -> this.reservationStatus = reservationStatus);
-        Optional.ofNullable(reservationRoomUpdateRequest.getTotalPrice()).ifPresent(totalPrice -> this.totalPrice = totalPrice);
-        Optional.ofNullable(reservationRoomUpdateRequest.getPaymentStatus()).ifPresent(paymentStatus -> this.paymentStatus = paymentStatus);
     }
 }
