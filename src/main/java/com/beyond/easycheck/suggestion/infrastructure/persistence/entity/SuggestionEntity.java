@@ -1,6 +1,7 @@
 package com.beyond.easycheck.suggestion.infrastructure.persistence.entity;
 
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
+import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -28,6 +29,11 @@ public class SuggestionEntity {
     @JsonManagedReference
     private AccommodationEntity accommodationEntity;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonManagedReference
+    private UserEntity userEntity;
+
     // suggestion_type : 유형
     @NotNull
     @Column(length = 20)
@@ -37,11 +43,6 @@ public class SuggestionEntity {
     @NotNull
     @Column(length = 20)
     private String subject;
-
-    // suggester_name : 건의자명
-    @NotNull
-    @Column(length = 10)
-    private String suggesterName;
 
 
     @NotNull
