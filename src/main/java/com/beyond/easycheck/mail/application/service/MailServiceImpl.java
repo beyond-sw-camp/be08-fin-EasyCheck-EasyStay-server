@@ -136,18 +136,46 @@ public class MailServiceImpl implements MailService{
     private String generateReservationConfirmationEmailContent(ReservationRoomView reservationDetails) {
 
         String title = "EasyCheck 예약 안내 메일";
-        String mainContent = "<h1>EasyCheck 예약 내역</h1>" +
-                "<p>안녕하세요, " + reservationDetails.getUserName() + "님.</p>" +
-                "<p>다음과 같이 예약 내역을 확인해주세요:</p>" +
-                "<ul>" +
-                "<li>객실 이름: " + reservationDetails.getTypeName() + "</li>" +
-                "<li>체크인 날짜: " + ReservationFormatUtil.formatLocalDateTime(reservationDetails.getCheckinDate()) + "</li>" +
-                "<li>체크아웃 날짜: " + ReservationFormatUtil.formatLocalDateTime(reservationDetails.getCheckoutDate()) + "</li>" +
-                "<li>예약 상태: " + ReservationFormatUtil.formatReservationStatus(reservationDetails.getReservationStatus()) + "</li>" +
-                "<li>총 가격: " + reservationDetails.getTotalPrice() + "원</li>" +
-                "<li>결제 상태: " + ReservationFormatUtil.formatPaymentStatus(reservationDetails.getPaymentStatus()) + "</li>" +
-                "</ul>" +
-                "<p>감사합니다, EasyCheck 팀.</p>";
+        String mainContent = "<div style=\"width: 100%; max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;\">" +
+                "<div style=\"background-color: #f8f8f8; padding: 20px; border-radius: 8px;\">" +
+                "<h1 style=\"color: #FF6B35; font-size: 24px; margin-bottom: 15px; text-align: center; font-weight: bold;\">" +
+                "EasyCheck 예약 내역</h1>" +
+                "<p style=\"font-size: 16px; color: #333333; text-align: center;\">" +
+                "안녕하세요, <strong>" + reservationDetails.getUserName() + "</strong>님.</p>" +
+                "<p style=\"font-size: 16px; color: #333333; text-align: center; margin-bottom: 20px;\">" +
+                "다음과 같이 예약 내역을 확인해주세요.</p>" +
+                "<div style=\"background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); margin-top: 20px;\">" +
+                "<table style=\"width: 100%; border-collapse: collapse; font-size: 16px; color: #333333;\">" +
+                "<tr>" +
+                "<td style=\"padding: 10px; border-bottom: 1px solid #ddd; border-right: 1px solid #ddd;\"><strong>객실 이름</strong></td>" +
+                "<td style=\"padding: 10px; border-bottom: 1px solid #ddd;\">" + reservationDetails.getTypeName() + "</td>" +
+                "</tr>" +
+                "<tr>" +
+                "<td style=\"padding: 10px; border-bottom: 1px solid #ddd; border-right: 1px solid #ddd;\"><strong>체크인 날짜</strong></td>" +
+                "<td style=\"padding: 10px; border-bottom: 1px solid #ddd;\">" + ReservationFormatUtil.formatLocalDateTime(reservationDetails.getCheckinDate()) + "</td>" +
+                "</tr>" +
+                "<tr>" +
+                "<td style=\"padding: 10px; border-bottom: 1px solid #ddd; border-right: 1px solid #ddd;\"><strong>체크아웃 날짜</strong></td>" +
+                "<td style=\"padding: 10px; border-bottom: 1px solid #ddd;\">" + ReservationFormatUtil.formatLocalDateTime(reservationDetails.getCheckoutDate()) + "</td>" +
+                "</tr>" +
+                "<tr>" +
+                "<td style=\"padding: 10px; border-bottom: 1px solid #ddd; border-right: 1px solid #ddd;\"><strong>예약 상태</strong></td>" +
+                "<td style=\"padding: 10px; border-bottom: 1px solid #ddd;\">" + ReservationFormatUtil.formatReservationStatus(reservationDetails.getReservationStatus()) + "</td>" +
+                "</tr>" +
+                "<tr>" +
+                "<td style=\"padding: 10px; border-bottom: 1px solid #ddd; border-right: 1px solid #ddd;\"><strong>총 가격</strong></td>" +
+                "<td style=\"padding: 10px; border-bottom: 1px solid #ddd;\">" + reservationDetails.getTotalPrice() + "원</td>" +
+                "</tr>" +
+                "<tr>" +
+                "<td style=\"padding: 10px; border-right: 1px solid #ddd;\"><strong>결제 상태</strong></td>" +
+                "<td style=\"padding: 10px;\">" + ReservationFormatUtil.formatPaymentStatus(reservationDetails.getPaymentStatus()) + "</td>" +
+                "</tr>" +
+                "</table>" +
+                "</div>" +
+                "</div>" +
+                "<p style=\"color: #666666; font-size: 14px; text-align: center; margin-top: 20px;\">" +
+                "감사합니다,<br><strong>EasyCheck 팀</strong></p>" +
+                "</div>";
 
         return generateEmailTemplate(title, mainContent);
     }
