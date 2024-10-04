@@ -14,9 +14,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public class AccommodationCreateRequest {
 
-    @NotNull
-    private Long userId;
-
     @NotBlank
     private String name;
 
