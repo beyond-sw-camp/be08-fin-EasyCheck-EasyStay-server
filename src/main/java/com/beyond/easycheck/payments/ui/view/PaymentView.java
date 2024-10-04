@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,9 +18,9 @@ public class PaymentView {
 
     private Long reservationRoomId;
 
-    private LocalDate checkinDate;
+    private LocalDateTime checkinDate;
 
-    private LocalDate checkoutDate;
+    private LocalDateTime checkoutDate;
 
     private String method;
 

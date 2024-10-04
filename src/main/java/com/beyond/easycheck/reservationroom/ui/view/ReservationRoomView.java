@@ -45,8 +45,8 @@ public class ReservationRoomView {
                 reservationRoomEntity.getRoomEntity().getRoomPic(),
                 reservationRoomEntity.getRoomEntity().getStatus(),
                 reservationRoomEntity.getReservationDate(),
-                reservationRoomEntity.getCheckinDate(),
-                reservationRoomEntity.getCheckoutDate(),
+                reservationRoomEntity.getCheckinDate().toLocalDate(),
+                reservationRoomEntity.getCheckoutDate().toLocalDate(),
                 reservationRoomEntity.getReservationStatus(),
                 reservationRoomEntity.getTotalPrice(),
                 reservationRoomEntity.getPaymentStatus()

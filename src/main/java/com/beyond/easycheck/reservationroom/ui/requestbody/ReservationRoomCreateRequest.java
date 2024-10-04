@@ -27,12 +27,12 @@ public class ReservationRoomCreateRequest {
     private LocalDateTime reservationDate;
 
     @NotNull(message = "체크인 날짜를 지정해야 합니다.")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate checkinDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime checkinDate;
 
     @NotNull(message = "체크아웃 날짜를 지정해야 합니다.")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate checkoutDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime checkoutDate;
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus;
