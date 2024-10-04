@@ -77,4 +77,8 @@ public class ReservationRoomEntity extends BaseTimeEntity {
         this.updateReservationRoom(reservationRoomUpdateRequest);
         this.processPayment(paymentEntity);
     }
+
+    public void updatePaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
 }

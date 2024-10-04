@@ -18,7 +18,7 @@ public class PaymentValidator {
             throw new IllegalArgumentException("결제가 완료되지 않았습니다.");
         }
 
-        if (reservationRoomEntity.getReservationStatus() != ReservationStatus.POSSIBLE) {
+        if (reservationRoomEntity.getReservationStatus() != ReservationStatus.RESERVATION) {
             throw new IllegalArgumentException("현재 예약 상태에서는 결제가 불가능합니다.");
         }
 

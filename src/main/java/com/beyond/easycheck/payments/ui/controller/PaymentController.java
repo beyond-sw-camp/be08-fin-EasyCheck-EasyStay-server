@@ -32,16 +32,6 @@ public class PaymentController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-//    @Operation(summary = "객실 예약을 결제하는 API")
-//    @PostMapping("")
-//    public ResponseEntity<PaymentCreateRequest> createPayment(
-//            @RequestBody @Valid PaymentCreateRequest paymentCreateRequest) {
-//
-//        paymentService.createPayment(paymentCreateRequest);
-//
-//        return ResponseEntity.status(HttpStatus.CREATED).build();
-//    }
-
     @Operation(summary = "결제 내역 리스트를 조회하는 API")
     @GetMapping("")
     public ResponseEntity<List<PaymentView>> getAllPayments(

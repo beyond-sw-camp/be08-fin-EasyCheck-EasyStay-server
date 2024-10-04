@@ -9,6 +9,7 @@ import com.beyond.easycheck.payments.ui.requestbody.PaymentCreateRequest;
 import com.beyond.easycheck.payments.ui.requestbody.PaymentUpdateRequest;
 import com.beyond.easycheck.payments.ui.view.PaymentView;
 import com.beyond.easycheck.reservationroom.exception.ReservationRoomMessageType;
+import com.beyond.easycheck.reservationroom.infrastructure.entity.PaymentStatus;
 import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationRoomEntity;
 import com.beyond.easycheck.reservationroom.infrastructure.repository.ReservationRoomRepository;
 import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomUpdateRequest;
@@ -40,6 +41,8 @@ public class PaymentService {
         PaymentValidator.validatePayment(paymentEntity, reservationRoomEntity);
 
         reservationRoomEntity.updateReservationRoomAndProcessPayment(new ReservationRoomUpdateRequest(), paymentEntity);
+
+        reservationRoomEntity.updatePaymentStatus(PaymentStatus.PAID);
 
         reservationRoomRepository.save(reservationRoomEntity);
     }
