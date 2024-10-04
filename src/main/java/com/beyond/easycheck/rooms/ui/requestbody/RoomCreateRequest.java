@@ -1,6 +1,7 @@
 package com.beyond.easycheck.rooms.ui.requestbody;
 
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomStatus;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,5 +21,8 @@ public class RoomCreateRequest {
 
     @NotNull
     private RoomStatus status;
+
+    @NotNull @Max(10)
+    private int roomAmount;
 
 }
