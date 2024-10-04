@@ -23,12 +23,11 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    @Operation(summary = "객실 예약을 결제하는 API")
+    @Operation(summary = "결제 처리하는 API")
     @PostMapping("")
-    public ResponseEntity<PaymentCreateRequest> createPayment(
-            @RequestBody @Valid PaymentCreateRequest paymentCreateRequest) {
+    public ResponseEntity<Void> processPayment(@RequestBody @Valid PaymentCreateRequest paymentCreateRequest) {
 
-        paymentService.createPayment(paymentCreateRequest);
+        paymentService.processReservationPayment(paymentCreateRequest.getReservationId(), paymentCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
