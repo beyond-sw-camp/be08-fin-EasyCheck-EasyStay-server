@@ -136,7 +136,7 @@ class UserServiceTest {
         assertThat(result.refreshToken()).isNotNull();
 
         assertThat(jwtUtil.parseEmail(result.accessToken())).isEqualTo(user.getEmail());
-        assertThat(Long.parseLong(jwtUtil.parseUserId(result.accessToken()))).isEqualTo(user.getId());
+        assertThat(jwtUtil.parseUserId(result.accessToken())).isEqualTo(user.getId());
     }
 
     @Test
