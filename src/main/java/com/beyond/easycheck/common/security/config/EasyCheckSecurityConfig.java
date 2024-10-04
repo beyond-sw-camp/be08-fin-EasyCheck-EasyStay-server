@@ -43,7 +43,11 @@ public class EasyCheckSecurityConfig {
                                     "/api/v1/users/change-password",
                                     "/api/v1/verification-code",
                                     "/api/v1/verify-code",
-                                    "/api/v1/sms/**"
+                                    "/api/v1/sms/**",
+
+                                    // Swagger UI v3 (OpenAPI)
+                                    "/v3/api-docs/**",
+                                    "/swagger-ui/**"
                             )
                             .permitAll();
 
@@ -68,7 +72,4 @@ public class EasyCheckSecurityConfig {
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter(jwtAuthenticationProvider);
     }
-
-
-
 }
