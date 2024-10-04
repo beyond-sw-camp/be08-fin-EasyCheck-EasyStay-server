@@ -2,6 +2,7 @@ package com.beyond.easycheck.events.infrastructure.entity;
 
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.common.entity.BaseTimeEntity;
+import com.beyond.easycheck.events.ui.requestbody.EventUpdateRequest;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -44,5 +45,14 @@ public class EventEntity extends BaseTimeEntity {
 
     @Column(nullable = false)
     private LocalDate endDate;
+
+    public void update(EventUpdateRequest eventUpdateRequest, AccommodationEntity newAccommodationEntity) {
+        this.accommodationEntity = newAccommodationEntity;
+        this.eventName = eventUpdateRequest.getEventName();
+        this.image = eventUpdateRequest.getImage();
+        this.detail = eventUpdateRequest.getDetail();
+        this.startDate = eventUpdateRequest.getStartDate();
+        this.endDate = eventUpdateRequest.getEndDate();
+    }
 
 }
