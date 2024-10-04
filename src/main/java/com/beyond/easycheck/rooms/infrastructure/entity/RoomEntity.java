@@ -37,9 +37,13 @@ public class RoomEntity extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private RoomStatus status;
 
+    @Column(nullable = false)
+    private int roomAmount;
+
     public void update(RoomUpdateRequest roomUpdateRequest) {
         roomNumber = roomUpdateRequest.getRoomNumber();
         roomPic = roomUpdateRequest.getRoomPic();
+        roomAmount = roomUpdateRequest.getRoomAmount();
         status = roomUpdateRequest.getStatus();
     }
 }

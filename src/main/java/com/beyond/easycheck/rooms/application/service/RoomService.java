@@ -35,6 +35,7 @@ public class RoomService {
                 .roomNumber(roomCreateRequest.getRoomNumber())
                 .roomPic(roomCreateRequest.getRoomPic())
                 .status(roomCreateRequest.getStatus())
+                .roomAmount(roomCreateRequest.getRoomAmount())
                 .build();
 
         room = roomRepository.save(room);
@@ -51,6 +52,7 @@ public class RoomService {
                 .roomId(room.getRoomId())
                 .roomNumber(room.getRoomNumber())
                 .roomPic(room.getRoomPic())
+                .roomAmount(room.getRoomAmount())
                 .status(room.getStatus())
                 .roomTypeId(roomType.getRoomTypeId())
                 .accomodationId(roomType.getAccommodationEntity().getId())
@@ -75,6 +77,7 @@ public class RoomService {
                         roomEntity.getRoomId(),
                         roomEntity.getRoomNumber(),
                         roomEntity.getRoomPic(),
+                        roomEntity.getRoomAmount(),
                         roomEntity.getStatus(),
                         roomEntity.getRoomTypeEntity().getRoomTypeId(),
                         roomEntity.getRoomTypeEntity().getAccommodationEntity().getId(),
