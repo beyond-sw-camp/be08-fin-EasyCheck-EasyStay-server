@@ -1,6 +1,7 @@
 package com.beyond.easycheck.reservationroom.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
+import com.beyond.easycheck.mail.application.service.MailService;
 import com.beyond.easycheck.reservationroom.exception.ReservationRoomMessageType;
 import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationRoomEntity;
 import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationStatus;
@@ -34,6 +35,7 @@ public class ReservationRoomService {
     private final ReservationRoomRepository reservationRoomRepository;
     private final RoomRepository roomRepository;
     private final UserJpaRepository userJpaRepository;
+    private final MailService mailService;
 
     @Transactional
     public ReservationRoomEntity createReservation(Long userId, ReservationRoomCreateRequest reservationRoomCreateRequest) {
@@ -76,7 +78,12 @@ public class ReservationRoomService {
                 .paymentStatus(reservationRoomCreateRequest.getPaymentStatus())
                 .build();
 
-        return reservationRoomRepository.save(reservationRoomEntity);
+        reservationRoomRepository.save(reservationRoomEntity);
+
+        ReservationRoomView reservationRoomView = ReservationRoomView.of(reservationRoomEntity);
+        mailService.sendReservationConfirmationEmail(userEntity.getEmail(), reservationRoomView);
+
+        return reservationRoomEntity;
     }
 
     @Transactional(readOnly = true)

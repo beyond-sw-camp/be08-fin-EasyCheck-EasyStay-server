@@ -7,6 +7,7 @@ import com.beyond.easycheck.mail.infrastructure.persistence.redis.entity.Verific
 import com.beyond.easycheck.mail.infrastructure.persistence.redis.entity.VerifiedEmailEntity;
 import com.beyond.easycheck.mail.infrastructure.persistence.redis.repository.VerificationCodeRepository;
 import com.beyond.easycheck.mail.infrastructure.persistence.redis.repository.VerifiedEmailRepository;
+import com.beyond.easycheck.reservationroom.ui.view.ReservationRoomView;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -86,6 +87,37 @@ public class MailServiceImpl implements MailService{
 
     }
 
+    @Override
+    @Transactional
+    public void sendReservationConfirmationEmail(String email, ReservationRoomView reservationDetails) {
+
+        MimeMessage message = mailSender.createMimeMessage();
+
+        try {
+            // 송신자 메일 설정
+            final String SENDER_EMAIL_ADDRESS = "yonginfren@gmail.com";
+            message.setFrom(new InternetAddress(SENDER_EMAIL_ADDRESS));
+
+            // 메일 수신자 설정
+            message.setRecipients(MimeMessage.RecipientType.TO, email);
+
+            // 메일 제목 설정
+            message.setSubject(MAIL_SUBJECT);
+
+            // 메일 본문 내용 생성
+            String htmlContent = generateReservationConfirmationEmailContent(reservationDetails);
+
+            // 메일 내용 설정
+            message.setContent(htmlContent, "text/html; charset=utf-8");
+
+            // 메일 전송
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            log.error("Failed to send reservation confirmation email", e);
+            throw new EasyCheckException(CommonMessageType.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     private String generateVerificationCode() {
         final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         final int CODE_LENGTH = 8;
@@ -97,6 +129,26 @@ public class MailServiceImpl implements MailService{
         }
         return code.toString();
 
+    }
+
+    private String generateReservationConfirmationEmailContent(ReservationRoomView reservationDetails) {
+
+        String title = "EasyCheck 예약 안내 메일";
+        String mainContent = "<h1>EasyCheck 예약 내역</h1>" +
+                "<p>안녕하세요, " + reservationDetails.getUserName() + "님.</p>" +
+                "<p>다음과 같이 예약 내역을 확인해주세요:</p>" +
+                "<ul>" +
+                "<li>객실 이름: " + reservationDetails.getTypeName() + "</li>" +
+                "<li>예약 생성 날짜: " + reservationDetails.getReservationDate() + "</li>" +
+                "<li>체크인 날짜: " + reservationDetails.getCheckinDate() + "</li>" +
+                "<li>체크아웃 날짜: " + reservationDetails.getCheckoutDate() + "</li>" +
+                "<li>예약 상태: " + reservationDetails.getReservationStatus() + "</li>" +
+                "<li>총 가격: " + reservationDetails.getTotalPrice() + "원</li>" +
+                "<li>결제 상태: " + reservationDetails.getPaymentStatus() + "</li>" +
+                "</ul>" +
+                "<p>감사합니다, EasyCheck 팀.</p>";
+
+        return generateEmailTemplate(title, mainContent);
     }
 
     private String generateCustomerInquiryResponseContent(String customerName, String inquirySubject, String responseContent) {
