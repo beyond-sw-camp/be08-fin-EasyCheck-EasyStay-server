@@ -20,13 +20,11 @@ public class ReservationRoomView {
 
     private String userName;
 
+    private Long roomId;
+
     private String typeName;
 
-    private String roomPic;
-
     private RoomStatus roomStatus;
-
-    private LocalDateTime reservationDate;
 
     private LocalDateTime checkinDate;
 
@@ -44,10 +42,9 @@ public class ReservationRoomView {
 
                 reservationRoomEntity.getId(),
                 reservationRoomEntity.getUserEntity().getName(),
+                reservationRoomEntity.getRoomEntity().getRoomId(),
                 reservationRoomEntity.getRoomEntity().getRoomTypeEntity().getTypeName(),
-                reservationRoomEntity.getRoomEntity().getRoomPic(),
                 reservationRoomEntity.getRoomEntity().getStatus(),
-                reservationRoomEntity.getReservationDate(),
                 reservationRoomEntity.getCheckinDate().toLocalDate().atStartOfDay(),
                 reservationRoomEntity.getCheckoutDate().toLocalDate().atStartOfDay(),
                 reservationRoomEntity.getReservationStatus(),

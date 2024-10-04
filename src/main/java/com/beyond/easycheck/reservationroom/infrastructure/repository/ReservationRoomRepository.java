@@ -11,6 +11,6 @@ import java.time.LocalDateTime;
 @Repository
 public interface ReservationRoomRepository extends JpaRepository<ReservationRoomEntity, Long> {
 
-    boolean existsByRoomEntityAndCheckinDateLessThanEqualAndCheckoutDateGreaterThanEqual(
+    int countByRoomEntityAndCheckinDateLessThanEqualAndCheckoutDateGreaterThanEqual(
             RoomEntity roomEntity, LocalDateTime checkoutDate, LocalDateTime checkinDate);
 }
