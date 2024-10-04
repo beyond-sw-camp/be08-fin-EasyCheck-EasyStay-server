@@ -5,6 +5,7 @@ import com.beyond.easycheck.common.security.infrastructure.persistence.entity.Ex
 import com.beyond.easycheck.common.security.infrastructure.persistence.repository.ExpiredAccessTokenJpaRepository;
 import com.beyond.easycheck.common.security.utils.JwtUtil;
 import com.beyond.easycheck.mail.infrastructure.persistence.redis.repository.VerifiedEmailRepository;
+import com.beyond.easycheck.sms.infrastructure.persistence.redis.repository.SmsVerifiedPhoneRepository;
 import com.beyond.easycheck.user.application.domain.EasyCheckUserDetails;
 import com.beyond.easycheck.user.application.domain.UserRole;
 import com.beyond.easycheck.user.exception.UserMessageType;
@@ -35,7 +36,11 @@ public class UserService implements UserOperationUseCase {
     private final UserJpaRepository userJpaRepository;
 
     private final VerifiedEmailRepository verifiedEmailRepository;
+
+    private final SmsVerifiedPhoneRepository smsVerifiedPhoneRepository;
+
     private final ExpiredAccessTokenJpaRepository expiredAccessTokenJpaRepository;
+
 
 
     @Override
@@ -51,6 +56,9 @@ public class UserService implements UserOperationUseCase {
         // 이메일 인증을 했는지 확인
         checkEmailIsVerified(command.email());
 
+        // 휴대폰 인증을 했는지 확인
+        checkPhoneIsVerified(command.phone());
+
         // 회원 저장하기 전에 비밀번호 암호화
         String securePassword = passwordEncoder.encode(command.password());
         user.setSecurePassword(securePassword);
@@ -63,6 +71,7 @@ public class UserService implements UserOperationUseCase {
         UserEntity result = userJpaRepository.save(user);
         log.info("[registerUser] - userEntity save result = {}", result);
     }
+
 
     @Override
     public FindJwtResult login(UserLoginCommand command) {
@@ -115,7 +124,6 @@ public class UserService implements UserOperationUseCase {
     }
 
     private boolean passwordIncorrect(UserLoginCommand command, UserEntity user) {
-        log.info(user.getPassword());
         return !passwordEncoder.matches(command.password(), user.getPassword());
     }
 
@@ -124,13 +132,17 @@ public class UserService implements UserOperationUseCase {
                 .orElseThrow(() -> new EasyCheckException(UserMessageType.EMAIL_UNAUTHORIZED));
     }
 
+    private void checkPhoneIsVerified(String phone) {
+        smsVerifiedPhoneRepository.findById(phone)
+                .orElseThrow(() -> new EasyCheckException(UserMessageType.PHONE_UNAUTHORIZED));
+    }
+
     private void checkEmailIsDuplicated(UserRegisterCommand command) {
         userJpaRepository.findUserEntityByEmail(command.email())
                 .ifPresent(userEntity -> {
                     throw new EasyCheckException(UserMessageType.USER_ALREADY_REGISTERED);
                 });
     }
-
 
     private UserEntity retrieveUserByEmail(String email) {
         return userJpaRepository.findUserEntityByEmail(email)

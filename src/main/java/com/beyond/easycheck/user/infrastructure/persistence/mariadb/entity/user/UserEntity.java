@@ -2,7 +2,7 @@ package com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user
 
 import com.beyond.easycheck.user.application.service.UserOperationUseCase.UserRegisterCommand;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.role.RoleEntity;
-import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.role.UserPermissionEntity;
+import com.beyond.easycheck.permissions.infrastructure.persistence.mariadb.entity.UserPermissionEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

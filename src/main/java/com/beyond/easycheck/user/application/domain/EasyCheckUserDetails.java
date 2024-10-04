@@ -1,7 +1,7 @@
 package com.beyond.easycheck.user.application.domain;
 
-import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.permission.PermissionEntity;
-import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.role.UserPermissionEntity;
+import com.beyond.easycheck.permissions.infrastructure.persistence.mariadb.entity.PermissionEntity;
+import com.beyond.easycheck.permissions.infrastructure.persistence.mariadb.entity.UserPermissionEntity;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

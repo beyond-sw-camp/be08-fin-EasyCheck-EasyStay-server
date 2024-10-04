@@ -1,11 +1,11 @@
-package com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.role;
+package com.beyond.easycheck.permissions.infrastructure.persistence.mariadb.entity;
 
 
-import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.permission.PermissionEntity;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
 
@@ -21,6 +21,7 @@ public class UserPermissionEntity {
 
     private String grantedBy;
 
+    @CreationTimestamp
     private Timestamp grantedDatetime;
 
     @ManyToOne
@@ -30,4 +31,14 @@ public class UserPermissionEntity {
     @ManyToOne
     @JoinColumn(name = "permission_id")
     private PermissionEntity permission;
+
+    private UserPermissionEntity(String grantedBy, UserEntity user, PermissionEntity permission) {
+        this.grantedBy = grantedBy;
+        this.user = user;
+        this.permission = permission;
+    }
+
+    public static UserPermissionEntity grantPermission(String grantedBy, UserEntity user, PermissionEntity permission) {
+        return new UserPermissionEntity(grantedBy, user, permission);
+    }
 }

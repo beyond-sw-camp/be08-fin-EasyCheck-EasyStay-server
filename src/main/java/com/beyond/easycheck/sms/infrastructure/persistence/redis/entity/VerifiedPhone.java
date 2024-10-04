@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.TimeToLive;
 
 @Getter
 @ToString
@@ -14,7 +15,12 @@ public class VerifiedPhone {
     @Id
     private String phone;
 
+    @TimeToLive
+    private Long ttl;
+
     private VerifiedPhone(String phone) {
+        // 만료기간 10분
+        this.ttl = 600L;
         this.phone = phone;
     }
 
