@@ -75,6 +75,9 @@ public class ReservationRoomService {
 
         roomRepository.save(roomEntity);
 
+        ReservationRoomView reservationRoomView = ReservationRoomView.of(reservationRoomEntity);
+        mailService.sendReservationConfirmationEmail(userEntity.getEmail(), reservationRoomView);
+
         return reservationRoomEntity;
     }
 
