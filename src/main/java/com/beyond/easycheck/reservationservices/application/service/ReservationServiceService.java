@@ -10,6 +10,7 @@ import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationSta
 import com.beyond.easycheck.reservationroom.infrastructure.repository.ReservationRoomRepository;
 import com.beyond.easycheck.reservationservices.exception.ReservationServiceMessageType;
 import com.beyond.easycheck.reservationservices.infrastructure.entity.ReservationServiceEntity;
+import com.beyond.easycheck.reservationservices.infrastructure.entity.ReservationServiceStatus;
 import com.beyond.easycheck.reservationservices.infrastructure.repository.ReservationServiceRepository;
 import com.beyond.easycheck.reservationservices.ui.requestbody.ReservationServiceCreateRequest;
 import com.beyond.easycheck.reservationservices.ui.requestbody.ReservationServiceUpdateRequest;
@@ -98,6 +99,14 @@ public class ReservationServiceService {
         ReservationServiceEntity reservationServiceEntity = reservationServiceRepository.findById(id).orElseThrow(
                 () -> new EasyCheckException(ReservationServiceMessageType.RESERVATION_SERVICE_NOT_FOUND)
         );
+
+        if (reservationServiceEntity.getReservationServiceStatus() == ReservationServiceStatus.CANCELED) {
+            throw new EasyCheckException(ReservationServiceMessageType.RESERVATION_SERVICE_ALREADY_CANCELED);
+        }
+
+        if (reservationServiceEntity.getReservationRoomEntity().getReservationStatus() == ReservationStatus.CANCELED) {
+            throw new EasyCheckException(ReservationRoomMessageType.RESERVATION_CANCELED);
+        }
 
         reservationServiceEntity.cancelReservationService(reservationServiceUpdateRequest);
 

@@ -18,6 +18,7 @@ public enum ReservationServiceMessageType implements MessageType {
     INVALID_QUANTITY("The quantity must be greater than 0.", HttpStatus.BAD_REQUEST),
     INVALID_TOTAL_PRICE("The total price must match the quantity multiplied by the service price.", HttpStatus.BAD_REQUEST),
     RESERVATION_CANCELED("The reservation has been canceled and cannot be modified.", HttpStatus.BAD_REQUEST),
+    RESERVATION_SERVICE_ALREADY_CANCELED("This reservation service has already been canceled.", HttpStatus.BAD_REQUEST),
     ;
 
     private final String message;
