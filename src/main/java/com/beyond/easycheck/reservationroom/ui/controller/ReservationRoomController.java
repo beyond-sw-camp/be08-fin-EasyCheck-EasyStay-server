@@ -19,7 +19,7 @@ import java.util.List;
 
 @Tag(name = "ReservationRoom", description = "객실 예약 관리")
 @RestController
-@RequestMapping("/api/v1/reservationroom")
+@RequestMapping("/api/v1/reservation-room")
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 public class ReservationRoomController {
 

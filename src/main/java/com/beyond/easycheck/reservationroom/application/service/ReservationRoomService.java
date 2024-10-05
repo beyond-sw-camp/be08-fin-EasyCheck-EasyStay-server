@@ -9,6 +9,10 @@ import com.beyond.easycheck.reservationroom.infrastructure.repository.Reservatio
 import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomCreateRequest;
 import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomUpdateRequest;
 import com.beyond.easycheck.reservationroom.ui.view.ReservationRoomView;
+import com.beyond.easycheck.reservationservices.infrastructure.entity.ReservationServiceEntity;
+import com.beyond.easycheck.reservationservices.infrastructure.entity.ReservationServiceStatus;
+import com.beyond.easycheck.reservationservices.infrastructure.repository.ReservationServiceRepository;
+import com.beyond.easycheck.reservationservices.ui.requestbody.ReservationServiceUpdateRequest;
 import com.beyond.easycheck.rooms.exception.RoomMessageType;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomStatus;
@@ -36,6 +40,7 @@ public class ReservationRoomService {
     private final RoomRepository roomRepository;
     private final UserJpaRepository userJpaRepository;
     private final MailService mailService;
+    private final ReservationServiceRepository reservationServiceRepository;
 
     @Transactional
     public ReservationRoomEntity createReservation(Long userId, ReservationRoomCreateRequest reservationRoomCreateRequest) {
@@ -110,6 +115,13 @@ public class ReservationRoomService {
 
         reservationRoomEntity.updateReservationRoom(reservationRoomUpdateRequest);
         reservationRoomRepository.save(reservationRoomEntity);
+
+        List<ReservationServiceEntity> additionalServices = reservationServiceRepository.findByReservationRoomEntity(reservationRoomEntity);
+
+        for (ReservationServiceEntity service : additionalServices) {
+            service.cancelReservationService(new ReservationServiceUpdateRequest(ReservationServiceStatus.CANCELED));
+        }
+        reservationServiceRepository.saveAll(additionalServices);
 
         RoomEntity roomEntity = reservationRoomEntity.getRoomEntity();
 
