@@ -52,33 +52,34 @@ public class ReservationRoomService {
             throw new EasyCheckException(ReservationRoomMessageType.ROOM_NOT_AVAILABLE);
         }
 
-        if (reservationRoomCreateRequest.getCheckinDate().isBefore(LocalDateTime.now())) {
-            throw new EasyCheckException(ReservationRoomMessageType.INVALID_CHECKIN_DATE);
-        }
-
-        if (reservationRoomCreateRequest.getCheckoutDate().isBefore(reservationRoomCreateRequest.getCheckinDate())) {
-            throw new EasyCheckException(ReservationRoomMessageType.INVALID_CHECKOUT_DATE);
-        }
-
-        boolean isRoomAlreadyBooked = reservationRoomRepository.existsByRoomEntityAndCheckinDateLessThanEqualAndCheckoutDateGreaterThanEqual(
-                roomEntity, reservationRoomCreateRequest.getCheckoutDate(), reservationRoomCreateRequest.getCheckinDate());
-
-        if (isRoomAlreadyBooked) {
-            throw new EasyCheckException(ReservationRoomMessageType.ROOM_ALREADY_BOOKED);
-        }
-
         ReservationRoomEntity reservationRoomEntity = ReservationRoomEntity.builder()
                 .roomEntity(roomEntity)
                 .userEntity(userEntity)
                 .reservationDate(LocalDateTime.now())
                 .checkinDate(reservationRoomCreateRequest.getCheckinDate())
                 .checkoutDate(reservationRoomCreateRequest.getCheckoutDate())
-                .reservationStatus(reservationRoomCreateRequest.getReservationStatus())
+                .reservationStatus(ReservationStatus.RESERVATION)
                 .totalPrice(reservationRoomCreateRequest.getTotalPrice())
                 .paymentStatus(reservationRoomCreateRequest.getPaymentStatus())
                 .build();
 
         reservationRoomRepository.save(reservationRoomEntity);
+
+        int reservationCount = reservationRoomRepository.countByRoomEntityAndReservationStatus(roomEntity, ReservationStatus.RESERVATION);
+
+        if (reservationCount > 10) {
+            if (reservationRoomEntity.getUserEntity().getId().equals(userId)) {
+                throw new EasyCheckException(ReservationRoomMessageType.ROOM_ALREADY_FULL);
+            }
+        }
+
+        if (reservationCount >= 10) {
+            roomEntity.setStatus(RoomStatus.예약불가);
+        } else {
+            roomEntity.setStatus(RoomStatus.예약가능);
+        }
+
+        roomRepository.save(roomEntity);
 
         ReservationRoomView reservationRoomView = ReservationRoomView.of(reservationRoomEntity);
         mailService.sendReservationConfirmationEmail(userEntity.getEmail(), reservationRoomView);
@@ -114,7 +115,15 @@ public class ReservationRoomService {
                 .orElseThrow(() -> new EasyCheckException(ReservationRoomMessageType.RESERVATION_NOT_FOUND));
 
         reservationRoomEntity.updateReservationRoom(reservationRoomUpdateRequest);
-
         reservationRoomRepository.save(reservationRoomEntity);
+
+        RoomEntity roomEntity = reservationRoomEntity.getRoomEntity();
+
+        int reservationCount = reservationRoomRepository.countByRoomEntityAndReservationStatus(roomEntity, ReservationStatus.RESERVATION);
+
+        if (reservationCount < 10) {
+            roomEntity.setStatus(RoomStatus.예약가능);
+            roomRepository.save(roomEntity);
+        }
     }
 }

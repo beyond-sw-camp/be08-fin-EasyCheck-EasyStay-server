@@ -46,4 +46,8 @@ public class RoomEntity extends BaseTimeEntity {
         roomAmount = roomUpdateRequest.getRoomAmount();
         status = roomUpdateRequest.getStatus();
     }
+
+    public void setStatus(RoomStatus status) {
+        this.status = status;
+    }
 }

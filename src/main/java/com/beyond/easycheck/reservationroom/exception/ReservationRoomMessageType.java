@@ -18,6 +18,7 @@ public enum ReservationRoomMessageType implements MessageType {
     INVALID_CHECKIN_DATE("Check-in date must be after the current date.", HttpStatus.BAD_REQUEST),
     INVALID_CHECKOUT_DATE("Checkout date must be after check-in date.", HttpStatus.BAD_REQUEST),
     ROOM_ALREADY_BOOKED("The room is already booked for the selected dates.", HttpStatus.CONFLICT),
+    ROOM_ALREADY_FULL("The room is already fully booked.", HttpStatus.CONFLICT),
     CANNOT_CANCEL_CHECKED_IN_RESERVATION("You cannot cancel a reservation that has already checked in.", HttpStatus.BAD_REQUEST);
     ;
 
