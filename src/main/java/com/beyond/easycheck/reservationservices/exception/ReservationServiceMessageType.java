@@ -14,6 +14,10 @@ public enum ReservationServiceMessageType implements MessageType {
     INTERNAL_SERVER_ERROR("An error occurred inside the server.", HttpStatus.INTERNAL_SERVER_ERROR),
     RESERVATION_SERVICE_NOT_FOUND("Reservation Service not found", HttpStatus.NOT_FOUND),
     METHOD_NOT_ALLOWED("your request method not allowed", HttpStatus.METHOD_NOT_ALLOWED),
+    SERVICE_ALREADY_ADDED("This service has already been added to the reservation.", HttpStatus.BAD_REQUEST),
+    INVALID_QUANTITY("The quantity must be greater than 0.", HttpStatus.BAD_REQUEST),
+    INVALID_TOTAL_PRICE("The total price must match the quantity multiplied by the service price.", HttpStatus.BAD_REQUEST),
+    RESERVATION_CANCELED("The reservation has been canceled and cannot be modified.", HttpStatus.BAD_REQUEST),
     ;
 
     private final String message;
