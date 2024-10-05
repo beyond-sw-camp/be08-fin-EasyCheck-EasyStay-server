@@ -65,15 +65,9 @@ public class ReservationRoomService {
 
         reservationRoomRepository.save(reservationRoomEntity);
 
-        int reservationCount = reservationRoomRepository.countByRoomEntityAndReservationStatus(roomEntity, ReservationStatus.RESERVATION);
+        roomEntity.setRemainingRoom(roomEntity.getRemainingRoom() - 1);
 
-        if (reservationCount > 10) {
-            if (reservationRoomEntity.getUserEntity().getId().equals(userId)) {
-                throw new EasyCheckException(ReservationRoomMessageType.ROOM_ALREADY_FULL);
-            }
-        }
-
-        if (reservationCount >= 10) {
+        if (roomEntity.getRemainingRoom() <= 0) {
             roomEntity.setStatus(RoomStatus.예약불가);
         } else {
             roomEntity.setStatus(RoomStatus.예약가능);
@@ -119,11 +113,12 @@ public class ReservationRoomService {
 
         RoomEntity roomEntity = reservationRoomEntity.getRoomEntity();
 
-        int reservationCount = reservationRoomRepository.countByRoomEntityAndReservationStatus(roomEntity, ReservationStatus.RESERVATION);
+        roomEntity.setRemainingRoom(roomEntity.getRemainingRoom() + 1);
 
-        if (reservationCount < 10) {
+        if (roomEntity.getRemainingRoom() > 0) {
             roomEntity.setStatus(RoomStatus.예약가능);
-            roomRepository.save(roomEntity);
         }
+
+        roomRepository.save(roomEntity);
     }
 }
