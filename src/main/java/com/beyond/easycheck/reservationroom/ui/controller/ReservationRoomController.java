@@ -6,7 +6,6 @@ import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomCreate
 import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomUpdateRequest;
 import com.beyond.easycheck.reservationroom.ui.view.DayRoomAvailabilityView;
 import com.beyond.easycheck.reservationroom.ui.view.ReservationRoomView;
-import com.beyond.easycheck.reservationroom.ui.view.RoomAvailabilityView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
