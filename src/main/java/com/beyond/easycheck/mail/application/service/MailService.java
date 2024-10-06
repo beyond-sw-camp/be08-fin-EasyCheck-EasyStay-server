@@ -1,6 +1,7 @@
 package com.beyond.easycheck.mail.application.service;
 
 import com.beyond.easycheck.reservationroom.ui.view.ReservationRoomView;
+import com.beyond.easycheck.suggestion.ui.requestbody.SuggestionReplyRequestBody;
 
 public interface MailService {
 
@@ -9,4 +10,6 @@ public interface MailService {
     void verifyEmail(String code);
 
     void sendReservationConfirmationEmail(String email, ReservationRoomView reservationDetails);
+
+    void sendSuggestionReply(SuggestionReplyRequestBody requestBody);
 }
