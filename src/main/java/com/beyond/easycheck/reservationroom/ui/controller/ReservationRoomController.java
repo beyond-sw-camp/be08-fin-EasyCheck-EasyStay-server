@@ -4,6 +4,7 @@ import com.beyond.easycheck.reservationroom.application.service.ReservationRoomS
 import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationRoomEntity;
 import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomCreateRequest;
 import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomUpdateRequest;
+import com.beyond.easycheck.reservationroom.ui.view.DayRoomAvailabilityView;
 import com.beyond.easycheck.reservationroom.ui.view.ReservationRoomView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,6 +35,17 @@ public class ReservationRoomController {
         reservationRoomService.createReservation(userId, reservationRoomCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Operation(summary = "월별 예약 가능한 객실 조회 API")
+    @GetMapping("/room-list")
+    public ResponseEntity<List<DayRoomAvailabilityView>> getRoomAvailabilityByMonth(
+            @RequestParam int year,
+            @RequestParam int month) {
+
+        List<DayRoomAvailabilityView> roomAvailability = reservationRoomService.getRoomAvailabilityByMonth(year, month);
+
+        return ResponseEntity.ok(roomAvailability);
     }
 
     @Operation(summary = "예약 내역 리스트를 조회하는 API")
