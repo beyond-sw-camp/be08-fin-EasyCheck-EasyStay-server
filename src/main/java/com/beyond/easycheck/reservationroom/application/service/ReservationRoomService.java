@@ -71,6 +71,7 @@ public class ReservationRoomService {
                         .roomEntity(roomEntity)
                         .date(checkinDate.atStartOfDay())
                         .remainingRoom(10)
+                        .status(RoomStatus.예약가능)
                         .build());
 
         if (dailyAvailability.getRemainingRoom() <= 0) {
@@ -91,6 +92,13 @@ public class ReservationRoomService {
         reservationRoomRepository.save(reservationRoomEntity);
 
         dailyAvailability.decrementRemainingRoom();
+
+        if (dailyAvailability.getRemainingRoom() <= 0) {
+            dailyAvailability.setStatus(RoomStatus.예약불가);
+        } else {
+            dailyAvailability.setStatus(RoomStatus.예약가능);
+        }
+
         dailyRoomAvailabilityRepository.save(dailyAvailability);
 
 //        ReservationRoomView reservationRoomView = ReservationRoomView.of(reservationRoomEntity);
@@ -170,6 +178,13 @@ public class ReservationRoomService {
                 .orElseThrow(() -> new EasyCheckException(ReservationRoomMessageType.ROOM_NOT_AVAILABLE));
 
         dailyAvailability.incrementRemainingRoom();
+
+        if (dailyAvailability.getRemainingRoom() <= 0) {
+            dailyAvailability.setStatus(RoomStatus.예약불가);
+        } else {
+            dailyAvailability.setStatus(RoomStatus.예약가능);
+        }
+
         dailyRoomAvailabilityRepository.save(dailyAvailability);
     }
 }

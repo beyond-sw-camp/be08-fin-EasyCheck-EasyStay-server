@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
@@ -26,10 +25,14 @@ public class DailyRoomAvailabilityEntity {
     private RoomEntity roomEntity;
 
     @Column(nullable = false)
-    private LocalDateTime date; // 해당 날짜
+    @Enumerated(EnumType.STRING)
+    private RoomStatus status;
 
     @Column(nullable = false)
-    private int remainingRoom = 10; // 기본값을 10으로 설정
+    private LocalDateTime date;
+
+    @Column(nullable = false)
+    private int remainingRoom = 10;
 
     public void decrementRemainingRoom() {
         if (remainingRoom > 0) {
@@ -41,5 +44,9 @@ public class DailyRoomAvailabilityEntity {
         if (remainingRoom < 10) {
             remainingRoom++;
         }
+    }
+
+    public void setStatus(RoomStatus status) {
+        this.status = status;
     }
 }
