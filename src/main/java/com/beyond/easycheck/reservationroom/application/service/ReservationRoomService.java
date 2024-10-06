@@ -8,7 +8,9 @@ import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationSta
 import com.beyond.easycheck.reservationroom.infrastructure.repository.ReservationRoomRepository;
 import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomCreateRequest;
 import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomUpdateRequest;
+import com.beyond.easycheck.reservationroom.ui.view.DayRoomAvailabilityView;
 import com.beyond.easycheck.reservationroom.ui.view.ReservationRoomView;
+import com.beyond.easycheck.reservationroom.ui.view.RoomAvailabilityView;
 import com.beyond.easycheck.reservationservices.infrastructure.entity.ReservationServiceEntity;
 import com.beyond.easycheck.reservationservices.infrastructure.entity.ReservationServiceStatus;
 import com.beyond.easycheck.reservationservices.infrastructure.repository.ReservationServiceRepository;
@@ -28,7 +30,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,10 +84,41 @@ public class ReservationRoomService {
 
         roomRepository.save(roomEntity);
 
-        ReservationRoomView reservationRoomView = ReservationRoomView.of(reservationRoomEntity);
-        mailService.sendReservationConfirmationEmail(userEntity.getEmail(), reservationRoomView);
+//        ReservationRoomView reservationRoomView = ReservationRoomView.of(reservationRoomEntity);
+//        mailService.sendReservationConfirmationEmail(userEntity.getEmail(), reservationRoomView);
 
         return reservationRoomEntity;
+    }
+
+    @Transactional(readOnly = true)
+    public List<DayRoomAvailabilityView> getRoomAvailabilityByMonth(int year, int month) {
+        // 요청된 연월에 해당하는 시작 날짜와 끝 날짜 계산
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+
+        // 모든 객실 정보와 예약 정보를 조회
+        List<RoomEntity> allRooms = roomRepository.findAll();
+        List<ReservationRoomEntity> reservations = reservationRoomRepository.findByCheckinDateBetween(startDate.atStartOfDay(), endDate.atTime(23, 59));
+
+        // 날짜별로 객실 예약 가능 상태를 수집
+        List<DayRoomAvailabilityView> availabilityViews = new ArrayList<>();
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            LocalDate finalDate = date;  // effectively final 변수 생성
+            List<RoomAvailabilityView> roomsForDay = allRooms.stream()
+                    .map(room -> new RoomAvailabilityView(room, isRoomAvailable(room, reservations, finalDate)))
+                    .collect(Collectors.toList());
+            availabilityViews.add(new DayRoomAvailabilityView(finalDate, roomsForDay));
+        }
+
+        return availabilityViews;
+    }
+
+    // 객실이 해당 날짜에 예약 가능한지 확인하는 메서드
+    private boolean isRoomAvailable(RoomEntity room, List<ReservationRoomEntity> reservations, LocalDate date) {
+        return reservations.stream()
+                .noneMatch(reservation -> reservation.getRoomEntity().equals(room) &&
+                        !reservation.getCheckinDate().toLocalDate().isAfter(date) &&
+                        !reservation.getCheckoutDate().toLocalDate().isBefore(date));
     }
 
     @Transactional(readOnly = true)
