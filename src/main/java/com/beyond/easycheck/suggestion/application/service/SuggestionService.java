@@ -1,13 +1,17 @@
 package com.beyond.easycheck.suggestion.application.service;
 
+import com.beyond.easycheck.accomodations.exception.AccommodationMessageType;
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
 import com.beyond.easycheck.common.exception.EasyCheckException;
+import com.beyond.easycheck.mail.application.service.MailService;
 import com.beyond.easycheck.suggestion.exception.SuggestionMessageType;
 import com.beyond.easycheck.suggestion.infrastructure.persistence.entity.SuggestionEntity;
 import com.beyond.easycheck.suggestion.infrastructure.persistence.repository.SuggestionsRepository;
 import com.beyond.easycheck.suggestion.ui.requestbody.SuggestionCreateRequest;
+import com.beyond.easycheck.suggestion.ui.requestbody.SuggestionReplyRequestBody;
 import com.beyond.easycheck.suggestion.ui.view.SuggestionView;
+import com.beyond.easycheck.user.exception.UserMessageType;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.repository.UserJpaRepository;
 import lombok.AccessLevel;
@@ -33,16 +37,17 @@ public class SuggestionService {
     private final SuggestionsRepository suggestionsRepository;
     private final AccommodationRepository accommodationRepository;
     private final UserJpaRepository userJpaRepository;
+    private final MailService mailService;
 
     @Transactional
     public Optional<SuggestionEntity> createSuggestion(Long userId, SuggestionCreateRequest suggestionCreateRequest) {
 
         AccommodationEntity accommodationEntity = accommodationRepository.findById(suggestionCreateRequest.getAccommodationId()).orElseThrow(
-                () -> new EasyCheckException(SuggestionMessageType.SUGGESTION_NOT_FOUND)
+                () -> new EasyCheckException(AccommodationMessageType.ACCOMMODATION_NOT_FOUND)
         );
 
         UserEntity userEntity = userJpaRepository.findById(userId).orElseThrow(
-                () -> new EasyCheckException(SuggestionMessageType.SUGGESTION_NOT_FOUND)
+                () -> new EasyCheckException(UserMessageType.USER_NOT_FOUND)
         );
 
 
@@ -83,8 +88,32 @@ public class SuggestionService {
     }
 
 
+    public UserEntity getUserEntity(Long userId) {
+        return userJpaRepository.findById(userId)
+                .orElseThrow(() -> new EasyCheckException(UserMessageType.USER_NOT_FOUND));
+    }
+
+    public SuggestionEntity getSuggestionEntity(Long suggestionId) {
+        return suggestionsRepository.findById(suggestionId)
+                .orElseThrow(() -> new EasyCheckException(SuggestionMessageType.SUGGESTION_NOT_FOUND));
+    }
+
+    public void replySuggestion(SuggestionReplyRequestBody suggestionReplyRequestBody) {
+
+        // 건의사항 조회
+        SuggestionEntity suggestionEntity = getSuggestionEntity(suggestionReplyRequestBody.getSuggestionId());
+
+        // 이메일 내용 설정
+        String replyContent = suggestionReplyRequestBody.getReplyContent();
+        String userEmail = suggestionEntity.getEmail();
+
+        // sendSuggestionReply 메서드 호출 시 수정
+        SuggestionReplyRequestBody requestBody = new SuggestionReplyRequestBody();
+        requestBody.setSuggestionId(suggestionReplyRequestBody.getSuggestionId());
+        requestBody.setReplyContent(replyContent);
+
+        mailService.sendSuggestionReply(requestBody);
 
 
-
-
+    }
 }

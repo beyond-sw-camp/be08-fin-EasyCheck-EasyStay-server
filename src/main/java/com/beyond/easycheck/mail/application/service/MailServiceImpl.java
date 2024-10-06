@@ -9,6 +9,10 @@ import com.beyond.easycheck.mail.infrastructure.persistence.redis.repository.Ver
 import com.beyond.easycheck.mail.infrastructure.persistence.redis.repository.VerifiedEmailRepository;
 import com.beyond.easycheck.reservationroom.application.util.ReservationFormatUtil;
 import com.beyond.easycheck.reservationroom.ui.view.ReservationRoomView;
+import com.beyond.easycheck.suggestion.exception.SuggestionMessageType;
+import com.beyond.easycheck.suggestion.infrastructure.persistence.repository.SuggestionsRepository;
+import com.beyond.easycheck.suggestion.ui.requestbody.SuggestionReplyRequestBody;
+import com.beyond.easycheck.suggestion.ui.view.SuggestionView;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -33,6 +37,7 @@ public class MailServiceImpl implements MailService{
     private final JavaMailSender mailSender;
     private final VerificationCodeRepository verificationCodeRepository;
     private final VerifiedEmailRepository verifiedEmailRepository;
+    private final SuggestionsRepository suggestionsRepository;
 
     @Override
     @Transactional
@@ -120,6 +125,44 @@ public class MailServiceImpl implements MailService{
         }
     }
 
+
+    @Override
+    @Transactional
+    public void sendSuggestionReply(SuggestionReplyRequestBody requestBody) {
+
+        final String SENDER_EMAIL_ADDRESS = "yonginfren@gmail.com";
+
+        log.info("sender = {}", SENDER_EMAIL_ADDRESS);
+        // html 형식으로 내용을 첨부하기 위한 객체
+        MimeMessage message = mailSender.createMimeMessage();
+
+        try {
+            // 송신자 메일 설정
+            message.setFrom(new InternetAddress(SENDER_EMAIL_ADDRESS));
+
+            SuggestionView suggestionView = SuggestionView.of(suggestionsRepository.findById(requestBody.getSuggestionId())
+                    .orElseThrow(() -> new EasyCheckException(SuggestionMessageType.SUGGESTION_NOT_FOUND)));
+
+            // 메일 내용 html로 생성
+            String htmlContent = generateCustomerInquiryResponseContent(suggestionView, requestBody.getReplyContent());
+
+            String email = suggestionView.getEmail();
+            // 수신자 이메일 주소 설정
+            message.setRecipients(MimeMessage.RecipientType.TO, email);
+
+            // 메일 제목 설정
+            message.setSubject(MAIL_SUBJECT);
+
+            // 메일 내용 설정
+            message.setContent(htmlContent, "text/html; charset=utf-8");
+
+            // 메일 전송
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            throw new EasyCheckException(CommonMessageType.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     private String generateVerificationCode() {
         final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         final int CODE_LENGTH = 8;
@@ -177,33 +220,82 @@ public class MailServiceImpl implements MailService{
                 "감사합니다,<br><strong>EasyCheck 팀</strong></p>" +
                 "</div>";
 
+
+
         return generateEmailTemplate(title, mainContent);
     }
 
-    private String generateCustomerInquiryResponseContent(String customerName, String inquirySubject, String responseContent) {
+    private String generateCustomerInquiryResponseContent(SuggestionView suggestionView, String replyContent) {
+        // 제목 설정
         String title = "EasyCheck 고객 건의사항 답변";
+
+        // 답변 내용을 저장할 변수
+        String responseContent = "";
+
+        // 건의사항 주제에 따른 답변 내용 설정
+        switch (suggestionView.getSubject()) {
+            case "칭찬":
+                responseContent = "<p style=\"font-size: 16px; line-height: 1.6;\">" +
+                        "귀하의 의견에 감사드리며, 저희는 이를 적극 반영할 계획입니다." +
+                        "</p>";
+                break;
+            case "문의":
+                responseContent = "<p style=\"font-size: 16px; line-height: 1.6;\">" +
+                        "귀하의 문의에 대해 추가 정보를 제공할 수 있도록 하겠습니다." +
+                        "</p>";
+                break;
+            case "불만":
+                responseContent = "<p style=\"font-size: 16px; line-height: 1.6;\">" +
+                        "서비스 개선에 대한 귀하의 의견에 감사드리며, 저희는 이를 적극 반영할 계획입니다." +
+                        "</p>";
+                break;
+            default:
+                responseContent = "<p style=\"font-size: 16px; line-height: 1.6;\">" +
+                        "기타 의견에 대해서도 소중하게 검토하고 있으며, 적절한 조치를 취할 것입니다." +
+                        "</p>";
+                break;
+        }
+
+        // 메인 내용 설정
         String mainContent =
-                "<h1 style=\"color: #FF6B35; font-size: 24px; margin: 0 0 15px 0; text-align: center; font-weight: bold;\">고객 건의사항 답변</h1>" +
-                        "<p style=\"color: #333333; font-size: 16px; line-height: 1.4; margin: 0 0 20px 0; text-align: left;\">" +
-                        "안녕하세요 " + customerName + "님,<br><br>" +
-                        "귀하의 소중한 의견에 감사드립니다. 아래와 같이 답변 드립니다." +
+                "<div style=\"font-family: 'Arial', sans-serif; color: #333333;\">" +
+                        // 메일 인사말
+                        "<p style=\"font-size: 16px; line-height: 1.6; margin-bottom: 20px;\">" +
+                        "안녕하세요, <strong>" + suggestionView.getUserName() + "</strong>님,<br><br>" +
+                        "고객님의 소중한 의견을 보내주셔서 감사합니다. " + responseContent +
                         "</p>" +
-                        "<div style=\"background-color: #f8f8f8; border-radius: 8px; padding: 20px; margin-bottom: 20px;\">" +
-                        "<h2 style=\"color: #FF6B35; font-size: 18px; margin: 0 0 10px 0;\">건의사항: " + inquirySubject + "</h2>" +
-                        "<p style=\"color: #333333; font-size: 16px; line-height: 1.6; margin: 0;\">" +
-                        responseContent +
+
+                        // 건의사항 및 답변 섹션
+                        "<div style=\"background-color: #ffffff; padding: 20px; border-radius: 8px; margin-bottom: 20px;\">" +
+                        "<h2 style=\"font-size: 18px; color: #8da6c5; margin-bottom: 10px;\">건의사항: " + suggestionView.getSubject() + "</h2>" +
+                        "<p style=\"font-size: 16px; line-height: 1.6; color: #333333; margin: 0;\">" +
+                        suggestionView.getContent() +
                         "</p>" +
                         "</div>" +
-                        "<p style=\"color: #666666; font-size: 14px; line-height: 1.4; margin: 0 0 15px 0; text-align: left;\">" +
-                        "추가 문의사항이 있으시면 언제든 연락 주시기 바랍니다." +
+
+                        // 답변 내용
+                        "<div style=\"background-color: #ffffff; padding: 20px; border-left: 4px solid #8da6c5; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);\">" +
+                        "<p style=\"font-size: 16px; line-height: 1.6; color: #333333; margin: 0;\">" + replyContent +
                         "</p>" +
-                        "<p style=\"color: #333333; font-size: 14px; line-height: 1.4; margin: 0; text-align: left;\">" +
+                        "</div>" +
+
+                        // 추가 안내 사항
+                        "<p style=\"font-size: 14px; color: #666666; line-height: 1.6; margin-bottom: 20px;\">" +
+                        "추가 문의사항이 있으시면 언제든지 연락해 주시기 바랍니다." +
+                        "</p>" +
+
+                        // 마지막 인사말
+                        "<p style=\"font-size: 14px; color: #333333; margin: 0; line-height: 1.6;\">" +
                         "감사합니다,<br>" +
                         "<strong>EasyCheck 고객지원팀</strong>" +
-                        "</p>";
+                        "</p>" +
+                        "</div>";
 
+        // 최종 이메일 템플릿 반환
         return generateEmailTemplate(title, mainContent);
     }
+
+
 
     private String generateVerificationCodeEmailContent(String verificationCode) {
         String title = "EasyCheck 인증 코드";
