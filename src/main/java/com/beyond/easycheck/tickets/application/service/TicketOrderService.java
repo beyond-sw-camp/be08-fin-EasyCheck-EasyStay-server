@@ -67,6 +67,7 @@ public class TicketOrderService {
                 ticketOrder.getId(),
                 ticketOrder.getTicket().getTicketName(),
                 ticketOrder.getQuantity(),
+                ticketOrder.getTotalPrice(),
                 ticketOrder.getUserId(),
                 ticketOrder.getPurchaseTimestamp()
         );

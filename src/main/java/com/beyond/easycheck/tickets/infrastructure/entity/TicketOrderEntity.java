@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -35,6 +36,8 @@ public class TicketOrderEntity {
     @Column(nullable = false)
     private CollectionAgreementType collectionAgreement;
 
+    private BigDecimal totalPrice;
+
     @Column(nullable = false)
     private LocalDateTime purchaseTimestamp;
 
@@ -45,6 +48,7 @@ public class TicketOrderEntity {
         this.guestId = guestId;
         this.receiptMethod = receiptMethod;
         this.collectionAgreement = collectionAgreement;
+        this.totalPrice = ticket.getPrice().multiply(BigDecimal.valueOf(quantity));
         this.purchaseTimestamp = LocalDateTime.now();
     }
 }
