@@ -16,7 +16,7 @@ public enum TicketOrderMessageType implements MessageType {
     INVALID_ORDER_STATUS_FOR_PAYMENT("주문이 결제 가능한 상태가 아닙니다.", HttpStatus.BAD_REQUEST),
     INVALID_ORDER_STATUS_FOR_COMPLETION("주문이 완료 가능한 상태가 아닙니다.", HttpStatus.BAD_REQUEST),
     INVALID_ORDER_STATUS_FOR_CANCELLATION("주문이 취소 가능한 상태가 아닙니다.", HttpStatus.BAD_REQUEST),
-
+    UNAUTHORIZED_ACCESS("접근 권한이 없습니다.", HttpStatus.UNAUTHORIZED),
     ;
    private final String message;
    private final HttpStatus status;
