@@ -329,16 +329,16 @@ public class MailServiceImpl implements MailService{
                 "<head>" +
                 "<meta charset=\"UTF-8\">" +
                 "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
-                "<title>" + title + "</title>" +
+                "<title>EasyCheck 인증 코드</title>" +
                 "</head>" +
-                "<body style=\"font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;\">" +
+                "<body style=\"font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;\">" +
                 "<table role=\"presentation\" style=\"width: 100%; border-collapse: collapse;\">" +
                 "<tr>" +
-                "<td align=\"center\" style=\"padding: 20px 0;\">" +
-                "<table role=\"presentation\" style=\"width: 100%; max-width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);\">" +
+                "<td align=\"center\" style=\"padding: 40px 0;\">" +
+                "<table role=\"presentation\" style=\"width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);\">" +
                 "<tr>" +
-                "<td style=\"padding: 20px 20px 10px 20px;\">" +
-                "<img src=\"https://beyond-easycheck.s3.us-east-1.amazonaws.com/logos/email-logo.png\" alt=\"EasyCheck\" style=\"max-width: 100%; height: auto; border-radius: 8px;\">" +
+                "<td style=\"padding: 40px 40px 20px 40px; text-align: center;\">" +
+                "<img src=\"https://example.com/ticketlink-logo.png\" alt=\"티켓링크 로고\" style=\"max-width: 200px; height: auto;\">" +
                 "</td>" +
                 "</tr>" +
                 "<tr>" +
