@@ -1,12 +1,18 @@
 package com.beyond.easycheck.user.application.service;
 
+import com.beyond.easycheck.corporate.ui.requestbody.CorporateCreateRequest;
 import com.beyond.easycheck.user.application.service.UserReadUseCase.FindJwtResult;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserOperationUseCase {
 
     void registerUser(UserRegisterCommand command);
 
+    void registerCorporateUser(UserRegisterCommand command, CorporateCreateRequest corporateCreateRequest, MultipartFile verificationFilesZip);
+
     FindJwtResult login(UserLoginCommand command);
+
+    FindJwtResult loginGuest(GuestUserLoginCommand command);
 
     void logout(UserLogoutCommand command);
 
@@ -26,6 +32,12 @@ public interface UserOperationUseCase {
     record UserLoginCommand(
             String email,
             String password
+    ) {
+    }
+
+    record GuestUserLoginCommand(
+            String name,
+            String phone
     ) {
     }
 
