@@ -6,15 +6,16 @@ import com.beyond.easycheck.tickets.infrastructure.entity.TicketPaymentEntity;
 import com.beyond.easycheck.tickets.infrastructure.repository.TicketOrderRepository;
 import com.beyond.easycheck.tickets.infrastructure.repository.TicketPaymentRepository;
 import com.beyond.easycheck.tickets.ui.requestbody.TicketPaymentRequest;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.beyond.easycheck.payments.exception.PaymentMessageType.PAYMENT_NOT_FOUND;
 import static com.beyond.easycheck.tickets.exception.TicketOrderMessageType.ORDER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class TicketPaymentService {
 
     private final TicketOrderRepository ticketorderRepository;
@@ -35,11 +36,12 @@ public class TicketPaymentService {
     }
 
     @Transactional
-    public void cancelPayment(Long orderId, String reason) {
+    public TicketPaymentEntity cancelPayment(Long orderId, String reason) {
         TicketPaymentEntity payment = ticketpaymentRepository.findByTicketOrderId(orderId)
                 .orElseThrow(() -> new EasyCheckException(PAYMENT_NOT_FOUND));
 
         payment.cancelPayment(reason);
         ticketpaymentRepository.save(payment);
+        return payment;
     }
 }
