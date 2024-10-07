@@ -23,7 +23,7 @@ public class EasyCheckUserDetails implements UserDetails {
     private final Long id;
     private final String email;
     private final String password;
-    private final String status;
+    private final UserStatus status;
 
     // 유저 역할 필드
     private String role;
@@ -67,12 +67,12 @@ public class EasyCheckUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return "EXPIRED".equals(this.status);
+        return UserStatus.ACTIVE.equals(this.status);
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return "LOCKED".equals(this.status);
+        return !UserStatus.SUSPENDED.equals(this.status);
     }
 
     @Override
@@ -82,6 +82,6 @@ public class EasyCheckUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return "ENABLED".equals(this.status);
+        return UserStatus.ACTIVE.equals(this.status);
     }
 }
