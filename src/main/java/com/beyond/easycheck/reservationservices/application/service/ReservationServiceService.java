@@ -6,9 +6,11 @@ import com.beyond.easycheck.additionalservices.infrastructure.repository.Additio
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.reservationroom.exception.ReservationRoomMessageType;
 import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationRoomEntity;
+import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationStatus;
 import com.beyond.easycheck.reservationroom.infrastructure.repository.ReservationRoomRepository;
 import com.beyond.easycheck.reservationservices.exception.ReservationServiceMessageType;
 import com.beyond.easycheck.reservationservices.infrastructure.entity.ReservationServiceEntity;
+import com.beyond.easycheck.reservationservices.infrastructure.entity.ReservationServiceStatus;
 import com.beyond.easycheck.reservationservices.infrastructure.repository.ReservationServiceRepository;
 import com.beyond.easycheck.reservationservices.ui.requestbody.ReservationServiceCreateRequest;
 import com.beyond.easycheck.reservationservices.ui.requestbody.ReservationServiceUpdateRequest;
@@ -34,13 +36,30 @@ public class ReservationServiceService {
     @Transactional
     public ReservationServiceEntity createReservationRoom(ReservationServiceCreateRequest reservationServiceCreateRequest) {
 
-        ReservationRoomEntity reservationRoomEntity = reservationRoomRepository.findById(reservationServiceCreateRequest.getReservationRoomId()).orElseThrow(
-                () -> new EasyCheckException(ReservationRoomMessageType.RESERVATION_NOT_FOUND)
-        );
+        ReservationRoomEntity reservationRoomEntity = reservationRoomRepository.findById(reservationServiceCreateRequest.getReservationRoomId())
+                .orElseThrow(() -> new EasyCheckException(ReservationRoomMessageType.RESERVATION_NOT_FOUND));
 
-        AdditionalServiceEntity additionalServiceEntity = additionalServiceRepository.findById(reservationServiceCreateRequest.getAdditionalServiceId()).orElseThrow(
-                () -> new EasyCheckException(AdditionalServiceMessageType.ADDITIONAL_SERVICE_NOT_FOUND)
-        );
+        if (reservationRoomEntity.getReservationStatus() == ReservationStatus.CANCELED) {
+            throw new EasyCheckException(ReservationRoomMessageType.RESERVATION_CANCELED);
+        }
+
+        AdditionalServiceEntity additionalServiceEntity = additionalServiceRepository.findById(reservationServiceCreateRequest.getAdditionalServiceId())
+                .orElseThrow(() -> new EasyCheckException(AdditionalServiceMessageType.ADDITIONAL_SERVICE_NOT_FOUND));
+
+        boolean isDuplicate = reservationServiceRepository.existsByReservationRoomEntityAndAdditionalServiceEntity(
+                reservationRoomEntity, additionalServiceEntity);
+        if (isDuplicate) {
+            throw new EasyCheckException(ReservationServiceMessageType.SERVICE_ALREADY_ADDED);
+        }
+
+        if (reservationServiceCreateRequest.getQuantity() <= 0) {
+            throw new EasyCheckException(ReservationServiceMessageType.INVALID_QUANTITY);
+        }
+
+        if (reservationServiceCreateRequest.getTotalPrice() < 0 ||
+                reservationServiceCreateRequest.getTotalPrice() != reservationServiceCreateRequest.getQuantity() * additionalServiceEntity.getPrice()) {
+            throw new EasyCheckException(ReservationServiceMessageType.INVALID_TOTAL_PRICE);
+        }
 
         ReservationServiceEntity reservationServiceEntity = ReservationServiceEntity.builder()
                 .reservationRoomEntity(reservationRoomEntity)
@@ -80,6 +99,14 @@ public class ReservationServiceService {
         ReservationServiceEntity reservationServiceEntity = reservationServiceRepository.findById(id).orElseThrow(
                 () -> new EasyCheckException(ReservationServiceMessageType.RESERVATION_SERVICE_NOT_FOUND)
         );
+
+        if (reservationServiceEntity.getReservationServiceStatus() == ReservationServiceStatus.CANCELED) {
+            throw new EasyCheckException(ReservationServiceMessageType.RESERVATION_SERVICE_ALREADY_CANCELED);
+        }
+
+        if (reservationServiceEntity.getReservationRoomEntity().getReservationStatus() == ReservationStatus.CANCELED) {
+            throw new EasyCheckException(ReservationRoomMessageType.RESERVATION_CANCELED);
+        }
 
         reservationServiceEntity.cancelReservationService(reservationServiceUpdateRequest);
 

@@ -41,6 +41,14 @@ public class RoomEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private int roomAmount;
 
+    @Column(nullable = false)
+    private int remainingRoom;
+
+    @PrePersist
+    public void prePersist() {
+        this.remainingRoom = this.roomAmount;
+    }
+
     public void update(RoomUpdateRequest roomUpdateRequest) {
         roomNumber = roomUpdateRequest.getRoomNumber();
         roomPic = roomUpdateRequest.getRoomPic();
@@ -50,5 +58,13 @@ public class RoomEntity extends BaseTimeEntity {
         if (roomUpdateRequest.getRoomAmount() <= 0) {
             throw new EasyCheckException(ARGUMENT_NOT_VALID);
         }
+    }
+
+    public void setStatus(RoomStatus status) {
+        this.status = status;
+    }
+
+    public void setRemainingRoom(int remainingRoom) {
+        this.remainingRoom = remainingRoom;
     }
 }

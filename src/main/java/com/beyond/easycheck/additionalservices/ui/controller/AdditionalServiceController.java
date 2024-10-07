@@ -19,7 +19,7 @@ import java.util.List;
 
 @Tag(name = "Additional Service", description = "부가 서비스 관리 API")
 @RestController
-@RequestMapping("/api/v1/additionalservices")
+@RequestMapping("/api/v1/additional-services")
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 public class AdditionalServiceController {
 

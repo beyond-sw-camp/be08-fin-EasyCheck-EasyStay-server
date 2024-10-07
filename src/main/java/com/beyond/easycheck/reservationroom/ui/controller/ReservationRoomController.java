@@ -4,6 +4,7 @@ import com.beyond.easycheck.reservationroom.application.service.ReservationRoomS
 import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationRoomEntity;
 import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomCreateRequest;
 import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomUpdateRequest;
+import com.beyond.easycheck.reservationroom.ui.view.DayRoomAvailabilityView;
 import com.beyond.easycheck.reservationroom.ui.view.ReservationRoomView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,12 +16,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Tag(name = "ReservationRoom", description = "객실 예약 관리")
 @RestController
-@RequestMapping("/api/v1/reservationroom")
+@RequestMapping("/api/v1/reservation-room")
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 public class ReservationRoomController {
 
@@ -35,6 +35,17 @@ public class ReservationRoomController {
         reservationRoomService.createReservation(userId, reservationRoomCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Operation(summary = "월별 예약 가능한 객실 조회 API")
+    @GetMapping("/room-list")
+    public ResponseEntity<List<DayRoomAvailabilityView>> getRoomAvailabilityByMonth(
+            @RequestParam int year,
+            @RequestParam int month) {
+
+        List<DayRoomAvailabilityView> roomAvailability = reservationRoomService.getRoomAvailabilityByMonth(year, month);
+
+        return ResponseEntity.ok(roomAvailability);
     }
 
     @Operation(summary = "예약 내역 리스트를 조회하는 API")

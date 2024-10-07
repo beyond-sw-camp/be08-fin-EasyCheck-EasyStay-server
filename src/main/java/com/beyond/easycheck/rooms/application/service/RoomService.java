@@ -79,6 +79,7 @@ public class RoomService {
                         roomEntity.getRoomNumber(),
                         roomEntity.getRoomPic(),
                         roomEntity.getRoomAmount(),
+                        roomEntity.getRemainingRoom(),
                         roomEntity.getStatus(),
                         roomEntity.getRoomTypeEntity().getRoomTypeId(),
                         roomEntity.getRoomTypeEntity().getAccommodationEntity().getId(),
