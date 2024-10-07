@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,8 +38,8 @@ public class TicketOrderController {
 
     @Operation(summary = "입장권 주문 조회하는 API")
     @GetMapping("/{orderId}")
-    public ResponseEntity<ApiResponseView<TicketOrderDTO>> getOrder(@PathVariable Long orderId) {
-        TicketOrderDTO orderDTO = ticketOrderReadUseCase.getTicketOrder(orderId);
+    public ResponseEntity<ApiResponseView<TicketOrderDTO>> getOrder(@AuthenticationPrincipal Long userId, @PathVariable Long orderId) {
+        TicketOrderDTO orderDTO = ticketOrderReadUseCase.getTicketOrder(userId, orderId);
         return ResponseEntity.ok(new ApiResponseView<>(orderDTO));
     }
 
@@ -60,7 +61,7 @@ public class TicketOrderController {
     @Operation(summary = "입장권 사용자가 사용해서 사용완료로 상태를 변경하는 API")
     @PutMapping("/{orderId}/complete")
     public ResponseEntity<Void> completeOrder(@PathVariable Long orderId) {
-        ticketOrderOperationUseCase.completeOrder(orderId);  // 주문 완료 처리
+        ticketOrderOperationUseCase.completeOrder(orderId);
         return ResponseEntity.ok().build();
     }
 }
