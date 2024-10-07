@@ -19,8 +19,7 @@ import java.util.stream.Collectors;
 
 import static com.beyond.easycheck.themeparks.exception.ThemeParkMessageType.THEME_PARK_NOT_FOUND;
 import static com.beyond.easycheck.tickets.exception.TicketMessageType.*;
-import static com.beyond.easycheck.tickets.exception.TicketOrderMessageType.ORDER_ALREADY_CANCELLED;
-import static com.beyond.easycheck.tickets.exception.TicketOrderMessageType.ORDER_NOT_FOUND;
+import static com.beyond.easycheck.tickets.exception.TicketOrderMessageType.*;
 
 @Service
 @RequiredArgsConstructor
@@ -92,6 +91,19 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
 
         ticketOrder.cancelOrder();
         ticketOrderRepository.save(ticketOrder);
+    }
+
+    @Transactional
+    public void completeOrder(Long orderId) {
+        TicketOrderEntity order = ticketOrderRepository.findById(orderId)
+                .orElseThrow(() -> new EasyCheckException(ORDER_NOT_FOUND));
+
+        if (order.getStatus() != OrderStatus.CONFIRMED) {
+            throw new EasyCheckException(INVALID_ORDER_STATUS_FOR_COMPLETION);
+        }
+
+        order.completeOrder();
+        ticketOrderRepository.save(order);
     }
 
     @Override

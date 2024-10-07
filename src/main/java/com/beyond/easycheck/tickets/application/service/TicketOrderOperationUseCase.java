@@ -8,4 +8,6 @@ public interface TicketOrderOperationUseCase {
     TicketOrderDTO createTicketOrder(Long themeParkId, TicketOrderRequest request);
 
     void cancelTicketOrder(Long orderId);
+
+    void completeOrder(Long orderId);
 }

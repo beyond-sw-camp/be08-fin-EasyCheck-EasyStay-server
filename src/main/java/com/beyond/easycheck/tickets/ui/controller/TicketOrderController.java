@@ -55,4 +55,12 @@ public class TicketOrderController {
         ticketOrderOperationUseCase.cancelTicketOrder(orderId);
         return ResponseEntity.noContent().build();
     }
+
+
+    @Operation(summary = "입장권 사용자가 사용해서 사용완료로 상태를 변경하는 API")
+    @PutMapping("/{orderId}/complete")
+    public ResponseEntity<Void> completeOrder(@PathVariable Long orderId) {
+        ticketOrderOperationUseCase.completeOrder(orderId);  // 주문 완료 처리
+        return ResponseEntity.ok().build();
+    }
 }
