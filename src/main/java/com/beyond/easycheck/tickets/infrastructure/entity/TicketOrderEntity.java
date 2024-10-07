@@ -60,4 +60,8 @@ public class TicketOrderEntity {
     public void cancelOrder() {
         this.status = OrderStatus.CANCELLED;
     }
+
+    public void confirmOrder() { this.status = OrderStatus.CONFIRMED; }
+
+    public void completeOrder() { this.status = OrderStatus.COMPLETED; }
 }
