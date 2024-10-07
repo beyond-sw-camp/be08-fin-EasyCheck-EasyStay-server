@@ -29,7 +29,7 @@ public class TicketPaymentEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TicketPaymentStatus paymentStatus;
+    private OrderStatus paymentStatus;
 
     private String cancelReason;
 
@@ -42,14 +42,14 @@ public class TicketPaymentEntity {
         payment.ticketOrder = order;
         payment.paymentAmount = amount;
         payment.paymentMethod = method;
-        payment.paymentStatus = TicketPaymentStatus.결제대기;
+        payment.paymentStatus = OrderStatus.결제대기;
         payment.paymentDate = LocalDateTime.now();
         return payment;
     }
 
 
     public void cancelPayment(String reason) {
-        this.paymentStatus = TicketPaymentStatus.결제취소;
+        this.paymentStatus = OrderStatus.결제취소;
         this.cancelReason = reason;
         this.cancelDate = LocalDateTime.now();
     }

@@ -2,7 +2,7 @@ package com.beyond.easycheck.tickets.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.tickets.infrastructure.entity.TicketOrderEntity;
-import com.beyond.easycheck.tickets.infrastructure.entity.TicketStatus;
+import com.beyond.easycheck.tickets.infrastructure.entity.OrderStatus;
 import com.beyond.easycheck.tickets.infrastructure.repository.TicketOrderRepository;
 import com.beyond.easycheck.tickets.infrastructure.entity.TicketEntity;
 import com.beyond.easycheck.tickets.infrastructure.repository.TicketRepository;
@@ -86,7 +86,7 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
         TicketOrderEntity ticketOrder = ticketOrderRepository.findById(orderId)
                 .orElseThrow(() -> new EasyCheckException(ORDER_NOT_FOUND));
 
-        if (ticketOrder.getStatus() == TicketStatus.주문취소) {
+        if (ticketOrder.getStatus() == OrderStatus.주문취소) {
             throw new EasyCheckException(ORDER_ALREADY_CANCELLED);
         }
 

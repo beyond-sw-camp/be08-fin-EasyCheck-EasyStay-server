@@ -30,6 +30,10 @@ public class TicketOrderEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    private OrderStatus status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ReceiptMethodType receiptMethod;
 
     @Enumerated(EnumType.STRING)
@@ -50,5 +54,10 @@ public class TicketOrderEntity {
         this.collectionAgreement = collectionAgreement;
         this.totalPrice = ticket.getPrice().multiply(BigDecimal.valueOf(quantity));
         this.purchaseTimestamp = LocalDateTime.now();
+        this.status = OrderStatus.결제대기;
+    }
+
+    public void cancelOrder() {
+        this.status = OrderStatus.주문취소;
     }
 }
