@@ -3,7 +3,6 @@ package com.beyond.easycheck.tickets.ui.controller;
 import com.beyond.easycheck.common.ui.view.ApiResponseView;
 import com.beyond.easycheck.tickets.application.service.TicketOrderOperationUseCase;
 import com.beyond.easycheck.tickets.application.service.TicketOrderReadUseCase;
-import com.beyond.easycheck.tickets.application.service.TicketOrderService;
 import com.beyond.easycheck.tickets.ui.requestbody.TicketOrderRequest;
 import com.beyond.easycheck.tickets.ui.view.TicketOrderDTO;
 import io.swagger.v3.oas.annotations.Operation;
