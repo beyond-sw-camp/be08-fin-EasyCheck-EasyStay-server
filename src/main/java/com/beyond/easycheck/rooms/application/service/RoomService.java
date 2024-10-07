@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.beyond.easycheck.rooms.exception.RoomMessageType.ROOM_NOT_FOUND;
+import static com.beyond.easycheck.roomtypes.exception.RoomtypeMessageType.ROOM_TYPE_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class RoomService {
     public void createRoom(RoomCreateRequest roomCreateRequest) {
 
         RoomtypeEntity roomType = roomTypeRepository.findById(roomCreateRequest.getRoomTypeId())
-                .orElseThrow(() -> new EasyCheckException(ROOM_NOT_FOUND));
+                .orElseThrow(() -> new EasyCheckException(ROOM_TYPE_NOT_FOUND));
 
         RoomEntity room = RoomEntity.builder()
                 .roomTypeEntity(roomType)
