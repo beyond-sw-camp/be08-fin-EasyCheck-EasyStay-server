@@ -42,14 +42,14 @@ public class TicketPaymentEntity {
         payment.ticketOrder = order;
         payment.paymentAmount = amount;
         payment.paymentMethod = method;
-        payment.paymentStatus = OrderStatus.결제대기;
+        payment.paymentStatus = OrderStatus.PENDING;
         payment.paymentDate = LocalDateTime.now();
         return payment;
     }
 
 
     public void cancelPayment(String reason) {
-        this.paymentStatus = OrderStatus.결제취소;
+        this.paymentStatus = OrderStatus.CANCELLED;
         this.cancelReason = reason;
         this.cancelDate = LocalDateTime.now();
     }
