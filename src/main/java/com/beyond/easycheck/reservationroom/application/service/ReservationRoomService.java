@@ -34,8 +34,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,14 +53,11 @@ public class ReservationRoomService {
 
     @Transactional
     public ReservationRoomEntity createReservation(Long userId, ReservationRoomCreateRequest reservationRoomCreateRequest) {
+        UserEntity userEntity = userJpaRepository.findById(userId)
+                .orElseThrow(() -> new EasyCheckException(UserMessageType.USER_NOT_FOUND));
 
-        UserEntity userEntity = userJpaRepository.findById(userId).orElseThrow(
-                () -> new EasyCheckException(UserMessageType.USER_NOT_FOUND)
-        );
-
-        RoomEntity roomEntity = roomRepository.findById(reservationRoomCreateRequest.getRoomId()).orElseThrow(
-                () -> new EasyCheckException(RoomMessageType.ROOM_NOT_FOUND)
-        );
+        RoomEntity roomEntity = roomRepository.findById(reservationRoomCreateRequest.getRoomId())
+                .orElseThrow(() -> new EasyCheckException(RoomMessageType.ROOM_NOT_FOUND));
 
         if (!roomEntity.getStatus().equals(RoomStatus.예약가능)) {
             throw new EasyCheckException(ReservationRoomMessageType.ROOM_NOT_AVAILABLE);
@@ -66,7 +65,8 @@ public class ReservationRoomService {
 
         LocalDate checkinDate = reservationRoomCreateRequest.getCheckinDate().toLocalDate();
 
-        DailyRoomAvailabilityEntity dailyAvailability = dailyRoomAvailabilityRepository.findByRoomEntityAndDate(roomEntity, checkinDate.atStartOfDay())
+        DailyRoomAvailabilityEntity dailyAvailability = dailyRoomAvailabilityRepository
+                .findByRoomEntityAndDate(roomEntity, checkinDate.atStartOfDay())
                 .orElse(DailyRoomAvailabilityEntity.builder()
                         .roomEntity(roomEntity)
                         .date(checkinDate.atStartOfDay())
@@ -74,9 +74,7 @@ public class ReservationRoomService {
                         .status(RoomStatus.예약가능)
                         .build());
 
-        if (dailyAvailability.getRemainingRoom() <= 0) {
-            throw new EasyCheckException(ReservationRoomMessageType.ROOM_ALREADY_FULL);
-        }
+        dailyRoomAvailabilityRepository.save(dailyAvailability);
 
         ReservationRoomEntity reservationRoomEntity = ReservationRoomEntity.builder()
                 .roomEntity(roomEntity)
@@ -92,17 +90,10 @@ public class ReservationRoomService {
         reservationRoomRepository.save(reservationRoomEntity);
 
         dailyAvailability.decrementRemainingRoom();
-
         if (dailyAvailability.getRemainingRoom() <= 0) {
             dailyAvailability.setStatus(RoomStatus.예약불가);
-        } else {
-            dailyAvailability.setStatus(RoomStatus.예약가능);
         }
-
         dailyRoomAvailabilityRepository.save(dailyAvailability);
-
-        ReservationRoomView reservationRoomView = ReservationRoomView.of(reservationRoomEntity);
-        mailService.sendReservationConfirmationEmail(userEntity.getEmail(), reservationRoomView);
 
         return reservationRoomEntity;
     }
@@ -113,34 +104,41 @@ public class ReservationRoomService {
         LocalDate startDate = LocalDate.of(year, month, 1);
         LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
 
-        List<RoomEntity> allRooms = roomRepository.findAll();
-        List<DailyRoomAvailabilityEntity> dailyAvailabilities = dailyRoomAvailabilityRepository.findByDateBetween(
-                startDate.atStartOfDay(), endDate.atTime(23, 59));
+        List<DailyRoomAvailabilityEntity> availabilities = dailyRoomAvailabilityRepository
+                .findAvailabilityByDateRange(startDate.atStartOfDay(), endDate.atTime(23, 59));
 
-        List<DayRoomAvailabilityView> availabilityViews = new ArrayList<>();
+        return createDayRoomAvailabilityViews(availabilities, startDate, endDate);
+    }
+
+    private List<DayRoomAvailabilityView> createDayRoomAvailabilityViews(
+            List<DailyRoomAvailabilityEntity> availabilities, LocalDate startDate, LocalDate endDate) {
+
+        List<DayRoomAvailabilityView> result = new ArrayList<>();
+
         for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
             LocalDate finalDate = date;
-            List<RoomAvailabilityView> roomsForDay = allRooms.stream()
-                    .map(room -> {
-                        DailyRoomAvailabilityEntity dailyAvailability = dailyAvailabilities.stream()
-                                .filter(availability -> availability.getRoomEntity().equals(room) &&
-                                        availability.getDate().toLocalDate().equals(finalDate))
-                                .findFirst()
-                                .orElse(DailyRoomAvailabilityEntity.builder()
-                                        .roomEntity(room)
-                                        .date(finalDate.atStartOfDay())
-                                        .remainingRoom(10)
-                                        .status(RoomStatus.예약가능)
-                                        .build());
-
-                        return new RoomAvailabilityView(room.getRoomId(), room.getRoomTypeEntity().getTypeName(), dailyAvailability.getRemainingRoom(), dailyAvailability.getStatus());
+            List<RoomAvailabilityView> rooms = availabilities.stream()
+                    .filter(availability -> availability.getDate().toLocalDate().equals(finalDate))
+                    .map(availability -> {
+                        RoomEntity room = availability.getRoomEntity();
+                        return new RoomAvailabilityView(
+                                room.getRoomId(),
+                                room.getRoomTypeEntity().getTypeName(),
+                                room.getRoomNumber(),
+                                availability.getRemainingRoom(),
+                                availability.getStatus()
+                        );
                     })
                     .collect(Collectors.toList());
 
-            availabilityViews.add(new DayRoomAvailabilityView(finalDate, roomsForDay));
+            result.add(new DayRoomAvailabilityView(
+                    date,
+                    date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.KOREAN),
+                    rooms
+            ));
         }
 
-        return availabilityViews;
+        return result;
     }
 
     @Transactional(readOnly = true)
