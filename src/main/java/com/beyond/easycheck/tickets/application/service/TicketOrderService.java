@@ -32,14 +32,10 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
 
     @Override
     @Transactional
-    public TicketOrderDTO createTicketOrder(Long userId, Long themeParkId, TicketOrderRequest request) {
+    public TicketOrderDTO createTicketOrder(Long userId, TicketOrderRequest request) {
 
         TicketEntity ticket = ticketRepository.findById(request.getTicketId())
                 .orElseThrow(() -> new EasyCheckException(TICKET_NOT_FOUND));
-
-        if (!ticket.getThemePark().getId().equals(themeParkId)) {
-            throw new EasyCheckException(TICKET_NOT_BELONG_TO_THEME_PARK);
-        }
 
         if (request.getUserId() == null && request.getGuestId() == null) {
             throw new EasyCheckException(INVALID_USER_OR_GUEST);
@@ -77,7 +73,7 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
 
     @Override
     @Transactional
-    public void cancelTicketOrder(Long userId, Long themeParkId, Long orderId) {
+    public void cancelTicketOrder(Long userId, Long orderId) {
 
         TicketOrderEntity ticketOrder = ticketOrderRepository.findById(orderId)
                 .orElseThrow(() -> new EasyCheckException(ORDER_NOT_FOUND));
@@ -95,7 +91,7 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
     }
 
     @Transactional
-    public void completeOrder(Long userId, Long themeParkId, Long orderId) {
+    public void completeOrder(Long userId, Long orderId) {
 
         TicketOrderEntity order = ticketOrderRepository.findById(orderId)
                 .orElseThrow(() -> new EasyCheckException(ORDER_NOT_FOUND));
@@ -113,7 +109,7 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
     }
 
     @Override
-    public TicketOrderDTO getTicketOrder(Long userId, Long themeParkId, Long orderId) {
+    public TicketOrderDTO getTicketOrder(Long userId, Long orderId) {
 
         TicketOrderEntity ticketOrder = ticketOrderRepository.findById(orderId)
                 .orElseThrow(() -> new EasyCheckException(ORDER_NOT_FOUND));
@@ -139,9 +135,9 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
     }
 
     @Override
-    public List<TicketOrderDTO> getAllOrdersByUserId(Long userId, Long themeParkId) {
+    public List<TicketOrderDTO> getAllOrdersByUserId(Long userId) {
 
-        List<TicketOrderEntity> orders = ticketOrderRepository.findByUserIdAndThemeParkId(userId, themeParkId);
+        List<TicketOrderEntity> orders = ticketOrderRepository.findByUserId(userId);
 
         return orders.stream().map(order -> new TicketOrderDTO(
                 order.getId(),

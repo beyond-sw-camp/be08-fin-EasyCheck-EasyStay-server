@@ -9,5 +9,4 @@ import java.util.List;
 public interface TicketOrderRepository extends JpaRepository<TicketOrderEntity, Long> {
     List<TicketOrderEntity> findByUserId(Long userId);
 
-    List<TicketOrderEntity> findByUserIdAndThemeParkId(Long userId, Long themeParkId);
 }

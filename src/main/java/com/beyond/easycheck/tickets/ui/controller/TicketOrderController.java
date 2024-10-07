@@ -18,7 +18,7 @@ import java.util.List;
 
 @Tag(name = "TicketOrder", description = "입장권 주문 정보 관리 API")
 @RestController
-@RequestMapping("/api/v1/themeparks/{themeParkId}/tickets/orders")
+@RequestMapping("/api/v1/tickets/orders")
 @RequiredArgsConstructor
 public class TicketOrderController {
 
@@ -28,11 +28,10 @@ public class TicketOrderController {
     @Operation(summary = "입장권 주문 추가하는 API")
     @PostMapping("")
     public ResponseEntity<ApiResponseView<TicketOrderDTO>> createTicketOrder(
-            @PathVariable Long themeParkId,
             @AuthenticationPrincipal Long userId,
             @RequestBody @Validated TicketOrderRequest request) {
 
-        TicketOrderDTO ticketOrder = ticketOrderOperationUseCase.createTicketOrder(userId, themeParkId, request);
+        TicketOrderDTO ticketOrder = ticketOrderOperationUseCase.createTicketOrder(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponseView<>(ticketOrder));
     }
@@ -41,20 +40,18 @@ public class TicketOrderController {
     @GetMapping("/{orderId}")
     public ResponseEntity<ApiResponseView<TicketOrderDTO>> getOrder(
             @AuthenticationPrincipal Long userId,
-            @PathVariable Long themeParkId,
             @PathVariable Long orderId) {
 
-        TicketOrderDTO orderDTO = ticketOrderReadUseCase.getTicketOrder(userId, themeParkId, orderId);
+        TicketOrderDTO orderDTO = ticketOrderReadUseCase.getTicketOrder(userId, orderId);
         return ResponseEntity.ok(new ApiResponseView<>(orderDTO));
     }
 
     @Operation(summary = "사용자의 입장권 주문 조회하는 API")
     @GetMapping("/me")
     public ResponseEntity<ApiResponseView<List<TicketOrderDTO>>> getMyOrders(
-            @AuthenticationPrincipal Long userId,
-            @PathVariable Long themeParkId) {
+            @AuthenticationPrincipal Long userId) {
 
-        List<TicketOrderDTO> orderDTOList = ticketOrderReadUseCase.getAllOrdersByUserId(userId, themeParkId);
+        List<TicketOrderDTO> orderDTOList = ticketOrderReadUseCase.getAllOrdersByUserId(userId);
         return ResponseEntity.ok(new ApiResponseView<>(orderDTOList));
     }
 
@@ -62,10 +59,9 @@ public class TicketOrderController {
     @PutMapping("/{orderId}/cancel")
     public ResponseEntity<Void> cancelOrder(
             @AuthenticationPrincipal Long userId,
-            @PathVariable Long themeParkId,
             @PathVariable Long orderId) {
 
-        ticketOrderOperationUseCase.cancelTicketOrder(userId, themeParkId, orderId);
+        ticketOrderOperationUseCase.cancelTicketOrder(userId, orderId);
         return ResponseEntity.noContent().build();
     }
 
@@ -73,10 +69,9 @@ public class TicketOrderController {
     @PutMapping("/{orderId}/complete")
     public ResponseEntity<Void> completeOrder(
             @AuthenticationPrincipal Long userId,
-            @PathVariable Long themeParkId,
             @PathVariable Long orderId) {
 
-        ticketOrderOperationUseCase.completeOrder(userId, themeParkId, orderId);
+        ticketOrderOperationUseCase.completeOrder(userId, orderId);
         return ResponseEntity.ok().build();
     }
 }

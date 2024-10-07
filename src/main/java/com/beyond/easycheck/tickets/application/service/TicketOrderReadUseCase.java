@@ -5,7 +5,7 @@ import com.beyond.easycheck.tickets.ui.view.TicketOrderDTO;
 import java.util.List;
 
 public interface TicketOrderReadUseCase {
-    TicketOrderDTO getTicketOrder(Long userId, Long themeParkId, Long orderId);
+    TicketOrderDTO getTicketOrder(Long userId, Long orderId);
 
-    List<TicketOrderDTO> getAllOrdersByUserId(Long userId, Long themeParkId);
+    List<TicketOrderDTO> getAllOrdersByUserId(Long userId);
 }
