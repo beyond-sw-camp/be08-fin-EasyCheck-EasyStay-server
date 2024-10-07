@@ -5,9 +5,9 @@ import com.beyond.easycheck.tickets.ui.view.TicketOrderDTO;
 
 public interface TicketOrderOperationUseCase {
 
-    TicketOrderDTO createTicketOrder(Long themeParkId, TicketOrderRequest request);
+    TicketOrderDTO createTicketOrder(Long userId, Long themeParkId, TicketOrderRequest request);
 
-    void cancelTicketOrder(Long orderId);
+    void cancelTicketOrder(Long userId, Long themeParkId, Long orderId);
 
-    void completeOrder(Long orderId);
+    void completeOrder(Long userId, Long themeParkId, Long orderId);
 }

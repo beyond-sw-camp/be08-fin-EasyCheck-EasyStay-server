@@ -1,7 +1,6 @@
 package com.beyond.easycheck.tickets.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
-import com.beyond.easycheck.tickets.exception.TicketOrderMessageType;
 import com.beyond.easycheck.tickets.infrastructure.entity.TicketOrderEntity;
 import com.beyond.easycheck.tickets.infrastructure.entity.OrderStatus;
 import com.beyond.easycheck.tickets.infrastructure.entity.TicketPaymentEntity;
@@ -9,11 +8,9 @@ import com.beyond.easycheck.tickets.infrastructure.repository.TicketOrderReposit
 import com.beyond.easycheck.tickets.infrastructure.entity.TicketEntity;
 import com.beyond.easycheck.tickets.infrastructure.repository.TicketPaymentRepository;
 import com.beyond.easycheck.tickets.infrastructure.repository.TicketRepository;
-import com.beyond.easycheck.themeparks.infrastructure.repository.ThemeParkRepository;
 import com.beyond.easycheck.tickets.ui.requestbody.TicketOrderRequest;
 import com.beyond.easycheck.tickets.ui.view.TicketOrderDTO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +18,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.beyond.easycheck.themeparks.exception.ThemeParkMessageType.THEME_PARK_NOT_FOUND;
 import static com.beyond.easycheck.tickets.exception.TicketMessageType.*;
 import static com.beyond.easycheck.tickets.exception.TicketOrderMessageType.*;
 
@@ -33,15 +29,10 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
     private final TicketOrderRepository ticketOrderRepository;
     private final TicketPaymentRepository ticketPaymentRepository;
     private final TicketRepository ticketRepository;
-    private final ThemeParkRepository themeParkRepository;
 
     @Override
     @Transactional
-    public TicketOrderDTO createTicketOrder(Long themeParkId, TicketOrderRequest request) {
-
-        if (!themeParkRepository.existsById(themeParkId)) {
-            throw new EasyCheckException(THEME_PARK_NOT_FOUND);
-        }
+    public TicketOrderDTO createTicketOrder(Long userId, Long themeParkId, TicketOrderRequest request) {
 
         TicketEntity ticket = ticketRepository.findById(request.getTicketId())
                 .orElseThrow(() -> new EasyCheckException(TICKET_NOT_FOUND));
@@ -86,9 +77,14 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
 
     @Override
     @Transactional
-    public void cancelTicketOrder(Long orderId) {
+    public void cancelTicketOrder(Long userId, Long themeParkId, Long orderId) {
+
         TicketOrderEntity ticketOrder = ticketOrderRepository.findById(orderId)
                 .orElseThrow(() -> new EasyCheckException(ORDER_NOT_FOUND));
+
+        if (!ticketOrder.getUserId().equals(userId)) {
+            throw new EasyCheckException(UNAUTHORIZED_ACCESS);
+        }
 
         if (ticketOrder.getStatus() == OrderStatus.CANCELLED) {
             throw new EasyCheckException(ORDER_ALREADY_CANCELLED);
@@ -99,9 +95,14 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
     }
 
     @Transactional
-    public void completeOrder(Long orderId) {
+    public void completeOrder(Long userId, Long themeParkId, Long orderId) {
+
         TicketOrderEntity order = ticketOrderRepository.findById(orderId)
                 .orElseThrow(() -> new EasyCheckException(ORDER_NOT_FOUND));
+
+        if (!order.getUserId().equals(userId)) {
+            throw new EasyCheckException(UNAUTHORIZED_ACCESS);
+        }
 
         if (order.getStatus() != OrderStatus.CONFIRMED) {
             throw new EasyCheckException(INVALID_ORDER_STATUS_FOR_COMPLETION);
@@ -112,7 +113,8 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
     }
 
     @Override
-    public TicketOrderDTO getTicketOrder(@AuthenticationPrincipal Long userId, Long orderId) {
+    public TicketOrderDTO getTicketOrder(Long userId, Long themeParkId, Long orderId) {
+
         TicketOrderEntity ticketOrder = ticketOrderRepository.findById(orderId)
                 .orElseThrow(() -> new EasyCheckException(ORDER_NOT_FOUND));
 
@@ -120,10 +122,8 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
             throw new EasyCheckException(UNAUTHORIZED_ACCESS);
         }
 
-
         TicketPaymentEntity payment = ticketPaymentRepository.findByTicketOrderId(orderId)
-                .orElseThrow(() -> new EasyCheckException(PAYMENT_NOT_FOUND));
-
+                .orElse(null);
 
         return new TicketOrderDTO(
                 ticketOrder.getId(),
@@ -132,15 +132,16 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
                 ticketOrder.getTotalPrice(),
                 ticketOrder.getUserId(),
                 ticketOrder.getPurchaseTimestamp(),
-                payment.getPaymentMethod(),
-                payment.getPaymentAmount(),
+                payment != null ? payment.getPaymentMethod() : null,
+                payment != null ? payment.getPaymentAmount() : null,
                 ticketOrder.getStatus()
         );
     }
 
     @Override
-    public List<TicketOrderDTO> getAllOrdersByUserId(Long userId) {
-        List<TicketOrderEntity> orders = ticketOrderRepository.findByUserId(userId);
+    public List<TicketOrderDTO> getAllOrdersByUserId(Long userId, Long themeParkId) {
+
+        List<TicketOrderEntity> orders = ticketOrderRepository.findByUserIdAndThemeParkId(userId, themeParkId);
 
         return orders.stream().map(order -> new TicketOrderDTO(
                 order.getId(),
@@ -151,5 +152,4 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
                 order.getPurchaseTimestamp()
         )).collect(Collectors.toList());
     }
-
 }
