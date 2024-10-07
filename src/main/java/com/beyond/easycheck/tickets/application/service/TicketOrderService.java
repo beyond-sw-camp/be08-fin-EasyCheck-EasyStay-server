@@ -86,7 +86,7 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
         TicketOrderEntity ticketOrder = ticketOrderRepository.findById(orderId)
                 .orElseThrow(() -> new EasyCheckException(ORDER_NOT_FOUND));
 
-        if (ticketOrder.getStatus() == OrderStatus.주문취소) {
+        if (ticketOrder.getStatus() == OrderStatus.CANCELLED) {
             throw new EasyCheckException(ORDER_ALREADY_CANCELLED);
         }
 
