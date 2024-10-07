@@ -1,7 +1,10 @@
 package com.beyond.easycheck.rooms.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
+import com.beyond.easycheck.rooms.infrastructure.entity.DailyRoomAvailabilityEntity;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
+import com.beyond.easycheck.rooms.infrastructure.entity.RoomStatus;
+import com.beyond.easycheck.rooms.infrastructure.repository.DailyRoomAvailabilityRepository;
 import com.beyond.easycheck.rooms.infrastructure.repository.RoomRepository;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomCreateRequest;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomUpdateRequest;
@@ -12,6 +15,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +27,7 @@ public class RoomService {
 
     private final RoomRepository roomRepository;
     private final RoomtypeRepository roomTypeRepository;
+    private final DailyRoomAvailabilityRepository dailyRoomAvailabilityRepository;
 
     @Transactional
     public void createRoom(RoomCreateRequest roomCreateRequest) {
@@ -39,6 +44,24 @@ public class RoomService {
                 .build();
 
         room = roomRepository.save(room);
+
+        initializeRoomAvailability(room);
+    }
+
+    public void initializeRoomAvailability(RoomEntity roomEntity) {
+        LocalDate today = LocalDate.now();
+
+        for (int i = 0; i < 30; i++) {
+            LocalDate date = today.plusDays(i);
+            DailyRoomAvailabilityEntity availability = DailyRoomAvailabilityEntity.builder()
+                    .roomEntity(roomEntity)
+                    .date(date.atStartOfDay())
+                    .remainingRoom(roomEntity.getRoomAmount())
+                    .status(RoomStatus.예약가능)
+                    .build();
+
+            dailyRoomAvailabilityRepository.save(availability);
+        }
     }
 
     public RoomView readRoom(Long id) {
