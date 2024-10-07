@@ -64,4 +64,6 @@ public class TicketOrderEntity {
     public void confirmOrder() { this.status = OrderStatus.CONFIRMED; }
 
     public void completeOrder() { this.status = OrderStatus.COMPLETED; }
+
+    public void failOrder() { this.status = OrderStatus.FAILED; }
 }
