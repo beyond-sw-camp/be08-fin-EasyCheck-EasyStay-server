@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class TicketPaymentController {
 
-    private final TicketPaymentService paymentService;
+    private final TicketPaymentService ticketpaymentService;
 
     @Operation(summary = "입장권 결제 추가하는 API")
     @PostMapping("")
@@ -25,7 +25,7 @@ public class TicketPaymentController {
             @PathVariable Long orderId,
             @RequestBody TicketPaymentRequest request) {
 
-        TicketPaymentEntity payment = paymentService.processPayment(orderId, request);
+        TicketPaymentEntity payment = ticketpaymentService.processPayment(orderId, request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponseView<>(payment));
     }
@@ -36,7 +36,8 @@ public class TicketPaymentController {
             @PathVariable Long orderId,
             @RequestBody String cancelReason) {
 
-        paymentService.cancelPayment(orderId, cancelReason);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        TicketPaymentEntity cancelledPayment = ticketpaymentService.cancelPayment(orderId, cancelReason);
+        return ResponseEntity.ok(new ApiResponseView<>(cancelledPayment));
     }
 }
+
