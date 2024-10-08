@@ -1,8 +1,11 @@
 package com.beyond.easycheck.corporate.ui.requestbody;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record CorporateCreateRequest(
-        Long userId,
+        @NotBlank
         String name,
+        @NotBlank
         String businessLicenseNumber
 ) {
 }
