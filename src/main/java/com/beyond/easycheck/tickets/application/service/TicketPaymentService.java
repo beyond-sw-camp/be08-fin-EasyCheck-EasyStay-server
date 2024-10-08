@@ -7,12 +7,18 @@ import com.beyond.easycheck.tickets.infrastructure.entity.TicketPaymentEntity;
 import com.beyond.easycheck.tickets.infrastructure.repository.TicketOrderRepository;
 import com.beyond.easycheck.tickets.infrastructure.repository.TicketPaymentRepository;
 import com.beyond.easycheck.tickets.ui.requestbody.TicketPaymentRequest;
+import com.beyond.easycheck.user.exception.UserMessageType;
+import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
+import com.beyond.easycheck.user.infrastructure.persistence.mariadb.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 import static com.beyond.easycheck.tickets.exception.TicketOrderMessageType.*;
+import static com.beyond.easycheck.user.exception.UserMessageType.USER_NOT_FOUND;
 
 @Slf4j
 @Service
@@ -22,18 +28,22 @@ public class TicketPaymentService {
 
     private final TicketOrderRepository ticketOrderRepository;
     private final TicketPaymentRepository ticketPaymentRepository;
+    private final UserJpaRepository userJpaRepository;
 
     @Transactional
     public TicketPaymentEntity processPayment(Long orderId, Long userId, TicketPaymentRequest request) {
 
+        UserEntity userEntity = userJpaRepository.findById(userId)
+                .orElseThrow(() -> new EasyCheckException(USER_NOT_FOUND));
+
         TicketOrderEntity order = ticketOrderRepository.findById(orderId)
                 .orElseThrow(() -> new EasyCheckException(ORDER_NOT_FOUND));
 
-        if (!order.getUserId().equals(userId)) {
+        if (!order.getUserEntity().getId().equals(userId)) {
             throw new EasyCheckException(UNAUTHORIZED_ACCESS);
         }
 
-        if (order.getStatus() != OrderStatus.PENDING) {
+        if (order.getOrderStatus() != OrderStatus.PENDING) {
             throw new EasyCheckException(INVALID_ORDER_STATUS_FOR_PAYMENT);
         }
 
@@ -56,19 +66,23 @@ public class TicketPaymentService {
 
     @Transactional
     public TicketPaymentEntity cancelPayment(Long orderId, Long userId, String reason) {
+        Optional<UserEntity> user = userJpaRepository.findById(userId);
+        if(user.isEmpty()){
+            throw new EasyCheckException(USER_NOT_FOUND);
+        }
 
         TicketOrderEntity order = ticketOrderRepository.findById(orderId)
                 .orElseThrow(() -> new EasyCheckException(ORDER_NOT_FOUND));
 
-        if (!order.getUserId().equals(userId)) {
+        if (!order.getUserEntity().getId().equals(userId)) {
             throw new EasyCheckException(UNAUTHORIZED_ACCESS);
         }
 
-        if (order.getStatus() == OrderStatus.CANCELLED) {
+        if (order.getOrderStatus() == OrderStatus.CANCELLED) {
             throw new EasyCheckException(ORDER_ALREADY_CANCELLED);
         }
 
-        if (order.getStatus() == OrderStatus.COMPLETED) {
+        if (order.getOrderStatus() == OrderStatus.COMPLETED) {
             throw new EasyCheckException(ORDER_ALREADY_COMPLETED);
         }
 

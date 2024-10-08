@@ -1,6 +1,7 @@
 package com.beyond.easycheck.tickets.application.service;
 
 import com.beyond.easycheck.tickets.infrastructure.entity.TicketEntity;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -18,15 +19,16 @@ public interface TicketReadUseCase {
 
     @Getter
     @Builder
+    @AllArgsConstructor
     @EqualsAndHashCode
     class FindTicketResult {
-        private final Long id;
-        private final String ticketName;
-        private final BigDecimal price;
-        private final LocalDateTime saleStartDate;
-        private final LocalDateTime saleEndDate;
-        private final LocalDateTime validFromDate;
-        private final LocalDateTime validToDate;
+        private Long id;
+        private String ticketName;
+        private BigDecimal price;
+        private LocalDateTime saleStartDate;
+        private LocalDateTime saleEndDate;
+        private LocalDateTime validFromDate;
+        private LocalDateTime validToDate;
 
         public static FindTicketResult fromEntity(TicketEntity ticket) {
             return FindTicketResult.builder()
