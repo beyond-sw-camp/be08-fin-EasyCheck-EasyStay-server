@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.beyond.easycheck.rooms.exception.RoomMessageType.ROOMS_NOT_FOUND;
 import static com.beyond.easycheck.rooms.exception.RoomMessageType.ROOM_NOT_FOUND;
 import static com.beyond.easycheck.roomtypes.exception.RoomtypeMessageType.ROOM_TYPE_NOT_FOUND;
 
@@ -26,7 +27,7 @@ public class RoomService {
     private final RoomtypeRepository roomTypeRepository;
 
     @Transactional
-    public void createRoom(RoomCreateRequest roomCreateRequest) {
+    public RoomEntity createRoom(RoomCreateRequest roomCreateRequest) {
 
         RoomtypeEntity roomType = roomTypeRepository.findById(roomCreateRequest.getRoomTypeId())
                 .orElseThrow(() -> new EasyCheckException(ROOM_TYPE_NOT_FOUND));
@@ -39,7 +40,7 @@ public class RoomService {
                 .roomAmount(roomCreateRequest.getRoomAmount())
                 .build();
 
-        room = roomRepository.save(room);
+        return roomRepository.save(room);
     }
 
     public RoomView readRoom(Long id) {
@@ -54,6 +55,7 @@ public class RoomService {
                 .roomNumber(room.getRoomNumber())
                 .roomPic(room.getRoomPic())
                 .roomAmount(room.getRoomAmount())
+                .remainingRoom(room.getRemainingRoom())
                 .status(room.getStatus())
                 .roomTypeId(roomType.getRoomTypeId())
                 .accomodationId(roomType.getAccommodationEntity().getId())
@@ -71,7 +73,7 @@ public class RoomService {
         List<RoomEntity> roomEntities = roomRepository.findAll();
 
         if (roomEntities.isEmpty()) {
-            throw new EasyCheckException(ROOM_NOT_FOUND);
+            throw new EasyCheckException(ROOMS_NOT_FOUND);
         }
         List<RoomView> roomViews = roomEntities.stream()
                 .map(roomEntity -> new RoomView(

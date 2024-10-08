@@ -1,6 +1,7 @@
 package com.beyond.easycheck.rooms.application.service;
 
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
+import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationType;
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
@@ -12,6 +13,7 @@ import com.beyond.easycheck.rooms.ui.view.RoomView;
 import com.beyond.easycheck.roomtypes.infrastructure.entity.RoomtypeEntity;
 import com.beyond.easycheck.roomtypes.infrastructure.repository.RoomtypeRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -19,9 +21,10 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
-import static com.beyond.easycheck.accomodations.exception.AccommodationMessageType.ACCOMMODATION_NOT_FOUND;
 import static com.beyond.easycheck.rooms.exception.RoomMessageType.*;
 import static com.beyond.easycheck.roomtypes.exception.RoomtypeMessageType.ROOM_TYPE_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,16 +51,49 @@ public class RoomServiceTest {
     private RoomService roomService;
 
     @InjectMocks
-    private RoomtypeEntity roomType;
+    private RoomtypeEntity roomtype1;
+
+    @InjectMocks
+    private RoomtypeEntity roomtype2;
 
     @InjectMocks
     private AccommodationEntity accommodationEntity;
 
+    @BeforeEach
+    void setUp() {
+        accommodationEntity = new AccommodationEntity(
+                1L,
+                "선셋 리조트",
+                "123 해변로, 오션 시티",
+                AccommodationType.RESORT
+        );
+
+        roomtype1 = new RoomtypeEntity(
+                1L,
+                accommodationEntity,
+                "디럭스",
+                "한 명이 묵을 수 있는 아늑한 룸",
+                1
+        );
+
+        roomtype2 = new RoomtypeEntity(
+                2L,
+                accommodationEntity,
+                "스탠다드",
+                "두 명이 묵을 수 있는 룸",
+                2
+        );
+
+        when(accommodationRepository.findById(accommodationEntity.getId())).thenReturn(Optional.of(accommodationEntity));
+        when(roomtypeRepository.findById(roomtype1.getRoomTypeId())).thenReturn(Optional.of(roomtype1));
+        when(roomtypeRepository.findById(roomtype2.getRoomTypeId())).thenReturn(Optional.of(roomtype2));
+    }
+
     @Test
-    @DisplayName("객실 생성 - 성공")
+    @DisplayName("객실 생성 성공")
     void createRoom_success() {
         // Given
-        when(roomtypeRepository.findById(1L)).thenReturn(Optional.of(roomType));
+        when(roomtypeRepository.findById(1L)).thenReturn(Optional.of(roomtype1));
 
         RoomCreateRequest roomCreateRequest = new RoomCreateRequest(
                 1L,
@@ -69,11 +105,12 @@ public class RoomServiceTest {
 
         RoomEntity roomEntity = new RoomEntity(
                 1L,
-                roomType,
+                roomtype1,
                 "402",
                 "roomPic1",
                 RoomStatus.예약가능,
-                10
+                10,
+                5
         );
 
         when(roomRepository.save(any(RoomEntity.class))).thenReturn(roomEntity);
@@ -102,6 +139,7 @@ public class RoomServiceTest {
         assertThatThrownBy(() -> roomService.createRoom(roomCreateRequest))
                 .isInstanceOf(EasyCheckException.class)
                 .hasMessage(ROOM_TYPE_NOT_FOUND.getMessage());
+
         // Verify
         verify(roomRepository, never()).save(any(RoomEntity.class));
     }
@@ -110,21 +148,14 @@ public class RoomServiceTest {
     @DisplayName("객실 단일 조회 성공")
     void readRoom_success() {
         // Given
-//        accommodationEntity = accommodationRepository.findById(1L)
-//                .orElseThrow(() -> new EasyCheckException(ACCOMMODATION_NOT_FOUND));
-//        roomType = roomtypeRepository.findById(1L)
-//                .orElseThrow(() -> new EasyCheckException(ROOM_TYPE_NOT_FOUND));
-
-        when(accommodationRepository.findById(roomType.getAccommodationEntity().getId())).thenReturn(Optional.of(accommodationEntity));
-        when(roomtypeRepository.findById(1L)).thenReturn(Optional.of(roomType));
-
         RoomEntity roomEntity = new RoomEntity(
                 1L,
-                roomType,
+                roomtype1,
                 "402",
                 "roomPic1",
                 RoomStatus.예약가능,
-                10
+                10,
+                5
         );
 
         when(roomRepository.findById(1L)).thenReturn(Optional.of(roomEntity));
@@ -134,20 +165,33 @@ public class RoomServiceTest {
                 "402",
                 "roomPic1",
                 10,
+                5,
                 RoomStatus.예약가능,
-                roomType.getRoomTypeId(),
-                roomType.getAccommodationEntity().getId(),
-                roomType.getDescription(),
-                roomType.getTypeName(),
-                roomType.getMaxOccupancy()
+                roomtype1.getRoomTypeId(),
+                roomtype1.getAccommodationEntity().getId(),
+                roomtype1.getTypeName(),
+                roomtype1.getDescription(),
+                roomtype1.getMaxOccupancy()
         );
 
         // When
         RoomView readRoom = roomService.readRoom(1L);
 
         // Then
-        assertThat(readRoom).isEqualTo(roomView);
+//        assertThat(readRoom).isEqualTo(roomView);
+        assertThat(readRoom.getRoomId()).isEqualTo(roomView.getRoomId());
+        assertThat(readRoom.getRoomNumber()).isEqualTo(roomView.getRoomNumber());
+        assertThat(readRoom.getRoomPic()).isEqualTo(roomView.getRoomPic());
+        assertThat(readRoom.getRoomAmount()).isEqualTo(roomView.getRoomAmount());
+        assertThat(readRoom.getRemainingRoom()).isEqualTo(roomView.getRemainingRoom());
+        assertThat(readRoom.getStatus()).isEqualTo(roomView.getStatus());
+        assertThat(readRoom.getRoomTypeId()).isEqualTo(roomView.getRoomTypeId());
+        assertThat(readRoom.getAccomodationId()).isEqualTo(roomView.getAccomodationId());
+        assertThat(readRoom.getTypeName()).isEqualTo(roomView.getTypeName());
+        assertThat(readRoom.getDescription()).isEqualTo(roomView.getDescription());
+        assertThat(readRoom.getMaxOccupancy()).isEqualTo(roomView.getMaxOccupancy());
     }
+
 
     @Test
     @DisplayName("객실 단일 조회 실패 - 존재하지 않는 roomID")
@@ -156,7 +200,7 @@ public class RoomServiceTest {
         Long roomId = 999L;
 
         when(accommodationRepository.findById(1L)).thenReturn(Optional.of(accommodationEntity));
-        when(roomtypeRepository.findById(1L)).thenReturn(Optional.of(roomType));
+        when(roomtypeRepository.findById(1L)).thenReturn(Optional.of(roomtype1));
         when(roomRepository.findById(roomId)).thenReturn(Optional.empty());
 
         // When & Then
@@ -171,7 +215,40 @@ public class RoomServiceTest {
     @Test
     @DisplayName("객실 전체 조회 성공")
     void readRooms_success() {
+        // Given
+        RoomEntity room1 = new RoomEntity(
+                1L,
+                roomtype1,
+                "402",
+                "roomPic1",
+                RoomStatus.예약가능,
+                10,
+                5
+        );
 
+        RoomEntity room2 = new RoomEntity(
+                2L,
+                roomtype2,
+                "403",
+                "roomPic2",
+                RoomStatus.예약가능,
+                8,
+                3
+        );
+
+        List<RoomEntity> roomEntities = Arrays.asList(room1, room2);
+        when(roomRepository.findAll()).thenReturn(roomEntities);
+
+        // When
+        List<RoomView> roomViews = roomService.readRooms();
+
+        // Then
+        assertThat(roomViews).hasSize(2);
+        assertThat(roomViews.get(0).getRoomId()).isEqualTo(room1.getRoomId());
+        assertThat(roomViews.get(1).getRoomId()).isEqualTo(room2.getRoomId());
+
+        // Verify
+        verify(roomRepository).findAll();
     }
 
     @Test
@@ -195,11 +272,12 @@ public class RoomServiceTest {
         // Given
         RoomEntity existingRoom = new RoomEntity(
                 1L,
-                roomType,
+                roomtype1,
                 "402",
                 "roomPic1",
                 RoomStatus.예약가능,
-                10
+                10,
+                5
         );
 
         RoomUpdateRequest updateRoom = new RoomUpdateRequest(
@@ -231,11 +309,12 @@ public class RoomServiceTest {
         // Given
         RoomEntity existingRoom = new RoomEntity(
                 1L,
-                roomType,
+                roomtype1,
                 "402",
                 "roomPic1",
                 RoomStatus.예약가능,
-                10
+                10,
+                5
         );
 
         RoomUpdateRequest updateRequest = new RoomUpdateRequest(
@@ -265,11 +344,12 @@ public class RoomServiceTest {
 
         RoomEntity roomEntity = new RoomEntity(
                 roomId,
-                roomType,
+                roomtype1,
                 "402",
                 "roomPic1",
                 RoomStatus.예약가능,
-                10
+                10,
+                5
         );
 
         when(roomRepository.findById(roomId)).thenReturn(Optional.of(roomEntity));
@@ -295,4 +375,3 @@ public class RoomServiceTest {
     }
 
 }
-
