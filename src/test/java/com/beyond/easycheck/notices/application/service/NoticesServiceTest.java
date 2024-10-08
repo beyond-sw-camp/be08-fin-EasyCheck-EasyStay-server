@@ -78,7 +78,7 @@ class NoticesServiceTest {
 
 
     @Test
-    @DisplayName("[공지사항 조회] - 성공")
+    @DisplayName("[공지사항 목록 조회] - 성공")
     void getAllNotices_success() {
         // given
         NoticesCreateRequest request1 = new NoticesCreateRequest(4L, "공지사항","공지사항 내용");
