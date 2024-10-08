@@ -45,12 +45,9 @@ public class RoomService {
                 .roomAmount(roomCreateRequest.getRoomAmount())
                 .build();
 
-<<<<<<< HEAD
-        return roomRepository.save(room);
-=======
         room = roomRepository.save(room);
 
-        initializeRoomAvailability(room);
+        return room;
     }
 
     public void initializeRoomAvailability(RoomEntity roomEntity) {
