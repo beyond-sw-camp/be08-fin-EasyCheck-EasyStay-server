@@ -20,12 +20,13 @@ public class TicketOrderDTO {
     private BigDecimal paymentAmount;
     private OrderStatus orderStatus;
 
-    public TicketOrderDTO(Long orderId, String ticketName, int quantity, BigDecimal totalPrice, Long userId, LocalDateTime purchaseTimestamp) {
+    public TicketOrderDTO(Long orderId, String ticketName, int quantity, BigDecimal totalPrice, Long userId, LocalDateTime purchaseTimestamp, OrderStatus orderStatus) {
         this.orderId = orderId;
         this.ticketName = ticketName;
         this.quantity = quantity;
         this.totalPrice = totalPrice;
         this.userId = userId;
         this.purchaseTimestamp = purchaseTimestamp;
+        this.orderStatus = orderStatus;
     }
 }

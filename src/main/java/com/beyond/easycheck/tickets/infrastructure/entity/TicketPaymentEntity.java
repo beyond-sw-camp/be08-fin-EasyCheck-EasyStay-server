@@ -21,7 +21,7 @@ public class TicketPaymentEntity {
     @JoinColumn(name = "ticket_order_id", nullable = false)
     private TicketOrderEntity ticketOrder;
 
-    @Column(nullable = false)
+    @Column(name = "amount",nullable = false)
     private BigDecimal paymentAmount;
 
     @Column(nullable = false)
