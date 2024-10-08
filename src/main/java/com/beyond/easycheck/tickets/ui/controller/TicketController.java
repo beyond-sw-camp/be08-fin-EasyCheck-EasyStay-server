@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,7 +31,7 @@ public class TicketController {
     @Operation(summary = "입장권 종류를 등록하는 API")
     @PostMapping("")
     public ResponseEntity<ApiResponseView<TicketView>> createTicket(@PathVariable Long themeParkId,
-                                                                    @RequestBody TicketRequest request) {
+                                                                    @RequestBody @Validated TicketRequest request) {
         TicketCreateCommand command = TicketCreateCommand.builder()
                 .themeParkId(themeParkId)
                 .ticketName(request.getTicketName())
@@ -103,7 +104,7 @@ public class TicketController {
                 .body(new ApiResponseView<>(ticketViews));
     }
 
-    @Operation(summary = "입장권 종류를 삭제하는 API")
+    @Operation(summary = "입장권 종류를 조회하는 API")
     @GetMapping("/{ticketId}")
     public ResponseEntity<ApiResponseView<TicketView>> getTicketById(@PathVariable Long ticketId) {
         FindTicketResult result = ticketReadUseCase.getTicketById(ticketId);

@@ -11,5 +11,6 @@ import java.util.List;
 public class DayRoomAvailabilityView {
 
     private LocalDate date;
+    private String dayOfWeek;
     private List<RoomAvailabilityView> rooms;
 }

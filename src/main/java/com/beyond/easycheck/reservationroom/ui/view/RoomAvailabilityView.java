@@ -10,6 +10,7 @@ public class RoomAvailabilityView {
 
     private Long roomId;
     private String roomTypeName;
+    private String roomNumber;
     private int remainingRoom;
     private RoomStatus status;
 }

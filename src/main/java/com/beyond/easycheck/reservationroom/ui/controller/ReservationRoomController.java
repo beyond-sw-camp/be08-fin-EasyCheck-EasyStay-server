@@ -43,9 +43,8 @@ public class ReservationRoomController {
             @RequestParam int year,
             @RequestParam int month) {
 
-        List<DayRoomAvailabilityView> roomAvailability = reservationRoomService.getRoomAvailabilityByMonth(year, month);
-
-        return ResponseEntity.ok(roomAvailability);
+        List<DayRoomAvailabilityView> availability = reservationRoomService.getRoomAvailabilityByMonth(year, month);
+        return ResponseEntity.ok(availability);
     }
 
     @Operation(summary = "예약 내역 리스트를 조회하는 API")
