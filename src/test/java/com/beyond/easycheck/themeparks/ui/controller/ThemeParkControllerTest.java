@@ -1,13 +1,11 @@
 package com.beyond.easycheck.themeparks.ui.controller;
 
-import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUseCase;
 import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase;
 import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase.FindThemeParkResult;
 import com.beyond.easycheck.themeparks.ui.requestbody.ThemeParkCreateRequest;
 import com.beyond.easycheck.themeparks.ui.requestbody.ThemeParkUpdateRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +20,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Collections;
 import java.util.List;
 
-import static com.beyond.easycheck.themeparks.exception.ThemeParkMessageType.THEME_PARK_NOT_FOUND;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
