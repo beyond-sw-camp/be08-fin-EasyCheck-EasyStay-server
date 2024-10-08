@@ -33,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 @ActiveProfiles("test")
 class NoticesControllerTest {
 
@@ -47,6 +46,7 @@ class NoticesControllerTest {
     NoticesService noticesService;
 
     @Test
+    @Transactional
     @DisplayName("[공지사항 등록] - 성공")
     @WithEasyCheckMockUser(id = 4L, role = "ADMIN")
     void createNotices() throws Exception {
@@ -106,6 +106,7 @@ class NoticesControllerTest {
     }
 
     @Test
+    @Transactional
     @DisplayName("[공지사항 목록 조회] - 성공")
     @WithEasyCheckMockUser(id = 4L, role = "ADMIN")
     void getAllNotices() throws Exception {
@@ -150,6 +151,7 @@ class NoticesControllerTest {
 
 
     @Test
+    @Transactional
     @DisplayName("[공지사항 조회] - 성공")
     @WithEasyCheckMockUser(id = 4L, role = "ADMIN")
     void getNotices() throws Exception {
@@ -191,27 +193,29 @@ class NoticesControllerTest {
     }
 
     @Test
+    @Transactional
     @WithEasyCheckMockUser(id = 4L, role = "ADMIN")
     @DisplayName("[공지사항 수정] - 성공")
     void updateNotices() throws Exception {
         // given
         NoticesCreateRequest request = new NoticesCreateRequest(1L,"공지사항","공지사항 내용");
 
-        mockMvc.perform(
-                post("/api/v1/notices-reply")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated());
+        Optional<NoticesEntity> notices = noticesService.createNotices(4L, request);
 
-        Long noticeId = 1L; // 생성한 공지사항의 ID
+
+        Long noticeId = notices.get().getId(); // 생성한 공지사항의 ID
+        System.out.println(noticeId);
+
         NoticesUpdateRequest updateRequest = new NoticesUpdateRequest("수정된 공지사항 제목", "수정한 내용");
 
         // when
         mockMvc.perform(
                 put("/api/v1/notices-reply/" + noticeId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateRequest))
-        );
+                        .content(objectMapper.writeValueAsString(updateRequest)))
+                        .andExpect(status().isNoContent());
+
+
 
         // then
        mockMvc.perform(get("/api/v1/notices-reply/" + noticeId)
@@ -244,18 +248,18 @@ class NoticesControllerTest {
     }
 
     @Test
+    @Transactional
     @DisplayName("[공지사항 삭제] - 성공")
     @WithEasyCheckMockUser(id = 4L, role = "ADMIN")
     void deleteNotices() throws Exception {
         // given
         NoticesCreateRequest request = new NoticesCreateRequest(1L,"공지사항","공지사항 내용");
 
-        mockMvc.perform(post("/api/v1/notices-reply")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated());
+        Optional<NoticesEntity> notices = noticesService.createNotices(4L, request);
 
-        Long noticeId = 1L;
+
+        Long noticeId = notices.get().getId(); // 생성한 공지사항의 ID
+        System.out.println(noticeId);
 
         // when: 공지사항 삭제
         mockMvc.perform(delete("/api/v1/notices-reply/" + noticeId)
