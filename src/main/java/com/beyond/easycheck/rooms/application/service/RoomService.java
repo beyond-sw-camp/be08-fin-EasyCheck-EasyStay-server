@@ -64,7 +64,6 @@ public class RoomService {
 
             dailyRoomAvailabilityRepository.save(availability);
         }
->>>>>>> develop
     }
 
     public RoomView readRoom(Long id) {
