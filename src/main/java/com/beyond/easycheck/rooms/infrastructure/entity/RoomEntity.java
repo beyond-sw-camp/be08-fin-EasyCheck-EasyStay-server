@@ -11,7 +11,6 @@ import lombok.*;
 import static com.beyond.easycheck.rooms.exception.RoomMessageType.ARGUMENT_NOT_VALID;
 
 @Getter
-@Setter
 @Entity
 @Builder
 @Table(name = "room")
