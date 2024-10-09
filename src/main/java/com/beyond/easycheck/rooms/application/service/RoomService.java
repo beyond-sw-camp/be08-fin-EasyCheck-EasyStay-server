@@ -56,23 +56,23 @@ public class RoomService {
         LocalDate today = LocalDate.now();
 
         for (LocalDate date = today; !date.isAfter(today.plusDays(30)); date = date.plusDays(1)) {
+            // 이미 해당 날짜에 대한 데이터가 있는지 확인
             DailyRoomAvailabilityEntity dailyAvailability = dailyRoomAvailabilityRepository
                     .findByRoomEntityAndDate(roomEntity, date.atStartOfDay())
                     .orElse(null);
 
             if (dailyAvailability == null) {
+                // 데이터가 없으면 새로 생성
                 dailyAvailability = DailyRoomAvailabilityEntity.builder()
                         .roomEntity(roomEntity)
                         .date(date.atStartOfDay())
-                        .remainingRoom(roomEntity.getRoomAmount())
+                        .remainingRoom(roomEntity.getRoomAmount()) // 새로 생성할 때만 초기화
                         .status(RoomStatus.예약가능)
                         .build();
 
                 dailyRoomAvailabilityRepository.save(dailyAvailability);
-            } else {
-                dailyAvailability.setRemainingRoom(roomEntity.getRoomAmount());
-                dailyRoomAvailabilityRepository.save(dailyAvailability);
             }
+            // 데이터가 이미 존재하는 경우는 remainingRoom 값을 유지하도록 변경
         }
     }
 
