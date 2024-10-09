@@ -26,6 +26,7 @@ import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.repository.UserJpaRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +43,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
+@Slf4j
 public class ReservationRoomService {
 
     private final ReservationRoomRepository reservationRoomRepository;
@@ -87,17 +89,21 @@ public class ReservationRoomService {
         reservationRoomRepository.save(reservationRoomEntity);
 
         for (LocalDateTime date = checkinDate; !date.isAfter(checkoutDate); date = date.plusDays(1)) {
-            DailyRoomAvailabilityEntity dailyAvailability = dailyRoomAvailabilityRepository
-                    .findByRoomEntityAndDate(roomEntity, date)
-                    .orElseThrow(() -> new EasyCheckException(ReservationRoomMessageType.ROOM_NOT_AVAILABLE));
 
-            dailyAvailability.decrementRemainingRoom();
+            if (date.isBefore(checkoutDate)) {
 
-            if (dailyAvailability.getRemainingRoom() <= 0) {
-                dailyAvailability.setStatus(RoomStatus.예약불가);
+                DailyRoomAvailabilityEntity dailyAvailability = dailyRoomAvailabilityRepository
+                        .findByRoomEntityAndDate(roomEntity, date)
+                        .orElseThrow(() -> new EasyCheckException(ReservationRoomMessageType.ROOM_NOT_AVAILABLE));
+
+                dailyAvailability.decrementRemainingRoom();
+
+                if (dailyAvailability.getRemainingRoom() <= 0) {
+                    dailyAvailability.setStatus(RoomStatus.예약불가);
+                }
+
+                dailyRoomAvailabilityRepository.save(dailyAvailability);
             }
-
-            dailyRoomAvailabilityRepository.save(dailyAvailability);
         }
 
         return reservationRoomEntity;
