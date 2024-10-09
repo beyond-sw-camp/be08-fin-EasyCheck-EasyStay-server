@@ -1,6 +1,8 @@
 package com.beyond.easycheck.rooms.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
+import com.beyond.easycheck.reservationroom.infrastructure.repository.ReservationRoomRepository;
+import com.beyond.easycheck.reservationroom.ui.view.RoomAvailabilityView;
 import com.beyond.easycheck.rooms.infrastructure.entity.DailyRoomAvailabilityEntity;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomStatus;
@@ -11,11 +13,12 @@ import com.beyond.easycheck.rooms.ui.requestbody.RoomUpdateRequest;
 import com.beyond.easycheck.rooms.ui.view.RoomView;
 import com.beyond.easycheck.roomtypes.infrastructure.entity.RoomtypeEntity;
 import com.beyond.easycheck.roomtypes.infrastructure.repository.RoomtypeRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +31,7 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final RoomtypeRepository roomTypeRepository;
     private final DailyRoomAvailabilityRepository dailyRoomAvailabilityRepository;
+    private final ReservationRoomRepository reservationRoomRepository;
 
     @Transactional
     public void createRoom(RoomCreateRequest roomCreateRequest) {
@@ -51,17 +55,43 @@ public class RoomService {
     public void initializeRoomAvailability(RoomEntity roomEntity) {
         LocalDate today = LocalDate.now();
 
-        for (int i = 0; i < 30; i++) {
-            LocalDate date = today.plusDays(i);
-            DailyRoomAvailabilityEntity availability = DailyRoomAvailabilityEntity.builder()
-                    .roomEntity(roomEntity)
-                    .date(date.atStartOfDay())
-                    .remainingRoom(roomEntity.getRoomAmount())
-                    .status(RoomStatus.예약가능)
-                    .build();
+        for (LocalDate date = today; !date.isAfter(today.plusDays(30)); date = date.plusDays(1)) {
+            DailyRoomAvailabilityEntity dailyAvailability = dailyRoomAvailabilityRepository
+                    .findByRoomEntityAndDate(roomEntity, date.atStartOfDay())
+                    .orElse(null);
 
-            dailyRoomAvailabilityRepository.save(availability);
+            if (dailyAvailability == null) {
+                dailyAvailability = DailyRoomAvailabilityEntity.builder()
+                        .roomEntity(roomEntity)
+                        .date(date.atStartOfDay())
+                        .remainingRoom(roomEntity.getRoomAmount())
+                        .status(RoomStatus.예약가능)
+                        .build();
+
+                dailyRoomAvailabilityRepository.save(dailyAvailability);
+            } else {
+                dailyAvailability.setRemainingRoom(roomEntity.getRoomAmount());
+                dailyRoomAvailabilityRepository.save(dailyAvailability);
+            }
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<RoomAvailabilityView> getAvailableRooms(LocalDateTime checkinDate, LocalDateTime checkoutDate) {
+
+        List<RoomEntity> reservedRooms = reservationRoomRepository.findReservedRoomsBetweenDates(checkinDate, checkoutDate);
+        List<RoomEntity> availableRooms = roomRepository.findAll().stream()
+                .filter(room -> !reservedRooms.contains(room))
+                .collect(Collectors.toList());
+
+        return availableRooms.stream()
+                .map(room -> new RoomAvailabilityView(
+                        room.getRoomId(),
+                        room.getRoomTypeEntity().getTypeName(),
+                        room.getRoomNumber(),
+                        room.getRemainingRoom(),
+                        room.getStatus()))
+                .collect(Collectors.toList());
     }
 
     public RoomView readRoom(Long id) {
