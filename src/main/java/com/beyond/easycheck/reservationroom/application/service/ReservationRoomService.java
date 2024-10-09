@@ -104,14 +104,11 @@ public class ReservationRoomService {
         LocalDate startDate = LocalDate.of(year, month, 1);
         LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
 
-        // 조회 범위에 해당하는 가용성 데이터 조회
         List<DailyRoomAvailabilityEntity> availabilities = dailyRoomAvailabilityRepository
                 .findAvailabilityByDateRange(startDate.atStartOfDay(), endDate.atTime(23, 59));
 
-        // 조회할 전체 객실 목록을 가져오기 (모든 객실에 대해 가용성 여부 판단)
         List<RoomEntity> allRooms = roomRepository.findAll();
 
-        // 가용성 데이터 생성
         return createDayRoomAvailabilityViews(availabilities, startDate, endDate, allRooms);
     }
 
@@ -123,23 +120,19 @@ public class ReservationRoomService {
         for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
             LocalDate finalDate = date;
 
-            // 모든 방에 대해 가용성 확인, 없으면 기본값 생성
             List<RoomAvailabilityView> rooms = allRooms.stream()
                     .map(room -> {
-                        // 현재 날짜에 대한 방의 가용성 정보가 있는지 확인
                         DailyRoomAvailabilityEntity dailyAvailability = availabilities.stream()
                                 .filter(availability -> availability.getRoomEntity().equals(room) &&
                                         availability.getDate().toLocalDate().equals(finalDate))
                                 .findFirst()
-                                // 가용성 정보가 없으면 기본값 생성 (예약 가능)
                                 .orElse(DailyRoomAvailabilityEntity.builder()
                                         .roomEntity(room)
                                         .date(finalDate.atStartOfDay())
-                                        .remainingRoom(room.getRoomAmount())  // 기본 남은 객실 수
-                                        .status(RoomStatus.예약가능)           // 기본 예약 가능 상태
+                                        .remainingRoom(room.getRoomAmount())
+                                        .status(RoomStatus.예약가능)
                                         .build());
 
-                        // RoomAvailabilityView 생성
                         return new RoomAvailabilityView(
                                 room.getRoomId(),
                                 room.getRoomTypeEntity().getTypeName(),
@@ -150,7 +143,6 @@ public class ReservationRoomService {
                     })
                     .collect(Collectors.toList());
 
-            // 날짜별 가용성 정보 추가
             result.add(new DayRoomAvailabilityView(
                     finalDate,
                     finalDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.KOREAN),

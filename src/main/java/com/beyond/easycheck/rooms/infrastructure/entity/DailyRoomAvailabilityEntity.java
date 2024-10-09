@@ -13,7 +13,8 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Builder
-@Table(name = "daily_room_availability_entity")
+@Table(name = "daily_room_availability_entity",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"room_id", "date"}))
 public class DailyRoomAvailabilityEntity {
 
     @Id
