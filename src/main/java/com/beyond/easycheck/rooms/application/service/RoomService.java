@@ -51,16 +51,24 @@ public class RoomService {
     public void initializeRoomAvailability(RoomEntity roomEntity) {
         LocalDate today = LocalDate.now();
 
-        for (int i = 0; i < 30; i++) {
-            LocalDate date = today.plusDays(i);
-            DailyRoomAvailabilityEntity availability = DailyRoomAvailabilityEntity.builder()
-                    .roomEntity(roomEntity)
-                    .date(date.atStartOfDay())
-                    .remainingRoom(roomEntity.getRoomAmount())
-                    .status(RoomStatus.예약가능)
-                    .build();
+        for (LocalDate date = today; !date.isAfter(today.plusDays(30)); date = date.plusDays(1)) {
+            DailyRoomAvailabilityEntity dailyAvailability = dailyRoomAvailabilityRepository
+                    .findByRoomEntityAndDate(roomEntity, date.atStartOfDay())
+                    .orElse(null);
 
-            dailyRoomAvailabilityRepository.save(availability);
+            if (dailyAvailability == null) {
+                dailyAvailability = DailyRoomAvailabilityEntity.builder()
+                        .roomEntity(roomEntity)
+                        .date(date.atStartOfDay())
+                        .remainingRoom(roomEntity.getRoomAmount())
+                        .status(RoomStatus.예약가능)
+                        .build();
+
+                dailyRoomAvailabilityRepository.save(dailyAvailability);
+            } else {
+                dailyAvailability.setRemainingRoom(roomEntity.getRoomAmount());
+                dailyRoomAvailabilityRepository.save(dailyAvailability);
+            }
         }
     }
 
