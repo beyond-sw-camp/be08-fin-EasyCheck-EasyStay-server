@@ -69,9 +69,6 @@ public class RoomService {
                         .build();
 
                 dailyRoomAvailabilityRepository.save(dailyAvailability);
-            } else {
-                dailyAvailability.setRemainingRoom(roomEntity.getRoomAmount());
-                dailyRoomAvailabilityRepository.save(dailyAvailability);
             }
         }
     }
