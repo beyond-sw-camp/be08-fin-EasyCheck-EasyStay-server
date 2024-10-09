@@ -53,6 +53,7 @@ public class ReservationRoomService {
 
     @Transactional
     public ReservationRoomEntity createReservation(Long userId, ReservationRoomCreateRequest reservationRoomCreateRequest) {
+
         UserEntity userEntity = userJpaRepository.findById(userId)
                 .orElseThrow(() -> new EasyCheckException(UserMessageType.USER_NOT_FOUND));
 
@@ -91,6 +92,11 @@ public class ReservationRoomService {
                     .orElseThrow(() -> new EasyCheckException(ReservationRoomMessageType.ROOM_NOT_AVAILABLE));
 
             dailyAvailability.decrementRemainingRoom();
+
+            if (dailyAvailability.getRemainingRoom() <= 0) {
+                dailyAvailability.setStatus(RoomStatus.예약불가);
+            }
+
             dailyRoomAvailabilityRepository.save(dailyAvailability);
         }
 
@@ -182,6 +188,12 @@ public class ReservationRoomService {
         reservationRoomEntity.updateReservationRoom(reservationRoomUpdateRequest);
         reservationRoomRepository.save(reservationRoomEntity);
 
+        List<ReservationServiceEntity> additionalServices = reservationServiceRepository.findByReservationRoomEntity(reservationRoomEntity);
+        for (ReservationServiceEntity service : additionalServices) {
+            service.cancelReservationService(new ReservationServiceUpdateRequest(ReservationServiceStatus.CANCELED));
+        }
+        reservationServiceRepository.saveAll(additionalServices);
+
         LocalDate checkinDate = reservationRoomEntity.getCheckinDate().toLocalDate();
         LocalDate checkoutDate = reservationRoomEntity.getCheckoutDate().toLocalDate();
 
@@ -191,6 +203,13 @@ public class ReservationRoomService {
                     .orElseThrow(() -> new EasyCheckException(ReservationRoomMessageType.ROOM_NOT_AVAILABLE));
 
             dailyAvailability.incrementRemainingRoom();
+
+            if (dailyAvailability.getRemainingRoom() <= 0) {
+                dailyAvailability.setStatus(RoomStatus.예약불가);
+            } else {
+                dailyAvailability.setStatus(RoomStatus.예약가능);
+            }
+
             dailyRoomAvailabilityRepository.save(dailyAvailability);
         }
     }
