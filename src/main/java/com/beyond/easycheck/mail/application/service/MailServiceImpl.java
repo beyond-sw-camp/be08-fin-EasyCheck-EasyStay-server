@@ -195,11 +195,11 @@ public class MailServiceImpl implements MailService{
                 "</tr>" +
                 "<tr>" +
                 "<td style=\"padding: 10px; border-bottom: 1px solid #ddd; border-right: 1px solid #ddd;\"><strong>체크인 날짜</strong></td>" +
-                "<td style=\"padding: 10px; border-bottom: 1px solid #ddd;\">" + ReservationFormatUtil.formatLocalDateTime(reservationDetails.getCheckinDate()) + "</td>" +
+                "<td style=\"padding: 10px; border-bottom: 1px solid #ddd;\">" + ReservationFormatUtil.formatLocalDateTime(reservationDetails.getCheckinDate().atStartOfDay()) + "</td>" +
                 "</tr>" +
                 "<tr>" +
                 "<td style=\"padding: 10px; border-bottom: 1px solid #ddd; border-right: 1px solid #ddd;\"><strong>체크아웃 날짜</strong></td>" +
-                "<td style=\"padding: 10px; border-bottom: 1px solid #ddd;\">" + ReservationFormatUtil.formatLocalDateTime(reservationDetails.getCheckoutDate()) + "</td>" +
+                "<td style=\"padding: 10px; border-bottom: 1px solid #ddd;\">" + ReservationFormatUtil.formatLocalDateTime(reservationDetails.getCheckoutDate().atStartOfDay()) + "</td>" +
                 "</tr>" +
                 "<tr>" +
                 "<td style=\"padding: 10px; border-bottom: 1px solid #ddd; border-right: 1px solid #ddd;\"><strong>예약 상태</strong></td>" +
