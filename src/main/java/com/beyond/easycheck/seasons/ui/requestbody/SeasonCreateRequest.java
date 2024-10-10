@@ -2,7 +2,9 @@ package com.beyond.easycheck.seasons.ui.requestbody;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -10,6 +12,8 @@ import java.time.LocalDate;
 
 @Getter
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class SeasonCreateRequest {
 
     @NotBlank
