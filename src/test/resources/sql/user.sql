@@ -6,23 +6,22 @@ values ('USER'),
        ('GUEST');
 
 -- 유저 더비
+-- 원본 비밀번호 password123으로 통일
 INSERT INTO users (email, password, name, phone, addr, addr_detail, point, marketing_consent, role_id, status)
 VALUES
     -- 일반 유저
-    ('john.doe@example.com', 'hashed_password_123', 'John Doe', '010-1234-5678', '서울시 강남구', '테헤란로 123', 1000, 'N',
+    ('john.doe@example.com', '$2a$10$2o44udz8WSc1mWL7dYOql.lSZ5TI.aW4h4W/UQt1gdIRPuk2Je1nO', 'John Doe', '010-1234-5678', '서울시 강남구', '테헤란로 123', 1000, 'N',
      (SELECT id FROM role WHERE name = 'USER'), 'ACTIVE'),
-    ('jane.smith@example.com', 'hashed_password_456', 'Jane Smith', '010-2345-6789', '서울시 서초구', '반포대로 456', 1500, 'N',
+    ('jane.smith@example.com', '$2a$10$2o44udz8WSc1mWL7dYOql.lSZ5TI.aW4h4W/UQt1gdIRPuk2Je1nO', 'Jane Smith', '010-2345-6789', '서울시 서초구', '반포대로 456', 1500, 'N',
      (SELECT id FROM role WHERE name = 'USER'), 'ACTIVE'),
-    ('kim.minsoo@example.com', 'hashed_password_789', '김민수', '010-3456-7890', '부산시 해운대구', '해운대로 789', 500, 'N',
+    ('kim.minsoo@example.com', '$2a$10$2o44udz8WSc1mWL7dYOql.lSZ5TI.aW4h4W/UQt1gdIRPuk2Je1nO', '김민수', '010-3456-7890', '부산시 해운대구', '해운대로 789', 500, 'N',
      (SELECT id FROM role WHERE name = 'USER'), 'ACTIVE'),
 
     -- 관리자 유저
-    ('admin.lee@example.com', 'admin_hashed_pw_123', '이관리', '010-7890-1234', '서울시 종로구', '종로 1길 10', 5000, 'N',
+    ('admin.lee@example.com', '$2a$10$2o44udz8WSc1mWL7dYOql.lSZ5TI.aW4h4W/UQt1gdIRPuk2Je1nO', '이관리', '010-7890-1234', '서울시 종로구', '종로 1길 10', 5000, 'N',
      (SELECT id FROM role WHERE name = 'ADMIN'), 'ACTIVE'),
-    ('super.admin@example.com', 'super_admin_hashed_pw', 'Super Admin', '010-8901-2345', '서울시 중구', '세종대로 100', 10000, 'N',
+    ('super.admin@example.com', '$2a$10$2o44udz8WSc1mWL7dYOql.lSZ5TI.aW4h4W/UQt1gdIRPuk2Je1nO', 'Super Admin', '010-8901-2345', '서울시 중구', '세종대로 100', 10000, 'N',
      (SELECT id FROM role WHERE name = 'ADMIN'), 'ACTIVE');
-
-
 
 INSERT INTO permission(name, description)
 VALUES ('ADMIN_MANAGER', '관리자 관리 가능한 권한'),
