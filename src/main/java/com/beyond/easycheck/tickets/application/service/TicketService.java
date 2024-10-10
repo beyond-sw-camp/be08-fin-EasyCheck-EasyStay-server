@@ -68,7 +68,7 @@ public class TicketService implements TicketOperationUseCase, TicketReadUseCase 
                 command.getValidToDate()
         );
 
-        return ticket;
+        return ticketRepository.save(ticket);
     }
 
     @Override
