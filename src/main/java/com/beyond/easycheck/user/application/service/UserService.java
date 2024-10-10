@@ -104,8 +104,12 @@ public class UserService implements UserOperationUseCase, UserReadUseCase {
 
     @Override
     public FindUserResult getUserInfo(UserFindQuery query) {
+        log.info("[getUserInfo] - query = {}", query);
 
-        return null;
+        UserEntity user = findUserById(query.userId());
+
+        log.info("[getUserInfo] - user = {}", user);
+        return FindUserResult.findByUserEntity(user);
     }
 
     @Override

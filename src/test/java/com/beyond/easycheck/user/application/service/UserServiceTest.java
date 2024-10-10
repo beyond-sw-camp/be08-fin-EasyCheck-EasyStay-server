@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 import static com.beyond.easycheck.user.application.service.UserOperationUseCase.*;
+import static com.beyond.easycheck.user.application.service.UserReadUseCase.*;
 import static com.beyond.easycheck.user.application.service.UserReadUseCase.FindJwtResult;
 import static com.beyond.easycheck.user.application.service.UserReadUseCase.FindUserResult;
 import static org.assertj.core.api.Assertions.*;
@@ -36,6 +37,9 @@ class UserServiceTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserReadUseCase userReadUseCase;
 
     @Autowired
     private UserJpaRepository userJpaRepository;
@@ -235,6 +239,18 @@ class UserServiceTest {
                 .hasMessage(UserMessageType.USER_NOT_FOUND.getMessage());
     }
 
+    @Test
+    @DisplayName("[유저 정보 불러오기] - 성공")
+    void getUserInfo_success() {
+        // given
+        UserFindQuery query = UserFindQuery.builder()
+                .userId(1L)
+                .build();
+        // when
+        FindUserResult result = userReadUseCase.getUserInfo(query);
+        // then
+        assertThat(result.role()).isEqualTo("USER");
+    }
 
 
 
