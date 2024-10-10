@@ -10,6 +10,7 @@ import com.beyond.easycheck.mail.infrastructure.persistence.redis.repository.Ver
 import com.beyond.easycheck.sms.infrastructure.persistence.redis.repository.SmsVerifiedPhoneRepository;
 import com.beyond.easycheck.user.application.domain.EasyCheckUserDetails;
 import com.beyond.easycheck.user.application.domain.UserRole;
+import com.beyond.easycheck.user.application.domain.UserStatus;
 import com.beyond.easycheck.user.exception.UserMessageType;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.role.RoleEntity;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import static com.beyond.easycheck.corporate.application.CorporateOperationUseCase.CorporateCreateCommand;
+import static com.beyond.easycheck.user.application.service.UserReadUseCase.*;
 import static com.beyond.easycheck.user.application.service.UserReadUseCase.FindJwtResult;
 
 @Slf4j
@@ -69,7 +71,7 @@ public class UserService implements UserOperationUseCase {
         // 회원의 역할 설정
         RoleEntity role = retrieveRoleByName(UserRole.USER.name());
         user.setRole(role);
-        user.setUserActive();
+        user.setUserStatus(UserStatus.ACTIVE);
 
         // 회원 저장
         UserEntity result = userJpaRepository.save(user);
@@ -100,6 +102,18 @@ public class UserService implements UserOperationUseCase {
                 );
 
         corporateOperationUseCase.createCorporate(corporateCreateCommand);
+    }
+
+    @Override
+    @Transactional
+    public FindUserResult updateUserStatus(UserStatusUpdateCommand command) {
+
+        UserEntity userEntity = userJpaRepository.findById(command.userId())
+                .orElseThrow(() -> new EasyCheckException(UserMessageType.USER_NOT_FOUND));
+
+        userEntity.setUserStatus(command.status());
+
+        return FindUserResult.findByUserEntity(userEntity);
     }
 
 
@@ -156,6 +170,11 @@ public class UserService implements UserOperationUseCase {
 
         UserEntity user = retrieveUserByEmail(command.email());
 
+        // 기존 패스워드와 일치하는지 검사
+        if (!passwordEncoder.matches(command.oldPassword(), user.getPassword())) {
+            throw new EasyCheckException(UserMessageType.PASSWORD_INCORRECT);
+        }
+
         String newSecurePassword = passwordEncoder.encode(command.newPassword());
         user.setSecurePassword(newSecurePassword);
 
@@ -174,18 +193,18 @@ public class UserService implements UserOperationUseCase {
 
     private void checkEmailIsVerified(String email) {
         verifiedEmailRepository.findById(email)
-                .orElseThrow(() -> new EasyCheckException(UserMessageType.EMAIL_UNAUTHORIZED));
+                .orElseThrow(() -> new EasyCheckException(UserMessageType.EMAIL_NOT_VERIFIED));
     }
 
     private void checkPhoneIsVerified(String phone) {
         smsVerifiedPhoneRepository.findById(phone)
-                .orElseThrow(() -> new EasyCheckException(UserMessageType.PHONE_UNAUTHORIZED));
+                .orElseThrow(() -> new EasyCheckException(UserMessageType.PHONE_NOT_VERIFIED));
     }
 
     private void checkEmailIsDuplicated(String email) {
         userJpaRepository.findUserEntityByEmail(email)
                 .ifPresent(userEntity -> {
-                    throw new EasyCheckException(UserMessageType.USER_ALREADY_REGISTERED);
+                    throw new EasyCheckException(UserMessageType.USER_ALREADY_EXISTS);
                 });
     }
 
@@ -196,6 +215,6 @@ public class UserService implements UserOperationUseCase {
 
     private RoleEntity retrieveRoleByName(String name) {
         return roleJpaRepository.findRoleEntityByName(name)
-                .orElseThrow(() -> new EasyCheckException(UserMessageType.USER_ROLE_NOT_FOUND));
+                .orElseThrow(() -> new EasyCheckException(UserMessageType.USER_ROLE_INVALID));
     }
 }

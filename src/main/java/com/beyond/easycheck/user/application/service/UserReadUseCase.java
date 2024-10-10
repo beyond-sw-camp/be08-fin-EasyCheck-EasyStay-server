@@ -16,6 +16,7 @@ public interface UserReadUseCase {
             String status,
             char marketingConsent,
             int point,
+            String role,
             Timestamp createdDate,
             Timestamp updatedDate
     ) {
@@ -27,9 +28,10 @@ public interface UserReadUseCase {
                     userEntity.getPhone(),
                     userEntity.getAddr(),
                     userEntity.getAddrDetail(),
-                    userEntity.getStatus(),
+                    userEntity.getStatus().name(),
                     userEntity.getMarketingConsent(),
                     userEntity.getPoint(),
+                    userEntity.getRole().getName(),
                     userEntity.getCreatedDate(),
                     userEntity.getUpdatedDate()
             );

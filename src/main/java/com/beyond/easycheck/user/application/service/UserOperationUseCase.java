@@ -1,7 +1,9 @@
 package com.beyond.easycheck.user.application.service;
 
 import com.beyond.easycheck.corporate.ui.requestbody.CorporateCreateRequest;
+import com.beyond.easycheck.user.application.domain.UserStatus;
 import com.beyond.easycheck.user.application.service.UserReadUseCase.FindJwtResult;
+import com.beyond.easycheck.user.application.service.UserReadUseCase.FindUserResult;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserOperationUseCase {
@@ -9,6 +11,8 @@ public interface UserOperationUseCase {
     void registerUser(UserRegisterCommand command);
 
     void registerCorporateUser(UserRegisterCommand command, CorporateCreateRequest corporateCreateRequest, MultipartFile verificationFilesZip);
+
+    FindUserResult updateUserStatus(UserStatusUpdateCommand command);
 
     FindJwtResult login(UserLoginCommand command);
 
@@ -41,6 +45,12 @@ public interface UserOperationUseCase {
     ) {
     }
 
+    record UserStatusUpdateCommand(
+            Long userId,
+            UserStatus status
+    ) {
+
+    }
     record UserLogoutCommand(
             String accessToken,
             Long userId
@@ -49,6 +59,7 @@ public interface UserOperationUseCase {
 
     record ChangePasswordCommand(
             String email,
+            String oldPassword,
             String newPassword
     ) {
     }
