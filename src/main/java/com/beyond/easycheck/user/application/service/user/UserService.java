@@ -1,4 +1,4 @@
-package com.beyond.easycheck.user.application.service;
+package com.beyond.easycheck.user.application.service.user;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.common.security.infrastructure.persistence.entity.ExpiredAccessToken;
@@ -111,19 +111,6 @@ public class UserService implements UserOperationUseCase, UserReadUseCase {
         log.info("[getUserInfo] - user = {}", user);
         return FindUserResult.findByUserEntity(user);
     }
-
-    @Override
-    @Transactional
-    public FindUserResult updateUserStatus(UserStatusUpdateCommand command) {
-
-        UserEntity userEntity = userJpaRepository.findById(command.userId())
-                .orElseThrow(() -> new EasyCheckException(UserMessageType.USER_NOT_FOUND));
-
-        userEntity.setUserStatus(command.status());
-
-        return FindUserResult.findByUserEntity(userEntity);
-    }
-
 
     @Override
     public FindJwtResult login(UserLoginCommand command) {

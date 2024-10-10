@@ -1,10 +1,9 @@
 package com.beyond.easycheck.user.ui.view;
 
-import com.beyond.easycheck.user.application.service.UserReadUseCase;
 import lombok.Getter;
 import lombok.ToString;
 
-import static com.beyond.easycheck.user.application.service.UserReadUseCase.*;
+import static com.beyond.easycheck.user.application.service.user.UserReadUseCase.*;
 
 @Getter
 @ToString

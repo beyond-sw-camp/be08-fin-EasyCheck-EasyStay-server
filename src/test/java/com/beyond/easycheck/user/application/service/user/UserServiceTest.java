@@ -1,4 +1,4 @@
-package com.beyond.easycheck.user.application.service;
+package com.beyond.easycheck.user.application.service.user;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.common.security.utils.JwtUtil;
@@ -6,26 +6,25 @@ import com.beyond.easycheck.mail.infrastructure.persistence.redis.entity.Verifie
 import com.beyond.easycheck.mail.infrastructure.persistence.redis.repository.VerifiedEmailRepository;
 import com.beyond.easycheck.sms.infrastructure.persistence.redis.entity.VerifiedPhone;
 import com.beyond.easycheck.sms.infrastructure.persistence.redis.repository.SmsVerifiedPhoneRepository;
-import com.beyond.easycheck.user.application.domain.UserStatus;
-import com.beyond.easycheck.user.application.mock.WithEasyCheckMockUser;
 import com.beyond.easycheck.user.exception.UserMessageType;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.repository.RoleJpaRepository;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.repository.UserJpaRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.Set;
 
-import static com.beyond.easycheck.user.application.service.UserOperationUseCase.*;
-import static com.beyond.easycheck.user.application.service.UserReadUseCase.*;
-import static com.beyond.easycheck.user.application.service.UserReadUseCase.FindJwtResult;
-import static com.beyond.easycheck.user.application.service.UserReadUseCase.FindUserResult;
+import static com.beyond.easycheck.user.application.service.user.UserOperationUseCase.*;
+import static com.beyond.easycheck.user.application.service.user.UserReadUseCase.*;
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
@@ -34,6 +33,9 @@ class UserServiceTest {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -55,6 +57,14 @@ class UserServiceTest {
 
     @Autowired
     private SmsVerifiedPhoneRepository smsVerifiedPhoneRepository;
+
+    @AfterEach
+    void tearDown() {
+        Set<String> keys = redisTemplate.keys("*");
+        if (keys != null) {
+            redisTemplate.delete(keys);
+        }
+    }
 
     @Test
     @Transactional
@@ -133,7 +143,7 @@ class UserServiceTest {
                 "test@example.com",
                 "1234",
                 "hello",
-                "010-1111-2222",
+                "010-2222-3333",
                 "서울시",
                 "동작구",
                 'Y'
@@ -210,33 +220,6 @@ class UserServiceTest {
         // then
         assertThat(userEntity.isPresent()).isTrue();
         assertThat(passwordEncoder.matches(newPassword, userEntity.get().getPassword())).isTrue();
-    }
-
-    @Test
-    @Transactional
-    @DisplayName("[계정 상태 변경] - 성공")
-    void updateStatus_success() {
-        // given
-        UserStatusUpdateCommand command = new UserStatusUpdateCommand(1L, UserStatus.BANNED);
-        // when
-        FindUserResult result = userOperationUseCase.updateUserStatus(command);
-        Optional<UserEntity> userEntity = userJpaRepository.findById(result.id());
-        // then
-        assertThat(result.status()).isEqualTo(UserStatus.BANNED.name());
-        assertThat(userEntity.isPresent()).isTrue();
-        assertThat(userEntity.get().getStatus()).isEqualTo(UserStatus.BANNED);
-    }
-
-    @Test
-    @Transactional
-    @DisplayName("[계정 상태 변경] - 실패 - 유저를 찾지 못함")
-    void updateStatus_failed() {
-        // given
-        UserStatusUpdateCommand command = new UserStatusUpdateCommand(9999L, UserStatus.BANNED);
-        // when & then
-        assertThatThrownBy(() -> userOperationUseCase.updateUserStatus(command))
-                .isInstanceOf(EasyCheckException.class)
-                .hasMessage(UserMessageType.USER_NOT_FOUND.getMessage());
     }
 
     @Test

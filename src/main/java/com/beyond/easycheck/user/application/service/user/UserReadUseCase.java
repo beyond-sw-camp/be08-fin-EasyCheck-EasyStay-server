@@ -1,4 +1,4 @@
-package com.beyond.easycheck.user.application.service;
+package com.beyond.easycheck.user.application.service.user;
 
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
 import lombok.Builder;
