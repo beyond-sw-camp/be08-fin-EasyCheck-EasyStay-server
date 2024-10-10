@@ -2,6 +2,7 @@ package com.beyond.easycheck.tickets.infrastructure.entity;
 
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,6 +26,7 @@ public class TicketOrderEntity {
     private TicketEntity ticket;
 
     @Column(nullable = false)
+    @Min(1)
     private int quantity;
 
 
