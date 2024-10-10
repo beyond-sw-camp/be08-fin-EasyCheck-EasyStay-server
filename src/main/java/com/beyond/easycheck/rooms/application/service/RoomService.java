@@ -43,6 +43,7 @@ public class RoomService {
                 .roomPic(roomCreateRequest.getRoomPic())
                 .status(roomCreateRequest.getStatus())
                 .roomAmount(roomCreateRequest.getRoomAmount())
+                .remainingRoom(roomCreateRequest.getRemainingRoom())
                 .build();
 
         room = roomRepository.save(room);

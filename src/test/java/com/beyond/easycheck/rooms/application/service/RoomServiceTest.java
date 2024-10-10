@@ -50,13 +50,10 @@ public class RoomServiceTest {
     @InjectMocks
     private RoomService roomService;
 
-    @InjectMocks
     private RoomtypeEntity roomtype1;
 
-    @InjectMocks
     private RoomtypeEntity roomtype2;
 
-    @InjectMocks
     private AccommodationEntity accommodationEntity;
 
     @BeforeEach
@@ -100,7 +97,8 @@ public class RoomServiceTest {
                 "402",
                 "roomPic1",
                 RoomStatus.예약가능,
-                10
+                10,
+                5
         );
 
         RoomEntity roomEntity = new RoomEntity(
@@ -132,7 +130,8 @@ public class RoomServiceTest {
                 "402",
                 "roomPic1",
                 RoomStatus.예약가능,
-                10
+                10,
+                5
         );
 
         // When & Then
@@ -178,7 +177,6 @@ public class RoomServiceTest {
         RoomView readRoom = roomService.readRoom(1L);
 
         // Then
-//        assertThat(readRoom).isEqualTo(roomView);
         assertThat(readRoom.getRoomId()).isEqualTo(roomView.getRoomId());
         assertThat(readRoom.getRoomNumber()).isEqualTo(roomView.getRoomNumber());
         assertThat(readRoom.getRoomPic()).isEqualTo(roomView.getRoomPic());

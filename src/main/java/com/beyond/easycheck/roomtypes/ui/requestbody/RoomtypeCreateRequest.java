@@ -7,6 +7,8 @@ import lombok.*;
 
 @Getter
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class RoomtypeCreateRequest {
 
     @NotNull

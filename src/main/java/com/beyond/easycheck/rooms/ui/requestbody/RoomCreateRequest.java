@@ -29,4 +29,7 @@ public class RoomCreateRequest {
     @NotNull @Max(10)
     private int roomAmount;
 
+    @NotNull @Max(10)
+    private int remainingRoom;
+
 }
