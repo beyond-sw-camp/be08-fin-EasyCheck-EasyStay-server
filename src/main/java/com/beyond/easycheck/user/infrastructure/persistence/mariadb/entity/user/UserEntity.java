@@ -19,7 +19,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @Table(name = "users")
-@ToString(of = {"id", "email", "name", "phone", "addr", "addrDetail", "marketingConsent"})
+@ToString(exclude = {"password", "createdDate", "updatedDate", "userPermissions", "corporate"})
 public class  UserEntity {
 
     @Id

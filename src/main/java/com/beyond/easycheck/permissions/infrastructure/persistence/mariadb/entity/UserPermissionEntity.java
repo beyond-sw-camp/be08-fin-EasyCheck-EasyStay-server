@@ -5,6 +5,7 @@ import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
@@ -13,6 +14,7 @@ import java.sql.Timestamp;
 @Entity
 @NoArgsConstructor
 @Table(name = "user_permission")
+@ToString(of = {"grantedBy", "permission"})
 public class UserPermissionEntity {
 
     @Id
