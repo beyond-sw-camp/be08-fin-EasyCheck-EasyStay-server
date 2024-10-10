@@ -6,6 +6,7 @@ import com.beyond.easycheck.tickets.application.service.TicketReadUseCase.FindTi
 import com.beyond.easycheck.tickets.infrastructure.entity.TicketEntity;
 import com.beyond.easycheck.tickets.ui.requestbody.TicketRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -45,9 +46,16 @@ class TicketControllerTest {
     @MockBean
     private TicketReadUseCase ticketReadUseCase;
 
+    private AutoCloseable closeable;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        closeable.close(); // 자원을 해제
     }
 
     @Test

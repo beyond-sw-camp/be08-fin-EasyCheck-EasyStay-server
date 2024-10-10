@@ -7,6 +7,7 @@ import com.beyond.easycheck.tickets.application.service.TicketOperationUseCase.T
 import com.beyond.easycheck.tickets.application.service.TicketOperationUseCase.TicketUpdateCommand;
 import com.beyond.easycheck.tickets.infrastructure.entity.TicketEntity;
 import com.beyond.easycheck.tickets.infrastructure.repository.TicketRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -34,9 +35,17 @@ class TicketServiceTest {
     @Mock
     private ThemeParkRepository themeParkRepository;
 
+
+    private AutoCloseable closeable;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        closeable.close(); // 자원을 해제
     }
 
     // 티켓 생성 테스트
