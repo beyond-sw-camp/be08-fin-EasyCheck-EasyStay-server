@@ -44,10 +44,6 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
         TicketEntity ticket = ticketRepository.findById(request.getTicketId())
                 .orElseThrow(() -> new EasyCheckException(TICKET_NOT_FOUND));
 
-        if (request.getUserId() == null && request.getGuestId() == null) {
-            throw new EasyCheckException(INVALID_USER_OR_GUEST);
-        }
-
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(ticket.getSaleStartDate()) || now.isAfter(ticket.getSaleEndDate())) {
             throw new EasyCheckException(TICKET_SALE_PERIOD_INVALID);
@@ -61,7 +57,6 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
                 ticket,
                 request.getQuantity(),
                 userEntity,
-                request.getGuestId(),
                 request.getReceiptMethod(),
                 request.getCollectionAgreement()
         );

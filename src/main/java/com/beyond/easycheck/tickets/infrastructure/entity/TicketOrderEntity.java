@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import static com.beyond.easycheck.tickets.infrastructure.entity.OrderStatus.*;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -30,8 +32,6 @@ public class TicketOrderEntity {
     @JoinColumn(name = "user_id")
     private UserEntity userEntity;
 
-    private Long guestId;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus OrderStatus;
@@ -49,25 +49,22 @@ public class TicketOrderEntity {
     @Column(nullable = false)
     private LocalDateTime purchaseTimestamp;
 
-    public TicketOrderEntity(TicketEntity ticket, int quantity, UserEntity userEntity, Long guestId, ReceiptMethodType receiptMethod, CollectionAgreementType collectionAgreement) {
+    public TicketOrderEntity(TicketEntity ticket, int quantity, UserEntity userEntity, ReceiptMethodType receiptMethod, CollectionAgreementType collectionAgreement) {
         this.ticket = ticket;
         this.quantity = quantity;
         this.userEntity = userEntity;
-        this.guestId = guestId;
         this.receiptMethod = receiptMethod;
         this.collectionAgreement = collectionAgreement;
         this.totalPrice = ticket.getPrice().multiply(BigDecimal.valueOf(quantity));
         this.purchaseTimestamp = LocalDateTime.now();
-        this.OrderStatus = OrderStatus.PENDING;
+        this.OrderStatus = PENDING;
     }
 
-    public void cancelOrder() {
-        this.OrderStatus = OrderStatus.CANCELLED;
-    }
+    public void cancelOrder() { this.OrderStatus = CANCELLED; }
 
-    public void confirmOrder() { this.OrderStatus = OrderStatus.CONFIRMED; }
+    public void confirmOrder() { this.OrderStatus = CONFIRMED; }
 
-    public void completeOrder() { this.OrderStatus = OrderStatus.COMPLETED; }
+    public void completeOrder() { this.OrderStatus = COMPLETED; }
 
-    public void failOrder() { this.OrderStatus = OrderStatus.FAILED; }
+    public void failOrder() { this.OrderStatus = FAILED; }
 }
