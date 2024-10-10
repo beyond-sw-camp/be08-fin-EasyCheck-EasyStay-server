@@ -2,7 +2,6 @@ package com.beyond.easycheck.rooms.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.reservationroom.infrastructure.repository.ReservationRoomRepository;
-import com.beyond.easycheck.reservationroom.ui.view.RoomAvailabilityView;
 import com.beyond.easycheck.rooms.infrastructure.entity.DailyRoomAvailabilityEntity;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomStatus;
@@ -14,11 +13,12 @@ import com.beyond.easycheck.rooms.ui.view.RoomView;
 import com.beyond.easycheck.roomtypes.infrastructure.entity.RoomtypeEntity;
 import com.beyond.easycheck.roomtypes.infrastructure.repository.RoomtypeRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,10 +28,10 @@ import static com.beyond.easycheck.rooms.exception.RoomMessageType.ROOM_NOT_FOUN
 @RequiredArgsConstructor
 public class RoomService {
 
+    private static final Logger log = LoggerFactory.getLogger(RoomService.class);
     private final RoomRepository roomRepository;
     private final RoomtypeRepository roomTypeRepository;
     private final DailyRoomAvailabilityRepository dailyRoomAvailabilityRepository;
-    private final ReservationRoomRepository reservationRoomRepository;
 
     @Transactional
     public void createRoom(RoomCreateRequest roomCreateRequest) {
@@ -71,24 +71,6 @@ public class RoomService {
                 dailyRoomAvailabilityRepository.save(dailyAvailability);
             }
         }
-    }
-
-    @Transactional(readOnly = true)
-    public List<RoomAvailabilityView> getAvailableRooms(LocalDateTime checkinDate, LocalDateTime checkoutDate) {
-
-        List<RoomEntity> reservedRooms = reservationRoomRepository.findReservedRoomsBetweenDates(checkinDate, checkoutDate);
-        List<RoomEntity> availableRooms = roomRepository.findAll().stream()
-                .filter(room -> !reservedRooms.contains(room))
-                .collect(Collectors.toList());
-
-        return availableRooms.stream()
-                .map(room -> new RoomAvailabilityView(
-                        room.getRoomId(),
-                        room.getRoomTypeEntity().getTypeName(),
-                        room.getRoomNumber(),
-                        room.getRemainingRoom(),
-                        room.getStatus()))
-                .collect(Collectors.toList());
     }
 
     public RoomView readRoom(Long id) {
