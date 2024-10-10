@@ -59,12 +59,4 @@ public class RoomEntity extends BaseTimeEntity {
             throw new EasyCheckException(ARGUMENT_NOT_VALID);
         }
     }
-
-    public void setStatus(RoomStatus status) {
-        this.status = status;
-    }
-
-    public void setRemainingRoom(int remainingRoom) {
-        this.remainingRoom = remainingRoom;
-    }
 }

@@ -51,6 +51,9 @@ public class EasyCheckSecurityConfig {
                             )
                             .permitAll();
 
+                    registry.requestMatchers("/api/v1/users/{id}/status")
+                            .hasRole("ADMIN");
+
                     // 권한 생성은 SUPER_ADMIN만 가능
                     registry.requestMatchers("/api/v1/permissions/**")
                             .hasRole("SUPER_ADMIN");

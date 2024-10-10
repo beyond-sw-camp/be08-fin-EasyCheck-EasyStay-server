@@ -1,13 +1,13 @@
 package com.beyond.easycheck.notices.application.service;
 
-import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
+import com.beyond.easycheck.accomodations.exception.AccommodationMessageType;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.notices.exception.NoticesMessageType;
 import com.beyond.easycheck.notices.infrastructure.persistence.entity.NoticesEntity;
 import com.beyond.easycheck.notices.ui.requestbody.NoticesCreateRequest;
 import com.beyond.easycheck.notices.ui.requestbody.NoticesUpdateRequest;
 import com.beyond.easycheck.notices.ui.view.NoticesView;
-import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
+import com.beyond.easycheck.user.exception.UserMessageType;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,7 +58,7 @@ class NoticesServiceTest {
         Assertions.assertThatThrownBy(() -> {
             noticesService.createNotices(4L, request);
         }).isInstanceOf(EasyCheckException.class)
-                .hasMessage(NoticesMessageType.NOTICES_NOT_FOUND.getMessage());
+                .hasMessage(AccommodationMessageType.ACCOMMODATION_NOT_FOUND.getMessage());
 
     }
 
@@ -73,12 +73,12 @@ class NoticesServiceTest {
         Assertions.assertThatThrownBy(() -> {
             noticesService.createNotices(9999L, request);
         }).isInstanceOf(EasyCheckException.class)
-                .hasMessage(NoticesMessageType.NOTICES_NOT_FOUND.getMessage());
+                .hasMessage(UserMessageType.USER_NOT_FOUND.getMessage());
     }
 
 
     @Test
-    @DisplayName("[공지사항 조회] - 성공")
+    @DisplayName("[공지사항 목록 조회] - 성공")
     void getAllNotices_success() {
         // given
         NoticesCreateRequest request1 = new NoticesCreateRequest(4L, "공지사항","공지사항 내용");

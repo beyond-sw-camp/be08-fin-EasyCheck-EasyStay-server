@@ -6,6 +6,7 @@ import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomCreate
 import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomUpdateRequest;
 import com.beyond.easycheck.reservationroom.ui.view.DayRoomAvailabilityView;
 import com.beyond.easycheck.reservationroom.ui.view.ReservationRoomView;
+import com.beyond.easycheck.reservationroom.ui.view.RoomAvailabilityView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Tag(name = "ReservationRoom", description = "객실 예약 관리")
@@ -35,6 +37,16 @@ public class ReservationRoomController {
         reservationRoomService.createReservation(userId, reservationRoomCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Operation(summary = "체크인, 체크아웃 날짜에 예약 가능한 객실 조회 API")
+    @GetMapping("/available")
+    public ResponseEntity<List<RoomAvailabilityView>> getAvailableRooms(
+            @RequestParam LocalDate checkinDate,
+            @RequestParam LocalDate checkoutDate) {
+
+        List<RoomAvailabilityView> availableRooms = reservationRoomService.getAvailableRooms(checkinDate, checkoutDate);
+        return ResponseEntity.ok(availableRooms);
     }
 
     @Operation(summary = "월별 예약 가능한 객실 조회 API")

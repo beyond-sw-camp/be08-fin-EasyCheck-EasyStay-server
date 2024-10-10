@@ -9,8 +9,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @RequiredArgsConstructor(access = lombok.AccessLevel.PUBLIC)
@@ -25,12 +25,10 @@ public class ReservationRoomCreateRequest {
     private LocalDateTime reservationDate;
 
     @NotNull(message = "체크인 날짜를 지정해야 합니다.")
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime checkinDate;
+    private LocalDate checkinDate;
 
     @NotNull(message = "체크아웃 날짜를 지정해야 합니다.")
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime checkoutDate;
+    private LocalDate checkoutDate;
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus;

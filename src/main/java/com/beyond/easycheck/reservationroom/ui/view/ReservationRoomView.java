@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,9 +25,9 @@ public class ReservationRoomView {
 
     private RoomStatus roomStatus;
 
-    private LocalDateTime checkinDate;
+    private LocalDate checkinDate;
 
-    private LocalDateTime checkoutDate;
+    private LocalDate checkoutDate;
 
     private ReservationStatus reservationStatus;
 
@@ -44,8 +44,8 @@ public class ReservationRoomView {
                 reservationRoomEntity.getRoomEntity().getRoomId(),
                 reservationRoomEntity.getRoomEntity().getRoomTypeEntity().getTypeName(),
                 reservationRoomEntity.getRoomEntity().getStatus(),
-                reservationRoomEntity.getCheckinDate().toLocalDate().atStartOfDay(),
-                reservationRoomEntity.getCheckoutDate().toLocalDate().atStartOfDay(),
+                reservationRoomEntity.getCheckinDate(),
+                reservationRoomEntity.getCheckoutDate(),
                 reservationRoomEntity.getReservationStatus(),
                 reservationRoomEntity.getTotalPrice(),
                 reservationRoomEntity.getPaymentStatus()

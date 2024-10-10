@@ -1,5 +1,6 @@
 package com.beyond.easycheck.notices.application.service;
 
+import com.beyond.easycheck.accomodations.exception.AccommodationMessageType;
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
 import com.beyond.easycheck.additionalservices.exception.AdditionalServiceMessageType;
@@ -10,6 +11,7 @@ import com.beyond.easycheck.notices.infrastructure.persistence.repository.Notice
 import com.beyond.easycheck.notices.ui.requestbody.NoticesCreateRequest;
 import com.beyond.easycheck.notices.ui.requestbody.NoticesUpdateRequest;
 import com.beyond.easycheck.notices.ui.view.NoticesView;
+import com.beyond.easycheck.user.exception.UserMessageType;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.repository.UserJpaRepository;
 import lombok.AccessLevel;
@@ -37,11 +39,11 @@ public class NoticesService {
     public Optional<NoticesEntity> createNotices(Long userId ,NoticesCreateRequest noticesCreateRequest) {
 
         AccommodationEntity accommodationEntity = accommodationRepository.findById(noticesCreateRequest.getAccommodationId()).orElseThrow(
-                () -> new EasyCheckException(NoticesMessageType.NOTICES_NOT_FOUND)
+                () -> new EasyCheckException(AccommodationMessageType.ACCOMMODATION_NOT_FOUND)
         );
 
         UserEntity userEntity = userJpaRepository.findById(userId).orElseThrow(
-                () -> new EasyCheckException(NoticesMessageType.NOTICES_NOT_FOUND)
+                () -> new EasyCheckException(UserMessageType.USER_NOT_FOUND)
         );
 
 
