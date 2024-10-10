@@ -109,6 +109,9 @@ public class ReservationRoomService {
             }
         }
 
+        ReservationRoomView reservationRoomView = ReservationRoomView.of(reservationRoomEntity);
+        mailService.sendReservationConfirmationEmail(userEntity.getEmail(), reservationRoomView);
+
         return reservationRoomEntity;
     }
 
