@@ -34,7 +34,7 @@ public class TicketOrderEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private OrderStatus OrderStatus;
+    private OrderStatus orderStatus;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -57,14 +57,14 @@ public class TicketOrderEntity {
         this.collectionAgreement = collectionAgreement;
         this.totalPrice = ticket.getPrice().multiply(BigDecimal.valueOf(quantity));
         this.purchaseTimestamp = LocalDateTime.now();
-        this.OrderStatus = PENDING;
+        this.orderStatus = PENDING;
     }
 
-    public void cancelOrder() { this.OrderStatus = CANCELLED; }
+    public void cancelOrder() { this.orderStatus = CANCELLED; }
 
-    public void confirmOrder() { this.OrderStatus = CONFIRMED; }
+    public void confirmOrder() { this.orderStatus = CONFIRMED; }
 
-    public void completeOrder() { this.OrderStatus = COMPLETED; }
+    public void completeOrder() { this.orderStatus = COMPLETED; }
 
-    public void failOrder() { this.OrderStatus = FAILED; }
+    public void failOrder() { this.orderStatus = FAILED; }
 }
