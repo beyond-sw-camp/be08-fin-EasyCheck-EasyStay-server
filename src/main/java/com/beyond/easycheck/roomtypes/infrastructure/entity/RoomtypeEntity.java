@@ -5,14 +5,12 @@ import com.beyond.easycheck.common.entity.BaseTimeEntity;
 import com.beyond.easycheck.roomtypes.ui.requestbody.RoomtypeUpdateRequest;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import static jakarta.persistence.FetchType.LAZY;
 
 @Getter
+@Setter
 @Entity
 @Builder
 @Table(name = "room_type")

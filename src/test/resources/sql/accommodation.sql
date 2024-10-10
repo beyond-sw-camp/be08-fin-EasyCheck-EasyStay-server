@@ -1,3 +1,15 @@
+DROP TABLE IF EXISTS Accommodation CASCADE;
+
+-- Accommodation 테이블 생성
+CREATE TABLE Accommodation (
+    accommodation_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    accommodation_type VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 INSERT INTO accommodation (name, address, accommodation_type)
 VALUES ('선셋 리조트', '123 해변로, 오션 시티', 'RESORT'),
        ('마운틴 뷰 호텔', '456 언덕길, 알파인 타운', 'HOTEL'),

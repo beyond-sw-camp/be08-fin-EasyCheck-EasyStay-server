@@ -5,9 +5,13 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Setter
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class RoomCreateRequest {
 
     @NotNull
@@ -24,5 +28,8 @@ public class RoomCreateRequest {
 
     @NotNull @Max(10)
     private int roomAmount;
+
+    @NotNull @Max(10)
+    private int remainingRoom;
 
 }

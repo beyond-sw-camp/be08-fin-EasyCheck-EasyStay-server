@@ -1,6 +1,8 @@
 package com.beyond.easycheck.rooms.ui.controller;
 
+import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.rooms.application.service.RoomService;
+import com.beyond.easycheck.rooms.exception.RoomMessageType;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomCreateRequest;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomUpdateRequest;
 import com.beyond.easycheck.rooms.ui.view.RoomView;
@@ -46,9 +48,15 @@ public class RoomController {
     @PutMapping("/{id}")
     @Operation(summary = "객실 수정 API")
     public ResponseEntity<Void> updateRoomType(@PathVariable Long id, @RequestBody RoomUpdateRequest roomUpdateRequest) {
+        if (roomUpdateRequest.getRoomNumber() == null || roomUpdateRequest.getRoomNumber().isEmpty()
+        || roomUpdateRequest.getRoomAmount() < 0) {
+            throw new EasyCheckException(RoomMessageType.ARGUMENT_NOT_VALID);
+        }
+
         roomService.updateRoom(id, roomUpdateRequest);
         return ResponseEntity.noContent().build();
     }
+
 
     @DeleteMapping("/{id}")
     @Operation(summary = "객실 삭제 API")

@@ -1,15 +1,16 @@
 package com.beyond.easycheck.rooms.infrastructure.entity;
 
 import com.beyond.easycheck.common.entity.BaseTimeEntity;
+import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomUpdateRequest;
 import com.beyond.easycheck.roomtypes.infrastructure.entity.RoomtypeEntity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import static com.beyond.easycheck.rooms.exception.RoomMessageType.ARGUMENT_NOT_VALID;
+
+@Setter
 @Getter
 @Entity
 @Builder
@@ -53,5 +54,9 @@ public class RoomEntity extends BaseTimeEntity {
         roomPic = roomUpdateRequest.getRoomPic();
         roomAmount = roomUpdateRequest.getRoomAmount();
         status = roomUpdateRequest.getStatus();
+
+        if (roomUpdateRequest.getRoomAmount() <= 0) {
+            throw new EasyCheckException(ARGUMENT_NOT_VALID);
+        }
     }
 }
