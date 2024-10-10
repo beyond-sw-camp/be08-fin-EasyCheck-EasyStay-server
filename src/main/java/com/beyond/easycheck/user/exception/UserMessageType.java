@@ -9,13 +9,15 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum UserMessageType implements MessageType {
 
-    USER_NOT_FOUND("No matching user found", HttpStatus.NOT_FOUND),
-    USER_ALREADY_REGISTERED("This user is already registered.", HttpStatus.CONFLICT),
-    USER_ROLE_NOT_FOUND("The role for this user does not exist.", HttpStatus.INTERNAL_SERVER_ERROR),
+    USER_NOT_FOUND("User not found in the system", HttpStatus.NOT_FOUND),
+    USER_ALREADY_EXISTS("User with this identifier already exists in the system", HttpStatus.CONFLICT),
+    USER_ROLE_INVALID("Invalid or non-existent user role specified", HttpStatus.BAD_REQUEST),
+    PASSWORD_INCORRECT("", HttpStatus.BAD_REQUEST),
 
-    EMAIL_UNAUTHORIZED("This is an unauthenticated email.", HttpStatus.UNAUTHORIZED),
-    PHONE_UNAUTHORIZED("", HttpStatus.UNAUTHORIZED),
+    EMAIL_NOT_VERIFIED("Email address has not been verified", HttpStatus.UNAUTHORIZED),
+    PHONE_NOT_VERIFIED("Phone number has not been verified", HttpStatus.UNAUTHORIZED),
     ;
+
     private final String message;
     private final HttpStatus status;
 }

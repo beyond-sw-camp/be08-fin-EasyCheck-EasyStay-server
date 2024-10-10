@@ -2,12 +2,10 @@ package com.beyond.easycheck.user.ui.requestbody;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record ChangePasswordRequest(
+public record GuestUserLoginRequest(
         @NotBlank
-        String email,
+        String name,
         @NotBlank
-        String oldPassword,
-        @NotBlank
-        String newPassword
+        String phone
 ) {
 }

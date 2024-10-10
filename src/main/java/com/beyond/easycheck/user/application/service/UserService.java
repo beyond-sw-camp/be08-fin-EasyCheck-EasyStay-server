@@ -4,10 +4,13 @@ import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.common.security.infrastructure.persistence.entity.ExpiredAccessToken;
 import com.beyond.easycheck.common.security.infrastructure.persistence.repository.ExpiredAccessTokenJpaRepository;
 import com.beyond.easycheck.common.security.utils.JwtUtil;
+import com.beyond.easycheck.corporate.application.CorporateOperationUseCase;
+import com.beyond.easycheck.corporate.ui.requestbody.CorporateCreateRequest;
 import com.beyond.easycheck.mail.infrastructure.persistence.redis.repository.VerifiedEmailRepository;
 import com.beyond.easycheck.sms.infrastructure.persistence.redis.repository.SmsVerifiedPhoneRepository;
 import com.beyond.easycheck.user.application.domain.EasyCheckUserDetails;
 import com.beyond.easycheck.user.application.domain.UserRole;
+import com.beyond.easycheck.user.application.domain.UserStatus;
 import com.beyond.easycheck.user.exception.UserMessageType;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.role.RoleEntity;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
@@ -18,8 +21,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import static com.beyond.easycheck.corporate.application.CorporateOperationUseCase.CorporateCreateCommand;
 import static com.beyond.easycheck.user.application.service.UserReadUseCase.*;
+import static com.beyond.easycheck.user.application.service.UserReadUseCase.FindJwtResult;
 
 @Slf4j
 @Service
@@ -37,24 +43,23 @@ public class UserService implements UserOperationUseCase {
 
     private final VerifiedEmailRepository verifiedEmailRepository;
 
+    private final CorporateOperationUseCase corporateOperationUseCase;
+
     private final SmsVerifiedPhoneRepository smsVerifiedPhoneRepository;
 
     private final ExpiredAccessTokenJpaRepository expiredAccessTokenJpaRepository;
-
-
 
     @Override
     @Transactional
     public void registerUser(UserRegisterCommand command) {
         log.info("[registerUser] - command = {}", command);
-        // 회원가입 전 이메일 인증 과정을 거쳐야 한다.
-        checkEmailIsDuplicated(command);
+
+        checkEmailIsDuplicated(command.email());
+        // 이메일 인증을 했는지 확인
+        checkEmailIsVerified(command.email());
 
         UserEntity user = UserEntity.createUser(command);
         log.info("[registerUser] - userEntity after createUser = {}", user);
-
-        // 이메일 인증을 했는지 확인
-        checkEmailIsVerified(command.email());
 
         // 휴대폰 인증을 했는지 확인
         checkPhoneIsVerified(command.phone());
@@ -66,10 +71,49 @@ public class UserService implements UserOperationUseCase {
         // 회원의 역할 설정
         RoleEntity role = retrieveRoleByName(UserRole.USER.name());
         user.setRole(role);
+        user.setUserStatus(UserStatus.ACTIVE);
 
         // 회원 저장
         UserEntity result = userJpaRepository.save(user);
         log.info("[registerUser] - userEntity save result = {}", result);
+    }
+
+    @Override
+    @Transactional
+    public void registerCorporateUser(UserRegisterCommand userRegisterCommand, CorporateCreateRequest corporateCreateRequest, MultipartFile verificationFilesZip) {
+
+        // 이메일 중복확인
+        checkEmailIsDuplicated(userRegisterCommand.email());
+        // 이메일 인증여부 확인
+        checkEmailIsVerified(userRegisterCommand.email());
+        // 핸드폰 인증여부 확인
+        checkPhoneIsVerified(userRegisterCommand.phone());
+
+        UserEntity user = UserEntity.createCorporateUser(userRegisterCommand);
+
+        userJpaRepository.save(user);
+
+        CorporateCreateCommand corporateCreateCommand = new CorporateCreateCommand
+                (
+                        user.getId(),
+                        corporateCreateRequest.name(),
+                        corporateCreateRequest.businessLicenseNumber(),
+                        verificationFilesZip
+                );
+
+        corporateOperationUseCase.createCorporate(corporateCreateCommand);
+    }
+
+    @Override
+    @Transactional
+    public FindUserResult updateUserStatus(UserStatusUpdateCommand command) {
+
+        UserEntity userEntity = userJpaRepository.findById(command.userId())
+                .orElseThrow(() -> new EasyCheckException(UserMessageType.USER_NOT_FOUND));
+
+        userEntity.setUserStatus(command.status());
+
+        return FindUserResult.findByUserEntity(userEntity);
     }
 
 
@@ -86,6 +130,21 @@ public class UserService implements UserOperationUseCase {
 
         EasyCheckUserDetails userDetails = new EasyCheckUserDetails(user);
         log.info("[login] - user details = {}", userDetails);
+
+        return generateJwt(userDetails);
+    }
+
+    @Override
+    public FindJwtResult loginGuest(GuestUserLoginCommand command) {
+
+        log.info("[loginGuest] - login command = {}", command);
+        UserEntity guestUserEntity = UserEntity.createGuestUser(command.name(), command.phone());
+
+        RoleEntity roleEntity = retrieveRoleByName(UserRole.GUEST.name());
+        guestUserEntity.setRole(roleEntity);
+
+        EasyCheckUserDetails userDetails = new EasyCheckUserDetails(guestUserEntity);
+        log.info("[loginGuest] - guestUser details = {}", userDetails);
 
         return generateJwt(userDetails);
     }
@@ -111,6 +170,11 @@ public class UserService implements UserOperationUseCase {
 
         UserEntity user = retrieveUserByEmail(command.email());
 
+        // 기존 패스워드와 일치하는지 검사
+        if (!passwordEncoder.matches(command.oldPassword(), user.getPassword())) {
+            throw new EasyCheckException(UserMessageType.PASSWORD_INCORRECT);
+        }
+
         String newSecurePassword = passwordEncoder.encode(command.newPassword());
         user.setSecurePassword(newSecurePassword);
 
@@ -129,18 +193,18 @@ public class UserService implements UserOperationUseCase {
 
     private void checkEmailIsVerified(String email) {
         verifiedEmailRepository.findById(email)
-                .orElseThrow(() -> new EasyCheckException(UserMessageType.EMAIL_UNAUTHORIZED));
+                .orElseThrow(() -> new EasyCheckException(UserMessageType.EMAIL_NOT_VERIFIED));
     }
 
     private void checkPhoneIsVerified(String phone) {
         smsVerifiedPhoneRepository.findById(phone)
-                .orElseThrow(() -> new EasyCheckException(UserMessageType.PHONE_UNAUTHORIZED));
+                .orElseThrow(() -> new EasyCheckException(UserMessageType.PHONE_NOT_VERIFIED));
     }
 
-    private void checkEmailIsDuplicated(UserRegisterCommand command) {
-        userJpaRepository.findUserEntityByEmail(command.email())
+    private void checkEmailIsDuplicated(String email) {
+        userJpaRepository.findUserEntityByEmail(email)
                 .ifPresent(userEntity -> {
-                    throw new EasyCheckException(UserMessageType.USER_ALREADY_REGISTERED);
+                    throw new EasyCheckException(UserMessageType.USER_ALREADY_EXISTS);
                 });
     }
 
@@ -151,6 +215,6 @@ public class UserService implements UserOperationUseCase {
 
     private RoleEntity retrieveRoleByName(String name) {
         return roleJpaRepository.findRoleEntityByName(name)
-                .orElseThrow(() -> new EasyCheckException(UserMessageType.USER_ROLE_NOT_FOUND));
+                .orElseThrow(() -> new EasyCheckException(UserMessageType.USER_ROLE_INVALID));
     }
 }
