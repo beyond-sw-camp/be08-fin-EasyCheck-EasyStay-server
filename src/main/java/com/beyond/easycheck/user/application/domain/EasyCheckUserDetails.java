@@ -11,7 +11,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,7 +30,7 @@ public class EasyCheckUserDetails implements UserDetails {
     // 유저 역할 필드
     private String role;
     // 유저 권한 필드
-    private Set<String> permissions;
+    private Set<String> permissions = new ConcurrentSkipListSet<>();
 
     public EasyCheckUserDetails(UserEntity user) {
         this.id = user.getId();
@@ -37,11 +39,14 @@ public class EasyCheckUserDetails implements UserDetails {
         this.status = user.getStatus();
         this.role = user.getRole().getName();
 
-        this.permissions = user.getUserPermissions()
-                .stream()
-                .map(UserPermissionEntity::getPermission)
-                .map(PermissionEntity::getName)
-                .collect(Collectors.toSet());
+        Optional.ofNullable(user.getUserPermissions())
+                .ifPresent((permissions) ->
+                        this.permissions = permissions
+                                .stream()
+                                .map(UserPermissionEntity::getPermission)
+                                .map(PermissionEntity::getName)
+                                .collect(Collectors.toSet())
+                );
     }
 
 
