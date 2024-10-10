@@ -39,6 +39,7 @@ import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -109,6 +110,35 @@ public class ReservationRoomService {
         }
 
         return reservationRoomEntity;
+    }
+
+    @Transactional(readOnly = true)
+    public List<RoomAvailabilityView> getAvailableRooms(LocalDate checkinDate, LocalDate checkoutDate) {
+
+        List<DailyRoomAvailabilityEntity> availableRoomsByDateRange = dailyRoomAvailabilityRepository.findAvailabilityByDateRange(
+                checkinDate.atStartOfDay(),
+                checkoutDate.atTime(23, 59)
+        );
+
+        Map<Long, List<DailyRoomAvailabilityEntity>> roomAvailabilityMap = availableRoomsByDateRange.stream()
+                .filter(availability -> availability.getStatus() == RoomStatus.예약가능)
+                .collect(Collectors.groupingBy(availability -> availability.getRoomEntity().getRoomId()));
+
+        List<RoomAvailabilityView> availableRooms = roomAvailabilityMap.entrySet().stream()
+                .filter(entry -> entry.getValue().size() == checkinDate.datesUntil(checkoutDate.plusDays(1)).count()) // 모든 날짜가 존재하는지 확인
+                .map(entry -> {
+                    DailyRoomAvailabilityEntity availability = entry.getValue().get(0);
+                    return new RoomAvailabilityView(
+                            availability.getRoomEntity().getRoomId(),
+                            availability.getRoomEntity().getRoomTypeEntity().getTypeName(),
+                            availability.getRoomEntity().getRoomNumber(),
+                            availability.getRemainingRoom(),
+                            availability.getStatus()
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return availableRooms;
     }
 
     @Transactional(readOnly = true)
