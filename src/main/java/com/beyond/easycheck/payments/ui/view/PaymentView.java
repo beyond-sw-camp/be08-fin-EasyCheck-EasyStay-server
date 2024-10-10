@@ -34,8 +34,8 @@ public class PaymentView {
 
                 paymentEntity.getId(),
                 paymentEntity.getReservationRoomEntity().getId(),
-                paymentEntity.getReservationRoomEntity().getCheckinDate(),
-                paymentEntity.getReservationRoomEntity().getCheckoutDate(),
+                paymentEntity.getReservationRoomEntity().getCheckinDate().atStartOfDay(),
+                paymentEntity.getReservationRoomEntity().getCheckoutDate().atStartOfDay(),
                 paymentEntity.getMethod(),
                 paymentEntity.getAmount(),
                 paymentEntity.getCompletionStatus()

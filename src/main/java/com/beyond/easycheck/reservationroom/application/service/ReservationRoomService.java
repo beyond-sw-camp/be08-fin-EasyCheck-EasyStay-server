@@ -62,13 +62,15 @@ public class ReservationRoomService {
         RoomEntity roomEntity = roomRepository.findById(reservationRoomCreateRequest.getRoomId())
                 .orElseThrow(() -> new EasyCheckException(RoomMessageType.ROOM_NOT_FOUND));
 
-        LocalDateTime checkinDate = reservationRoomCreateRequest.getCheckinDate().toLocalDate().atStartOfDay();
-        LocalDateTime checkoutDate = reservationRoomCreateRequest.getCheckoutDate().toLocalDate().atStartOfDay();
+        LocalDate checkinDate = reservationRoomCreateRequest.getCheckinDate();
+        LocalDate checkoutDate = reservationRoomCreateRequest.getCheckoutDate();
 
-        for (LocalDateTime date = checkinDate; !date.isAfter(checkoutDate); date = date.plusDays(1)) {
+        for (LocalDateTime date = checkinDate.atStartOfDay(); !date.isAfter(checkoutDate.atStartOfDay()); date = date.plusDays(1)) {
+            log.info("Logging checkpoint before dailyAvailability retrieval");
             DailyRoomAvailabilityEntity dailyAvailability = dailyRoomAvailabilityRepository
                     .findByRoomEntityAndDate(roomEntity, date)
                     .orElseThrow(() -> new EasyCheckException(ReservationRoomMessageType.ROOM_NOT_AVAILABLE));
+            log.info("dailyAvailability: {}, roomEntity: {}", dailyAvailability, roomEntity);
 
             if (dailyAvailability.getRemainingRoom() <= 0) {
                 throw new EasyCheckException(ReservationRoomMessageType.ROOM_ALREADY_FULL);
@@ -79,8 +81,8 @@ public class ReservationRoomService {
                 .roomEntity(roomEntity)
                 .userEntity(userEntity)
                 .reservationDate(LocalDateTime.now())
-                .checkinDate(reservationRoomCreateRequest.getCheckinDate())
-                .checkoutDate(reservationRoomCreateRequest.getCheckoutDate())
+                .checkinDate(LocalDate.from(checkinDate.atTime(15, 0)))
+                .checkoutDate(LocalDate.from(checkoutDate.atTime(11, 0)))
                 .reservationStatus(ReservationStatus.RESERVATION)
                 .totalPrice(reservationRoomCreateRequest.getTotalPrice())
                 .paymentStatus(reservationRoomCreateRequest.getPaymentStatus())
@@ -88,9 +90,9 @@ public class ReservationRoomService {
 
         reservationRoomRepository.save(reservationRoomEntity);
 
-        for (LocalDateTime date = checkinDate; !date.isAfter(checkoutDate); date = date.plusDays(1)) {
+        for (LocalDateTime date = checkinDate.atStartOfDay(); !date.isAfter(checkoutDate.atStartOfDay()); date = date.plusDays(1)) {
 
-            if (date.isBefore(checkoutDate)) {
+            if (date.isBefore(checkoutDate.atStartOfDay())) {
 
                 DailyRoomAvailabilityEntity dailyAvailability = dailyRoomAvailabilityRepository
                         .findByRoomEntityAndDate(roomEntity, date)
@@ -200,8 +202,8 @@ public class ReservationRoomService {
         }
         reservationServiceRepository.saveAll(additionalServices);
 
-        LocalDate checkinDate = reservationRoomEntity.getCheckinDate().toLocalDate();
-        LocalDate checkoutDate = reservationRoomEntity.getCheckoutDate().toLocalDate();
+        LocalDate checkinDate = reservationRoomEntity.getCheckinDate();
+        LocalDate checkoutDate = reservationRoomEntity.getCheckoutDate();
 
         for (LocalDate date = checkinDate; !date.isAfter(checkoutDate); date = date.plusDays(1)) {
             DailyRoomAvailabilityEntity dailyAvailability = dailyRoomAvailabilityRepository

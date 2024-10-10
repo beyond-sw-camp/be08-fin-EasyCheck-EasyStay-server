@@ -13,6 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -44,10 +45,10 @@ public class ReservationRoomEntity extends BaseTimeEntity {
     private LocalDateTime reservationDate;
 
     @Column(nullable = false)
-    private LocalDateTime checkinDate;
+    private LocalDate checkinDate;
 
     @Column(nullable = false)
-    private LocalDateTime checkoutDate;
+    private LocalDate checkoutDate;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
