@@ -285,7 +285,6 @@ public class RoomServiceTest {
                 RoomStatus.예약불가
         );
 
-        // 기존 객실 조회
         when(roomRepository.findById(1L)).thenReturn(Optional.of(existingRoom));
 
         // When

@@ -1,6 +1,7 @@
 package com.beyond.easycheck.seasons.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
+import com.beyond.easycheck.seasons.exception.SeasonMessageType;
 import com.beyond.easycheck.seasons.infrastructure.entity.SeasonEntity;
 import com.beyond.easycheck.seasons.infrastructure.repository.SeasonRepository;
 import com.beyond.easycheck.seasons.ui.requestbody.SeasonCreateRequest;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.beyond.easycheck.seasons.exception.SeasonMessageType.ARGUMENT_NOT_VALID;
 import static com.beyond.easycheck.seasons.exception.SeasonMessageType.SEASON_NOT_FOUND;
 
 @Service
@@ -23,6 +25,13 @@ public class SeasonService {
 
     @Transactional
     public void createSeason(SeasonCreateRequest seasonCreateRequest) {
+        if (seasonCreateRequest.getSeasonName() == null ||
+                seasonCreateRequest.getDescription() == null || seasonCreateRequest.getDescription().isEmpty() ||
+                seasonCreateRequest.getStartDate() == null ||
+                seasonCreateRequest.getEndDate() == null) {
+
+            throw new EasyCheckException(SeasonMessageType.ARGUMENT_NOT_VALID);
+        }
 
         SeasonEntity season = SeasonEntity.builder()
                 .seasonName(seasonCreateRequest.getSeasonName())
@@ -76,6 +85,12 @@ public class SeasonService {
 
         SeasonEntity season = seasonRepository.findById(seasonId)
                 .orElseThrow(() -> new EasyCheckException(SEASON_NOT_FOUND));
+
+        if (seasonUpdateRequest.getSeasonName() == null || seasonUpdateRequest.getDescription().isEmpty()
+                || seasonUpdateRequest.getStartDate() == null || seasonUpdateRequest.getEndDate() == null) {
+            throw new EasyCheckException(SeasonMessageType.ARGUMENT_NOT_VALID);
+        }
+
 
         season.update(seasonUpdateRequest);
     }
