@@ -1,7 +1,7 @@
-package com.beyond.easycheck.reservationroom.application.util;
+package com.beyond.easycheck.reservationrooms.application.util;
 
-import com.beyond.easycheck.reservationroom.infrastructure.entity.PaymentStatus;
-import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationStatus;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.PaymentStatus;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationStatus;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

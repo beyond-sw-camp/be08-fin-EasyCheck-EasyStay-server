@@ -8,11 +8,11 @@ import com.beyond.easycheck.payments.infrastructure.repository.PaymentRepository
 import com.beyond.easycheck.payments.ui.requestbody.PaymentCreateRequest;
 import com.beyond.easycheck.payments.ui.requestbody.PaymentUpdateRequest;
 import com.beyond.easycheck.payments.ui.view.PaymentView;
-import com.beyond.easycheck.reservationroom.exception.ReservationRoomMessageType;
-import com.beyond.easycheck.reservationroom.infrastructure.entity.PaymentStatus;
-import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationRoomEntity;
-import com.beyond.easycheck.reservationroom.infrastructure.repository.ReservationRoomRepository;
-import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomUpdateRequest;
+import com.beyond.easycheck.reservationrooms.exception.ReservationRoomMessageType;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.PaymentStatus;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationRoomEntity;
+import com.beyond.easycheck.reservationrooms.infrastructure.repository.ReservationRoomRepository;
+import com.beyond.easycheck.reservationrooms.ui.requestbody.ReservationRoomUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

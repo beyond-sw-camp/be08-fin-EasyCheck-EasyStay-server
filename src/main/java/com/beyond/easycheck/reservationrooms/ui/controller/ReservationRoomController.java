@@ -1,12 +1,12 @@
-package com.beyond.easycheck.reservationroom.ui.controller;
+package com.beyond.easycheck.reservationrooms.ui.controller;
 
-import com.beyond.easycheck.reservationroom.application.service.ReservationRoomService;
-import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationRoomEntity;
-import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomCreateRequest;
-import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomUpdateRequest;
-import com.beyond.easycheck.reservationroom.ui.view.DayRoomAvailabilityView;
-import com.beyond.easycheck.reservationroom.ui.view.ReservationRoomView;
-import com.beyond.easycheck.reservationroom.ui.view.RoomAvailabilityView;
+import com.beyond.easycheck.reservationrooms.application.service.ReservationRoomService;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationRoomEntity;
+import com.beyond.easycheck.reservationrooms.ui.requestbody.ReservationRoomCreateRequest;
+import com.beyond.easycheck.reservationrooms.ui.requestbody.ReservationRoomUpdateRequest;
+import com.beyond.easycheck.reservationrooms.ui.view.DayRoomAvailabilityView;
+import com.beyond.easycheck.reservationrooms.ui.view.ReservationRoomView;
+import com.beyond.easycheck.reservationrooms.ui.view.RoomAvailabilityView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

@@ -1,4 +1,4 @@
-package com.beyond.easycheck.reservationroom.exception;
+package com.beyond.easycheck.reservationrooms.exception;
 
 import com.beyond.easycheck.common.exception.MessageType;
 import lombok.Getter;

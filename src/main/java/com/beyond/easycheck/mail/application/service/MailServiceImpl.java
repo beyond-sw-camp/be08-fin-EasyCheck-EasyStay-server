@@ -7,8 +7,8 @@ import com.beyond.easycheck.mail.infrastructure.persistence.redis.entity.Verific
 import com.beyond.easycheck.mail.infrastructure.persistence.redis.entity.VerifiedEmailEntity;
 import com.beyond.easycheck.mail.infrastructure.persistence.redis.repository.VerificationCodeRepository;
 import com.beyond.easycheck.mail.infrastructure.persistence.redis.repository.VerifiedEmailRepository;
-import com.beyond.easycheck.reservationroom.application.util.ReservationFormatUtil;
-import com.beyond.easycheck.reservationroom.ui.view.ReservationRoomView;
+import com.beyond.easycheck.reservationrooms.application.util.ReservationFormatUtil;
+import com.beyond.easycheck.reservationrooms.ui.view.ReservationRoomView;
 import com.beyond.easycheck.suggestion.exception.SuggestionMessageType;
 import com.beyond.easycheck.suggestion.infrastructure.persistence.repository.SuggestionsRepository;
 import com.beyond.easycheck.suggestion.ui.requestbody.SuggestionReplyRequestBody;

@@ -1,4 +1,4 @@
-package com.beyond.easycheck.reservationroom.ui.view;
+package com.beyond.easycheck.reservationrooms.ui.view;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

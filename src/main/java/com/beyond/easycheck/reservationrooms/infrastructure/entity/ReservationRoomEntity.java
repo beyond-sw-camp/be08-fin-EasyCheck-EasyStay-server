@@ -1,9 +1,9 @@
-package com.beyond.easycheck.reservationroom.infrastructure.entity;
+package com.beyond.easycheck.reservationrooms.infrastructure.entity;
 
 import com.beyond.easycheck.common.entity.BaseTimeEntity;
 import com.beyond.easycheck.payments.infrastructure.entity.CompletionStatus;
 import com.beyond.easycheck.payments.infrastructure.entity.PaymentEntity;
-import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomUpdateRequest;
+import com.beyond.easycheck.reservationrooms.ui.requestbody.ReservationRoomUpdateRequest;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;

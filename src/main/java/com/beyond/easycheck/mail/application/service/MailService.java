@@ -1,6 +1,6 @@
 package com.beyond.easycheck.mail.application.service;
 
-import com.beyond.easycheck.reservationroom.ui.view.ReservationRoomView;
+import com.beyond.easycheck.reservationrooms.ui.view.ReservationRoomView;
 import com.beyond.easycheck.suggestion.ui.requestbody.SuggestionReplyRequestBody;
 
 public interface MailService {

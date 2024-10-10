@@ -2,9 +2,9 @@ package com.beyond.easycheck.payments.application.validator;
 
 import com.beyond.easycheck.payments.infrastructure.entity.CompletionStatus;
 import com.beyond.easycheck.payments.infrastructure.entity.PaymentEntity;
-import com.beyond.easycheck.reservationroom.infrastructure.entity.PaymentStatus;
-import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationRoomEntity;
-import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationStatus;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.PaymentStatus;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationRoomEntity;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationStatus;
 
 public class PaymentValidator {
 
