@@ -87,12 +87,6 @@ public class SuggestionService {
         return SuggestionView.of(suggestionEntity);
     }
 
-
-    public UserEntity getUserEntity(Long userId) {
-        return userJpaRepository.findById(userId)
-                .orElseThrow(() -> new EasyCheckException(UserMessageType.USER_NOT_FOUND));
-    }
-
     public SuggestionEntity getSuggestionEntity(Long suggestionId) {
         return suggestionsRepository.findById(suggestionId)
                 .orElseThrow(() -> new EasyCheckException(SuggestionMessageType.SUGGESTION_NOT_FOUND));
