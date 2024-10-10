@@ -108,8 +108,8 @@ public class  UserEntity {
         this.role = role;
     }
 
-    public void setUserActive() {
-        this.status = UserStatus.ACTIVE;
+    public void setUserStatus(UserStatus status) {
+        this.status = status;
     }
 
     public void setUserPending() {
