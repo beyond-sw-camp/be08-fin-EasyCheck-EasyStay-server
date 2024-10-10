@@ -4,7 +4,9 @@ import com.beyond.easycheck.user.application.service.UserOperationUseCase;
 import com.beyond.easycheck.user.ui.requestbody.ChangePasswordRequest;
 import com.beyond.easycheck.user.ui.requestbody.UserLoginRequest;
 import com.beyond.easycheck.user.ui.requestbody.UserRegisterRequest;
+import com.beyond.easycheck.user.ui.requestbody.UserStatusUpdateRequest;
 import com.beyond.easycheck.user.ui.view.UserLoginView;
+import com.beyond.easycheck.user.ui.view.UserView;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import static com.beyond.easycheck.user.application.service.UserOperationUseCase.*;
 import static com.beyond.easycheck.user.application.service.UserReadUseCase.FindJwtResult;
+import static com.beyond.easycheck.user.application.service.UserReadUseCase.FindUserResult;
 
 @Slf4j
 @RestController
@@ -82,18 +85,27 @@ public class UserController {
     @PatchMapping("/change-password")
     public ResponseEntity<Void> changePassword(@RequestBody @Validated ChangePasswordRequest request) {
 
-        ChangePasswordCommand command = new ChangePasswordCommand(request.email(), request.newPassword());
+        ChangePasswordCommand command = new ChangePasswordCommand(request.email(), request.oldPassword(), request.newPassword());
 
         userOperationUseCase.changePassword(command);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<UserView> changeUserStatus(@PathVariable Long id, @RequestBody @Validated UserStatusUpdateRequest request) {
+        UserStatusUpdateCommand command = new UserStatusUpdateCommand(id, request.status());
+
+        FindUserResult result = userOperationUseCase.updateUserStatus(command);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new UserView(result));
+    }
+
     @GetMapping("/auth-test")
     public String changePassword(@AuthenticationPrincipal Long userId) {
 
         log.info("AUTH test");
-
         log.info("[userId] = {}", userId);
         log.info("[security context] = {}", SecurityContextHolder.getContext().toString());
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
