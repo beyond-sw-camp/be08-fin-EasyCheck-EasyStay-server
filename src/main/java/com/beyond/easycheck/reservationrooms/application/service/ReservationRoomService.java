@@ -1,16 +1,16 @@
-package com.beyond.easycheck.reservationroom.application.service;
+package com.beyond.easycheck.reservationrooms.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.mail.application.service.MailService;
-import com.beyond.easycheck.reservationroom.exception.ReservationRoomMessageType;
-import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationRoomEntity;
-import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationStatus;
-import com.beyond.easycheck.reservationroom.infrastructure.repository.ReservationRoomRepository;
-import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomCreateRequest;
-import com.beyond.easycheck.reservationroom.ui.requestbody.ReservationRoomUpdateRequest;
-import com.beyond.easycheck.reservationroom.ui.view.DayRoomAvailabilityView;
-import com.beyond.easycheck.reservationroom.ui.view.ReservationRoomView;
-import com.beyond.easycheck.reservationroom.ui.view.RoomAvailabilityView;
+import com.beyond.easycheck.reservationrooms.exception.ReservationRoomMessageType;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationRoomEntity;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationStatus;
+import com.beyond.easycheck.reservationrooms.infrastructure.repository.ReservationRoomRepository;
+import com.beyond.easycheck.reservationrooms.ui.requestbody.ReservationRoomCreateRequest;
+import com.beyond.easycheck.reservationrooms.ui.requestbody.ReservationRoomUpdateRequest;
+import com.beyond.easycheck.reservationrooms.ui.view.DayRoomAvailabilityView;
+import com.beyond.easycheck.reservationrooms.ui.view.ReservationRoomView;
+import com.beyond.easycheck.reservationrooms.ui.view.RoomAvailabilityView;
 import com.beyond.easycheck.reservationservices.infrastructure.entity.ReservationServiceEntity;
 import com.beyond.easycheck.reservationservices.infrastructure.entity.ReservationServiceStatus;
 import com.beyond.easycheck.reservationservices.infrastructure.repository.ReservationServiceRepository;

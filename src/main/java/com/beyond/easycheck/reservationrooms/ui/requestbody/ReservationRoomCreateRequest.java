@@ -1,7 +1,7 @@
-package com.beyond.easycheck.reservationroom.ui.requestbody;
+package com.beyond.easycheck.reservationrooms.ui.requestbody;
 
-import com.beyond.easycheck.reservationroom.infrastructure.entity.PaymentStatus;
-import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationStatus;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.PaymentStatus;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationStatus;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Min;
@@ -39,4 +39,15 @@ public class ReservationRoomCreateRequest {
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
+
+    public void setRoom(long id, LocalDateTime date, LocalDate checkinDate, LocalDate checkoutDate, ReservationStatus reservationStatus, Integer totalPrice, PaymentStatus paymentStatus) {
+
+        this.roomId = id;
+        this.reservationDate = date;
+        this.checkinDate = checkinDate;
+        this.checkoutDate = checkoutDate;
+        this.reservationStatus = reservationStatus;
+        this.totalPrice = totalPrice;
+        this.paymentStatus = paymentStatus;
+    }
 }

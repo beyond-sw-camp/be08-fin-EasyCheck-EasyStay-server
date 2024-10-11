@@ -1,8 +1,8 @@
-package com.beyond.easycheck.reservationroom.ui.view;
+package com.beyond.easycheck.reservationrooms.ui.view;
 
-import com.beyond.easycheck.reservationroom.infrastructure.entity.PaymentStatus;
-import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationRoomEntity;
-import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationStatus;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.PaymentStatus;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationRoomEntity;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationStatus;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

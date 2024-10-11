@@ -4,10 +4,10 @@ import com.beyond.easycheck.additionalservices.exception.AdditionalServiceMessag
 import com.beyond.easycheck.additionalservices.infrastructure.entity.AdditionalServiceEntity;
 import com.beyond.easycheck.additionalservices.infrastructure.repository.AdditionalServiceRepository;
 import com.beyond.easycheck.common.exception.EasyCheckException;
-import com.beyond.easycheck.reservationroom.exception.ReservationRoomMessageType;
-import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationRoomEntity;
-import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationStatus;
-import com.beyond.easycheck.reservationroom.infrastructure.repository.ReservationRoomRepository;
+import com.beyond.easycheck.reservationrooms.exception.ReservationRoomMessageType;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationRoomEntity;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationStatus;
+import com.beyond.easycheck.reservationrooms.infrastructure.repository.ReservationRoomRepository;
 import com.beyond.easycheck.reservationservices.exception.ReservationServiceMessageType;
 import com.beyond.easycheck.reservationservices.infrastructure.entity.ReservationServiceEntity;
 import com.beyond.easycheck.reservationservices.infrastructure.entity.ReservationServiceStatus;
