@@ -49,6 +49,9 @@ public class ReservationRoomServiceTest {
     @Mock
     private DailyRoomAvailabilityRepository dailyRoomAvailabilityRepository;
 
+    @Mock
+    private ReservationServiceRepository reservationServiceRepository;
+
     private ReservationRoomEntity reservationRoomEntity;
     private UserEntity userEntity;
     private RoomEntity roomEntity;
