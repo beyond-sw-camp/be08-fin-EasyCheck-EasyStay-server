@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public interface ThemeParkReadUseCase {
 
@@ -25,15 +26,21 @@ public interface ThemeParkReadUseCase {
 
         private final String location;
 
-        private final String image;
+        private final List<String> imageUrls;
+
 
         public static FindThemeParkResult findByThemeParkEntity(ThemeParkEntity themePark){
+
+            List<String> imageUrls = themePark.getImages().stream()
+                    .map(ThemeParkEntity.ImageEntity::getUrl)
+                    .collect(Collectors.toList());
+
             return FindThemeParkResult.builder()
                     .id(themePark.getId())
                     .name(themePark.getName())
                     .description(themePark.getDescription())
                     .location(themePark.getLocation())
-                    .image(themePark.getImage())
+                    .imageUrls(imageUrls)
                     .build();
         }
     }
