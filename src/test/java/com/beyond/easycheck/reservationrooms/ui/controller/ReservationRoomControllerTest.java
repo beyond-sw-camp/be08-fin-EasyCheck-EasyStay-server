@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -55,7 +54,7 @@ public class ReservationRoomControllerTest {
 
     @BeforeEach
     void setUp() {
-        // 초기 설정 (Mock 데이터)
+
         reservationRoomEntity = new ReservationRoomEntity();
         reservationRoomCreateRequest = new ReservationRoomCreateRequest();
         reservationRoomUpdateRequest = new ReservationRoomUpdateRequest();
@@ -64,17 +63,16 @@ public class ReservationRoomControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     void testCreateReservation() throws Exception {
-        // 필수 값 설정
+
         reservationRoomCreateRequest.setRoom(1L, LocalDateTime.now(), LocalDate.of(2024, 10, 11), LocalDate.of(2024, 10, 13), ReservationStatus.RESERVATION, 10000, PaymentStatus.PAID);
 
-        // when: 서비스 메소드 모의
+        // when
         when(reservationRoomService.createReservation(any(Long.class), any(ReservationRoomCreateRequest.class)))
                 .thenReturn(reservationRoomEntity);
 
-        // 요청 데이터 설정
         String requestJson = objectMapper.writeValueAsString(reservationRoomCreateRequest);
 
-        // perform: HTTP POST 요청 실행 및 검증
+        // perform
         mockMvc.perform(post("/api/v1/reservation-room")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
@@ -84,11 +82,12 @@ public class ReservationRoomControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     void testGetAvailableRooms() throws Exception {
-        // when: 서비스 메소드 모의
+
+        // when
         List<RoomAvailabilityView> availableRooms = Collections.singletonList(new RoomAvailabilityView(1L, "Deluxe", "101", 1, null));
         when(reservationRoomService.getAvailableRooms(any(LocalDate.class), any(LocalDate.class))).thenReturn(availableRooms);
 
-        // perform: HTTP GET 요청 실행 및 검증
+        // perform
         mockMvc.perform(get("/api/v1/reservation-room/available")
                         .param("checkinDate", "2024-10-11")
                         .param("checkoutDate", "2024-10-13"))
@@ -100,11 +99,12 @@ public class ReservationRoomControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     void testGetRoomAvailabilityByMonth() throws Exception {
-        // when: 서비스 메소드 모의
+
+        // when
         List<DayRoomAvailabilityView> availability = Collections.singletonList(new DayRoomAvailabilityView(LocalDate.of(2024, 10, 11), "Monday", Collections.emptyList()));
         when(reservationRoomService.getRoomAvailabilityByMonth(anyInt(), anyInt())).thenReturn(availability);
 
-        // perform: HTTP GET 요청 실행 및 검증
+        // perform
         mockMvc.perform(get("/api/v1/reservation-room/room-list")
                         .param("year", "2024")
                         .param("month", "10"))
@@ -116,11 +116,12 @@ public class ReservationRoomControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     void testGetAllReservations() throws Exception {
-        // when: 서비스 메소드 모의
+
+        // when
         List<ReservationRoomView> reservations = Collections.singletonList(new ReservationRoomView());
         when(reservationRoomService.getAllReservations(anyInt(), anyInt())).thenReturn(reservations);
 
-        // perform: HTTP GET 요청 실행 및 검증
+        // perform
         mockMvc.perform(get("/api/v1/reservation-room")
                         .param("page", "0")
                         .param("size", "10"))
@@ -131,11 +132,12 @@ public class ReservationRoomControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     void testGetReservationById() throws Exception {
-        // when: 서비스 메소드 모의
+
+        // when
         ReservationRoomView reservationRoomView = new ReservationRoomView();
         when(reservationRoomService.getReservationById(any(Long.class))).thenReturn(reservationRoomView);
 
-        // perform: HTTP GET 요청 실행 및 검증
+        // perform
         mockMvc.perform(get("/api/v1/reservation-room/{id}", 1L))
                 .andExpect(status().isOk());
     }
@@ -143,13 +145,13 @@ public class ReservationRoomControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     void testCancelReservation() throws Exception {
-        // when: 서비스 메소드 모의
+
+        // when
         doNothing().when(reservationRoomService).cancelReservation(any(Long.class), any(ReservationRoomUpdateRequest.class));
 
-        // 요청 데이터 설정
         String requestJson = objectMapper.writeValueAsString(reservationRoomUpdateRequest);
 
-        // perform: HTTP PUT 요청 실행 및 검증
+        // perform
         mockMvc.perform(put("/api/v1/reservation-room/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
