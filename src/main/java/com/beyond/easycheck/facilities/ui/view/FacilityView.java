@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,6 +17,8 @@ public class FacilityView {
     private Long id;
 
     private String name;
+
+    private List<String> images;
 
     private String description;
 
@@ -31,10 +34,14 @@ public class FacilityView {
 
     public static FacilityView of(FacilityEntity facilityEntity) {
 
-        return new FacilityView(
+        List<String> imageUrls = facilityEntity.getImages().stream()
+                .map(FacilityEntity.ImageEntity::getUrl)
+                .collect(Collectors.toList());
 
+        return new FacilityView(
                 facilityEntity.getId(),
                 facilityEntity.getName(),
+                imageUrls,
                 facilityEntity.getDescription(),
                 facilityEntity.getAccommodationEntity().getName(),
                 facilityEntity.getAvailableStatus()
