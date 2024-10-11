@@ -49,7 +49,7 @@ public class UserService implements UserOperationUseCase, UserReadUseCase {
 
     @Override
     @Transactional
-    public void registerUser(UserRegisterCommand command) {
+    public FindUserResult registerUser(UserRegisterCommand command) {
         log.info("[registerUser] - command = {}", command);
 
         checkEmailIsDuplicated(command.email());
@@ -74,11 +74,13 @@ public class UserService implements UserOperationUseCase, UserReadUseCase {
         // 회원 저장
         UserEntity result = userJpaRepository.save(user);
         log.info("[registerUser] - userEntity save result = {}", result);
+
+        return FindUserResult.findByUserEntity(result);
     }
 
     @Override
     @Transactional
-    public void registerCorporateUser(UserRegisterCommand userRegisterCommand, CorporateCreateRequest corporateCreateRequest, MultipartFile verificationFilesZip) {
+    public FindUserResult registerCorporateUser(UserRegisterCommand userRegisterCommand, CorporateCreateRequest corporateCreateRequest, MultipartFile verificationFilesZip) {
 
         // 이메일 중복확인
         checkEmailIsDuplicated(userRegisterCommand.email());
@@ -100,6 +102,8 @@ public class UserService implements UserOperationUseCase, UserReadUseCase {
                 );
 
         corporateOperationUseCase.createCorporate(corporateCreateCommand);
+
+        return FindUserResult.findByUserEntity(user);
     }
 
     @Override

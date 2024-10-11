@@ -2,13 +2,14 @@ package com.beyond.easycheck.user.application.service.user;
 
 import com.beyond.easycheck.corporate.ui.requestbody.CorporateCreateRequest;
 import com.beyond.easycheck.user.application.service.user.UserReadUseCase.FindJwtResult;
+import com.beyond.easycheck.user.application.service.user.UserReadUseCase.FindUserResult;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserOperationUseCase {
 
-    void registerUser(UserRegisterCommand command);
+    FindUserResult registerUser(UserRegisterCommand command);
 
-    void registerCorporateUser(UserRegisterCommand command, CorporateCreateRequest corporateCreateRequest, MultipartFile verificationFilesZip);
+    FindUserResult registerCorporateUser(UserRegisterCommand command, CorporateCreateRequest corporateCreateRequest, MultipartFile verificationFilesZip);
 
     FindJwtResult login(UserLoginCommand command);
 
