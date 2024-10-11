@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Builder
@@ -22,7 +24,7 @@ public class RoomView {
     private String roomNumber;
 
     @NotBlank
-    private String roomPic;
+    private List<String> images;
 
     @NotNull
     private int roomAmount;
@@ -48,10 +50,10 @@ public class RoomView {
     @Min(1)
     private int maxOccupancy;
 
-    public RoomView(Long roomId, String roomNumber, String roomPic, int roomAmount, int remainingRoom, RoomStatus status, Long roomTypeId, Long accomodationId, String typeName, String description, int maxOccupancy) {
+    public RoomView(Long roomId, String roomNumber, List<String> images, int roomAmount, int remainingRoom, RoomStatus status, Long roomTypeId, Long accomodationId, String typeName, String description, int maxOccupancy) {
         this.roomId = roomId;
         this.roomNumber = roomNumber;
-        this.roomPic = roomPic;
+        this.images = images;
         this.roomAmount = roomAmount;
         this.remainingRoom = remainingRoom;
         this.status = status;

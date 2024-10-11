@@ -53,6 +53,10 @@ public class S3Service implements S3OperationUseCase, S3ReadUseCase {
         return uploadedUrls;
     }
 
+    public void deleteFile(String fileUrl) {
+        s3client.deleteObject(bucketName, fileUrl);
+    }
+
     public void deleteFiles(List<String> fileUrls) {
         for (String fileUrl : fileUrls) {
             String fileName = extractFileNameFromUrl(fileUrl);
