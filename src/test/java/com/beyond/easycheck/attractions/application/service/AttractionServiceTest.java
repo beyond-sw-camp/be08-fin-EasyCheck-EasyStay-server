@@ -1,5 +1,7 @@
 package com.beyond.easycheck.attractions.application.service;
 
+import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
+import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationType;
 import com.beyond.easycheck.attractions.infrastructure.entity.AttractionEntity;
 import com.beyond.easycheck.attractions.infrastructure.repository.AttractionRepository;
 import com.beyond.easycheck.common.exception.EasyCheckException;
@@ -12,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.DataAccessException;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static com.beyond.easycheck.attractions.exception.AttractionMessageType.ATTRACTION_NOT_FOUND;
@@ -43,7 +46,14 @@ class AttractionServiceTest {
         AttractionOperationUseCase.AttractionCreateCommand command = new AttractionOperationUseCase.AttractionCreateCommand(
                 1L, "어트랙션 이름", "설명", "이미지_주소");
 
-        ThemeParkEntity themeParkEntity = new ThemeParkEntity(1L, "테마파크", "설명", "서울", "이미지_주소", null);
+        AccommodationEntity accommodationEntity = AccommodationEntity.builder()
+                .id(1L)
+                .name("숙소 이름")
+                .address("숙소 주소")
+                .accommodationType(AccommodationType.HOTEL)
+                .build();
+
+        ThemeParkEntity themeParkEntity = new ThemeParkEntity(1L, "테마파크", "설명", "서울", accommodationEntity, new ArrayList<>());
         AttractionEntity attractionEntity = new AttractionEntity(1L, "어트랙션 이름", "설명", "이미지_주소", themeParkEntity);
 
         when(themeParkRepository.findById(1L)).thenReturn(Optional.of(themeParkEntity));
@@ -79,7 +89,14 @@ class AttractionServiceTest {
         AttractionOperationUseCase.AttractionUpdateCommand command = new AttractionOperationUseCase.AttractionUpdateCommand(
                 "업데이트된 이름", "업데이트된 설명", "업데이트된 이미지");
 
-        ThemeParkEntity themeParkEntity = new ThemeParkEntity(1L, "테마파크", "설명", "서울", "이미지_주소", null);
+        AccommodationEntity accommodationEntity = AccommodationEntity.builder()
+                .id(1L)
+                .name("숙소 이름")
+                .address("숙소 주소")
+                .accommodationType(AccommodationType.HOTEL)
+                .build();
+
+        ThemeParkEntity themeParkEntity = new ThemeParkEntity(1L, "테마파크", "설명", "서울", accommodationEntity, new ArrayList<>());
         AttractionEntity attractionEntity = new AttractionEntity(1L, "어트랙션 이름", "설명", "이미지_주소", themeParkEntity);
 
         when(attractionRepository.findById(1L)).thenReturn(Optional.of(attractionEntity));

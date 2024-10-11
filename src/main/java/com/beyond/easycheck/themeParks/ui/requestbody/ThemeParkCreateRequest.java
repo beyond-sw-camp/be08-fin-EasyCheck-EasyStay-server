@@ -18,6 +18,4 @@ public class ThemeParkCreateRequest {
 
     @NotBlank(message = "테마파크 위치는 필수입니다.")
     private String location;
-
-    private String image;
 }
