@@ -1,7 +1,6 @@
 package com.beyond.easycheck.seasons.ui.controller;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
-import com.beyond.easycheck.rooms.exception.RoomMessageType;
 import com.beyond.easycheck.seasons.application.service.SeasonService;
 import com.beyond.easycheck.seasons.exception.SeasonMessageType;
 import com.beyond.easycheck.seasons.infrastructure.repository.SeasonRepository;
