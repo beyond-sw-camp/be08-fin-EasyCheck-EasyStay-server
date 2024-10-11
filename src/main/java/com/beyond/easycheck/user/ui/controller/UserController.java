@@ -1,6 +1,8 @@
 package com.beyond.easycheck.user.ui.controller;
 
-import com.beyond.easycheck.user.application.service.UserOperationUseCase;
+import com.beyond.easycheck.user.application.service.admin.AdminOperationUseCase;
+import com.beyond.easycheck.user.application.service.admin.AdminOperationUseCase.UserStatusUpdateCommand;
+import com.beyond.easycheck.user.application.service.user.UserOperationUseCase;
 import com.beyond.easycheck.user.ui.requestbody.ChangePasswordRequest;
 import com.beyond.easycheck.user.ui.requestbody.UserLoginRequest;
 import com.beyond.easycheck.user.ui.requestbody.UserRegisterRequest;
@@ -18,9 +20,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import static com.beyond.easycheck.user.application.service.UserOperationUseCase.*;
-import static com.beyond.easycheck.user.application.service.UserReadUseCase.FindJwtResult;
-import static com.beyond.easycheck.user.application.service.UserReadUseCase.FindUserResult;
+import static com.beyond.easycheck.user.application.service.user.UserOperationUseCase.*;
+import static com.beyond.easycheck.user.application.service.user.UserReadUseCase.FindJwtResult;
+import static com.beyond.easycheck.user.application.service.user.UserReadUseCase.FindUserResult;
 
 @Slf4j
 @RestController
@@ -29,6 +31,8 @@ import static com.beyond.easycheck.user.application.service.UserReadUseCase.Find
 public class UserController {
 
     private final UserOperationUseCase userOperationUseCase;
+
+    private final AdminOperationUseCase adminOperationUseCase;
 
     @PostMapping("")
     public ResponseEntity<Void> registerUser(@RequestBody @Validated UserRegisterRequest request) {
@@ -96,7 +100,7 @@ public class UserController {
     public ResponseEntity<UserView> changeUserStatus(@PathVariable Long id, @RequestBody @Validated UserStatusUpdateRequest request) {
         UserStatusUpdateCommand command = new UserStatusUpdateCommand(id, request.status());
 
-        FindUserResult result = userOperationUseCase.updateUserStatus(command);
+        FindUserResult result = adminOperationUseCase.updateUserStatus(command);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new UserView(result));

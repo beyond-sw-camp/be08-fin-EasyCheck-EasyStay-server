@@ -1,4 +1,4 @@
-package com.beyond.easycheck.user.application.service;
+package com.beyond.easycheck.user.application.service.user;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.common.security.infrastructure.persistence.entity.ExpiredAccessToken;
@@ -24,14 +24,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import static com.beyond.easycheck.corporate.application.CorporateOperationUseCase.CorporateCreateCommand;
-import static com.beyond.easycheck.user.application.service.UserReadUseCase.*;
-import static com.beyond.easycheck.user.application.service.UserReadUseCase.FindJwtResult;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class UserService implements UserOperationUseCase {
+public class UserService implements UserOperationUseCase, UserReadUseCase {
 
     private final JwtUtil jwtUtil;
 
@@ -51,7 +49,7 @@ public class UserService implements UserOperationUseCase {
 
     @Override
     @Transactional
-    public void registerUser(UserRegisterCommand command) {
+    public FindUserResult registerUser(UserRegisterCommand command) {
         log.info("[registerUser] - command = {}", command);
 
         checkEmailIsDuplicated(command.email());
@@ -69,18 +67,20 @@ public class UserService implements UserOperationUseCase {
         user.setSecurePassword(securePassword);
 
         // 회원의 역할 설정
-        RoleEntity role = retrieveRoleByName(UserRole.USER.name());
+        RoleEntity role = findRoleByName(UserRole.USER.name());
         user.setRole(role);
         user.setUserStatus(UserStatus.ACTIVE);
 
         // 회원 저장
         UserEntity result = userJpaRepository.save(user);
         log.info("[registerUser] - userEntity save result = {}", result);
+
+        return FindUserResult.findByUserEntity(result);
     }
 
     @Override
     @Transactional
-    public void registerCorporateUser(UserRegisterCommand userRegisterCommand, CorporateCreateRequest corporateCreateRequest, MultipartFile verificationFilesZip) {
+    public FindUserResult registerCorporateUser(UserRegisterCommand userRegisterCommand, CorporateCreateRequest corporateCreateRequest, MultipartFile verificationFilesZip) {
 
         // 이메일 중복확인
         checkEmailIsDuplicated(userRegisterCommand.email());
@@ -102,26 +102,25 @@ public class UserService implements UserOperationUseCase {
                 );
 
         corporateOperationUseCase.createCorporate(corporateCreateCommand);
+
+        return FindUserResult.findByUserEntity(user);
     }
 
     @Override
-    @Transactional
-    public FindUserResult updateUserStatus(UserStatusUpdateCommand command) {
+    public FindUserResult getUserInfo(UserFindQuery query) {
+        log.info("[getUserInfo] - query = {}", query);
 
-        UserEntity userEntity = userJpaRepository.findById(command.userId())
-                .orElseThrow(() -> new EasyCheckException(UserMessageType.USER_NOT_FOUND));
+        UserEntity user = findUserById(query.userId());
 
-        userEntity.setUserStatus(command.status());
-
-        return FindUserResult.findByUserEntity(userEntity);
+        log.info("[getUserInfo] - user = {}", user);
+        return FindUserResult.findByUserEntity(user);
     }
-
 
     @Override
     public FindJwtResult login(UserLoginCommand command) {
 
         log.info("[login] - login command = {}", command);
-        UserEntity user = retrieveUserByEmail(command.email());
+        UserEntity user = findUserByEmail(command.email());
 
         log.info("[login] - user find result = {}", user);
         if (passwordIncorrect(command, user)) {
@@ -140,7 +139,7 @@ public class UserService implements UserOperationUseCase {
         log.info("[loginGuest] - login command = {}", command);
         UserEntity guestUserEntity = UserEntity.createGuestUser(command.name(), command.phone());
 
-        RoleEntity roleEntity = retrieveRoleByName(UserRole.GUEST.name());
+        RoleEntity roleEntity = findRoleByName(UserRole.GUEST.name());
         guestUserEntity.setRole(roleEntity);
 
         EasyCheckUserDetails userDetails = new EasyCheckUserDetails(guestUserEntity);
@@ -168,7 +167,7 @@ public class UserService implements UserOperationUseCase {
         // 비밀번호 변경 전 이메일 인증 과정을 거쳐야 한다.
         checkEmailIsVerified(command.email());
 
-        UserEntity user = retrieveUserByEmail(command.email());
+        UserEntity user = findUserByEmail(command.email());
 
         // 기존 패스워드와 일치하는지 검사
         if (!passwordEncoder.matches(command.oldPassword(), user.getPassword())) {
@@ -208,12 +207,17 @@ public class UserService implements UserOperationUseCase {
                 });
     }
 
-    private UserEntity retrieveUserByEmail(String email) {
+    private UserEntity findUserById(Long userId) {
+        return userJpaRepository.findById(userId)
+                .orElseThrow(() -> new EasyCheckException(UserMessageType.USER_NOT_FOUND));
+    }
+
+    private UserEntity findUserByEmail(String email) {
         return userJpaRepository.findUserEntityByEmail(email)
                 .orElseThrow(() -> new EasyCheckException(UserMessageType.USER_NOT_FOUND));
     }
 
-    private RoleEntity retrieveRoleByName(String name) {
+    private RoleEntity findRoleByName(String name) {
         return roleJpaRepository.findRoleEntityByName(name)
                 .orElseThrow(() -> new EasyCheckException(UserMessageType.USER_ROLE_INVALID));
     }
