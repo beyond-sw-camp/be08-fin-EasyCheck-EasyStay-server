@@ -11,6 +11,7 @@ public enum FileManagementCategory {
     RESERVATION("reservation", "예약"),
     FACILITY("facility", "시설"),
     EVENT("event", "이벤트"),
+    ROOM("room", "객실")
     ;
 
     private final String folderName;

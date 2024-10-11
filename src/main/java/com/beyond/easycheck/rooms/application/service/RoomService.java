@@ -5,53 +5,78 @@ import com.beyond.easycheck.rooms.infrastructure.entity.DailyRoomAvailabilityEnt
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomStatus;
 import com.beyond.easycheck.rooms.infrastructure.repository.DailyRoomAvailabilityRepository;
+import com.beyond.easycheck.rooms.infrastructure.repository.ImageRepository;
 import com.beyond.easycheck.rooms.infrastructure.repository.RoomRepository;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomCreateRequest;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomUpdateRequest;
 import com.beyond.easycheck.rooms.ui.view.RoomView;
 import com.beyond.easycheck.roomtypes.infrastructure.entity.RoomtypeEntity;
 import com.beyond.easycheck.roomtypes.infrastructure.repository.RoomtypeRepository;
+import com.beyond.easycheck.s3.application.service.S3Service;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.beyond.easycheck.rooms.exception.RoomMessageType.ROOMS_NOT_FOUND;
-import static com.beyond.easycheck.rooms.exception.RoomMessageType.ROOM_NOT_FOUND;
+import static com.beyond.easycheck.rooms.exception.RoomMessageType.*;
 import static com.beyond.easycheck.roomtypes.exception.RoomtypeMessageType.ROOM_TYPE_NOT_FOUND;
+import static com.beyond.easycheck.s3.application.domain.FileManagementCategory.ROOM;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RoomService {
 
-    private static final Logger log = LoggerFactory.getLogger(RoomService.class);
     private final RoomRepository roomRepository;
     private final RoomtypeRepository roomTypeRepository;
+    private final ImageRepository imageRepository;
     private final DailyRoomAvailabilityRepository dailyRoomAvailabilityRepository;
+    private final S3Service s3Service;
+
+
+    private void addImagesToRoom(RoomEntity roomEntity, List<String> imageUrls) {
+        List<RoomEntity.ImageEntity> newImageEntities = imageUrls.stream()
+                .map(url -> RoomEntity.ImageEntity.createImage(url, roomEntity))
+                .toList();
+
+        if (roomEntity.getImages() == null) {
+            roomEntity.setImages(new ArrayList<>());
+        }
+
+        for (RoomEntity.ImageEntity newImage : newImageEntities) {
+            if (!roomEntity.getImages().contains(newImage)) {
+                roomEntity.addImage(newImage);
+            }
+        }
+    }
 
     @Transactional
-    public RoomEntity createRoom(RoomCreateRequest roomCreateRequest) {
+    public RoomEntity createRoom(RoomCreateRequest roomCreateRequest, List<MultipartFile> imageFiles) {
 
         RoomtypeEntity roomType = roomTypeRepository.findById(roomCreateRequest.getRoomTypeId())
                 .orElseThrow(() -> new EasyCheckException(ROOM_TYPE_NOT_FOUND));
 
+        List<String> imageUrls = s3Service.uploadFiles(imageFiles, ROOM);
+
         RoomEntity room = RoomEntity.builder()
                 .roomTypeEntity(roomType)
                 .roomNumber(roomCreateRequest.getRoomNumber())
-                .roomPic(roomCreateRequest.getRoomPic())
                 .status(roomCreateRequest.getStatus())
                 .roomAmount(roomCreateRequest.getRoomAmount())
                 .remainingRoom(roomCreateRequest.getRemainingRoom())
                 .build();
 
-        room = roomRepository.save(room);
+        roomRepository.save(room);
+        addImagesToRoom(room, imageUrls);
 
-        return room;
+        return roomRepository.save(room);
     }
 
     public void initializeRoomAvailability(RoomEntity roomEntity) {
@@ -82,10 +107,14 @@ public class RoomService {
 
         RoomtypeEntity roomType = room.getRoomTypeEntity();
 
-        RoomView roomView = RoomView.builder()
+        List<String> images = room.getImages().stream()
+                .map(RoomEntity.ImageEntity::getUrl)
+                .collect(Collectors.toList());
+
+        return RoomView.builder()
                 .roomId(room.getRoomId())
+                .images(images)
                 .roomNumber(room.getRoomNumber())
-                .roomPic(room.getRoomPic())
                 .roomAmount(room.getRoomAmount())
                 .remainingRoom(room.getRemainingRoom())
                 .status(room.getStatus())
@@ -95,8 +124,6 @@ public class RoomService {
                 .description(roomType.getDescription())
                 .maxOccupancy(roomType.getMaxOccupancy())
                 .build();
-
-        return roomView;
     }
 
     @Transactional
@@ -107,20 +134,28 @@ public class RoomService {
         if (roomEntities.isEmpty()) {
             throw new EasyCheckException(ROOMS_NOT_FOUND);
         }
+
         List<RoomView> roomViews = roomEntities.stream()
-                .map(roomEntity -> new RoomView(
-                        roomEntity.getRoomId(),
-                        roomEntity.getRoomNumber(),
-                        roomEntity.getRoomPic(),
-                        roomEntity.getRoomAmount(),
-                        roomEntity.getRemainingRoom(),
-                        roomEntity.getStatus(),
-                        roomEntity.getRoomTypeEntity().getRoomTypeId(),
-                        roomEntity.getRoomTypeEntity().getAccommodationEntity().getId(),
-                        roomEntity.getRoomTypeEntity().getTypeName(),
-                        roomEntity.getRoomTypeEntity().getDescription(),
-                        roomEntity.getRoomTypeEntity().getMaxOccupancy()
-                )).collect(Collectors.toList());
+                .map(roomEntity -> {
+                    List<String> imageUrls = roomEntity.getImages().stream()
+                            .map(RoomEntity.ImageEntity::getUrl)
+                            .collect(Collectors.toList());
+
+                    return new RoomView(
+                            roomEntity.getRoomId(),
+                            roomEntity.getRoomNumber(),
+                            imageUrls,
+                            roomEntity.getRoomAmount(),
+                            roomEntity.getRemainingRoom(),
+                            roomEntity.getStatus(),
+                            roomEntity.getRoomTypeEntity().getRoomTypeId(),
+                            roomEntity.getRoomTypeEntity().getAccommodationEntity().getId(),
+                            roomEntity.getRoomTypeEntity().getTypeName(),
+                            roomEntity.getRoomTypeEntity().getDescription(),
+                            roomEntity.getRoomTypeEntity().getMaxOccupancy()
+                    );
+                })
+                .collect(Collectors.toList());
 
         return roomViews;
     }
@@ -135,10 +170,36 @@ public class RoomService {
     }
 
     @Transactional
+    public void updateRoomImage(Long imageId, MultipartFile newImageFile) {
+        RoomEntity.ImageEntity imageToUpdate = imageRepository.findById(imageId)
+                .orElseThrow(() -> new EasyCheckException(IMAGE_NOT_FOUND));
+
+        String oldImageUrl = imageToUpdate.getUrl();
+
+        String[] parts = oldImageUrl.split("/");
+
+        String deleteImage = String.join("/", Arrays.copyOfRange(parts, 3, parts.length));
+
+        s3Service.deleteFile(deleteImage);
+
+        String newImageUrl = s3Service.uploadFile(newImageFile, ROOM);
+        imageToUpdate.setUrl(newImageUrl);
+    }
+
+    @Transactional
     public void deleteRoom(Long roomId) {
         RoomEntity room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new EasyCheckException(ROOM_NOT_FOUND));
 
+        for (RoomEntity.ImageEntity image : room.getImages()) {
+            String oldImageUrl = image.getUrl();
+
+            String[] parts = oldImageUrl.split("/");
+            String deleteImage = String.join("/", Arrays.copyOfRange(parts, 3, parts.length));
+
+            s3Service.deleteFile(deleteImage);
+        }
         roomRepository.delete(room);
     }
+
 }

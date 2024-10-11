@@ -21,9 +21,6 @@ public class RoomCreateRequest {
     private String roomNumber;
 
     @NotNull
-    private String roomPic;
-
-    @NotNull
     private RoomStatus status;
 
     @NotNull @Max(10)
