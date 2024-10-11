@@ -47,9 +47,6 @@ public class ReservationRoomServiceTest {
     private MailService mailService;
 
     @Mock
-    private ReservationServiceRepository reservationServiceRepository;
-
-    @Mock
     private DailyRoomAvailabilityRepository dailyRoomAvailabilityRepository;
 
     private ReservationRoomEntity reservationRoomEntity;
@@ -59,21 +56,22 @@ public class ReservationRoomServiceTest {
 
     @BeforeEach
     void setUp() {
+
         MockitoAnnotations.openMocks(this);
 
-        // Mock entities
         userEntity = mock(UserEntity.class);
         roomEntity = mock(RoomEntity.class);
         dailyRoomAvailabilityEntity = mock(DailyRoomAvailabilityEntity.class);
         reservationRoomEntity = mock(ReservationRoomEntity.class);
 
         when(userEntity.getEmail()).thenReturn("test@test.com");
-        when(roomEntity.getRoomTypeEntity()).thenReturn(mock(RoomtypeEntity.class)); // RoomTypeEntity 모킹
-        when(roomEntity.getRoomTypeEntity().getTypeName()).thenReturn("Deluxe"); // 필요한 속성 설정
+        when(roomEntity.getRoomTypeEntity()).thenReturn(mock(RoomtypeEntity.class));
+        when(roomEntity.getRoomTypeEntity().getTypeName()).thenReturn("Deluxe");
     }
 
     @Test
     void testCreateReservation_success() {
+
         // given
         when(userJpaRepository.findById(1L)).thenReturn(Optional.of(userEntity));
         when(roomRepository.findById(1L)).thenReturn(Optional.of(roomEntity));
@@ -135,21 +133,19 @@ public class ReservationRoomServiceTest {
 
     @Test
     void testCancelReservation_success() {
+
         // given
         when(reservationRoomRepository.findById(1L)).thenReturn(Optional.of(reservationRoomEntity));
 
-        // Set up valid dates for check-in and check-out
         LocalDate checkinDate = LocalDate.of(2024, 10, 11);
         LocalDate checkoutDate = LocalDate.of(2024, 10, 13);
         when(reservationRoomEntity.getCheckinDate()).thenReturn(checkinDate);
         when(reservationRoomEntity.getCheckoutDate()).thenReturn(checkoutDate);
         when(reservationRoomEntity.getRoomEntity()).thenReturn(roomEntity);
 
-        // Mock daily availability for each date in the range
         when(dailyRoomAvailabilityRepository.findByRoomEntityAndDate(any(RoomEntity.class), any(LocalDateTime.class)))
                 .thenReturn(Optional.of(dailyRoomAvailabilityEntity));
 
-        // Setup daily room availability mock behavior
         when(dailyRoomAvailabilityEntity.getRemainingRoom()).thenReturn(1);
 
         ReservationRoomUpdateRequest updateRequest = new ReservationRoomUpdateRequest();
