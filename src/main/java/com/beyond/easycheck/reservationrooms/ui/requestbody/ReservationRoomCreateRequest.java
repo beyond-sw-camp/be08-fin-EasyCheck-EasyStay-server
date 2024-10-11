@@ -39,4 +39,15 @@ public class ReservationRoomCreateRequest {
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
+
+    public void setRoom(long id, LocalDateTime date, LocalDate checkinDate, LocalDate checkoutDate, ReservationStatus reservationStatus, Integer totalPrice, PaymentStatus paymentStatus) {
+
+        this.roomId = id;
+        this.reservationDate = date;
+        this.checkinDate = checkinDate;
+        this.checkoutDate = checkoutDate;
+        this.reservationStatus = reservationStatus;
+        this.totalPrice = totalPrice;
+        this.paymentStatus = paymentStatus;
+    }
 }
