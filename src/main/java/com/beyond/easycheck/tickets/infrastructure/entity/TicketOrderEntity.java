@@ -2,11 +2,14 @@ package com.beyond.easycheck.tickets.infrastructure.entity;
 
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import static com.beyond.easycheck.tickets.infrastructure.entity.OrderStatus.*;
 
 @Entity
 @Getter
@@ -23,6 +26,7 @@ public class TicketOrderEntity {
     private TicketEntity ticket;
 
     @Column(nullable = false)
+    @Min(1)
     private int quantity;
 
 
@@ -30,11 +34,9 @@ public class TicketOrderEntity {
     @JoinColumn(name = "user_id")
     private UserEntity userEntity;
 
-    private Long guestId;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private OrderStatus OrderStatus;
+    private OrderStatus orderStatus;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -49,25 +51,22 @@ public class TicketOrderEntity {
     @Column(nullable = false)
     private LocalDateTime purchaseTimestamp;
 
-    public TicketOrderEntity(TicketEntity ticket, int quantity, UserEntity userEntity, Long guestId, ReceiptMethodType receiptMethod, CollectionAgreementType collectionAgreement) {
+    public TicketOrderEntity(TicketEntity ticket, int quantity, UserEntity userEntity, ReceiptMethodType receiptMethod, CollectionAgreementType collectionAgreement) {
         this.ticket = ticket;
         this.quantity = quantity;
         this.userEntity = userEntity;
-        this.guestId = guestId;
         this.receiptMethod = receiptMethod;
         this.collectionAgreement = collectionAgreement;
         this.totalPrice = ticket.getPrice().multiply(BigDecimal.valueOf(quantity));
         this.purchaseTimestamp = LocalDateTime.now();
-        this.OrderStatus = OrderStatus.PENDING;
+        this.orderStatus = PENDING;
     }
 
-    public void cancelOrder() {
-        this.OrderStatus = OrderStatus.CANCELLED;
-    }
+    public void cancelOrder() { this.orderStatus = CANCELLED; }
 
-    public void confirmOrder() { this.OrderStatus = OrderStatus.CONFIRMED; }
+    public void confirmOrder() { this.orderStatus = CONFIRMED; }
 
-    public void completeOrder() { this.OrderStatus = OrderStatus.COMPLETED; }
+    public void completeOrder() { this.orderStatus = COMPLETED; }
 
-    public void failOrder() { this.OrderStatus = OrderStatus.FAILED; }
+    public void failOrder() { this.orderStatus = FAILED; }
 }

@@ -37,7 +37,6 @@ public class AttractionEntity {
         );
     }
 
-    // 어트랙션 정보 업데이트 메서드
     public void update(String name, String description, String image) {
         this.name = name;
         this.description = description;

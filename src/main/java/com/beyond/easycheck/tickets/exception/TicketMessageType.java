@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum TicketMessageType implements MessageType {
 
-    THEME_PARK_NOT_FOUND("해당 테마파크를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     TICKET_NOT_FOUND("해당 입장권을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     DUPLICATE_TICKET("이미 동일한 티켓이 존재합니다.", HttpStatus.CONFLICT),
     MISSING_REQUIRED_FIELD("필수 입력 항목이 누락되었습니다.", HttpStatus.BAD_REQUEST),
