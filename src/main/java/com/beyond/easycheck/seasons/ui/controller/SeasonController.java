@@ -4,6 +4,7 @@ import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.rooms.exception.RoomMessageType;
 import com.beyond.easycheck.seasons.application.service.SeasonService;
 import com.beyond.easycheck.seasons.exception.SeasonMessageType;
+import com.beyond.easycheck.seasons.infrastructure.repository.SeasonRepository;
 import com.beyond.easycheck.seasons.ui.requestbody.SeasonCreateRequest;
 import com.beyond.easycheck.seasons.ui.requestbody.SeasonUpdateRequest;
 import com.beyond.easycheck.seasons.ui.view.SeasonView;
@@ -23,6 +24,7 @@ import java.util.List;
 public class SeasonController {
 
     private final SeasonService seasonService;
+    private final SeasonRepository seasonRepository;
 
     @PostMapping("")
     @Operation(summary = "시즌 생성 API")
@@ -59,7 +61,11 @@ public class SeasonController {
     public ResponseEntity<Void> updateSeason(@PathVariable Long id, @RequestBody SeasonUpdateRequest seasonUpdateRequest) {
         if (seasonUpdateRequest.getSeasonName() == null || seasonUpdateRequest.getDescription().isEmpty()
                 || seasonUpdateRequest.getStartDate() == null || seasonUpdateRequest.getEndDate() == null) {
-            throw new EasyCheckException(RoomMessageType.ARGUMENT_NOT_VALID);
+            throw new EasyCheckException(SeasonMessageType.ARGUMENT_NOT_VALID);
+        }
+
+        if (!seasonRepository.findById(id).isPresent()) {
+            throw new EasyCheckException(SeasonMessageType.SEASON_NOT_FOUND);
         }
 
         seasonService.updateSeason(id, seasonUpdateRequest);
