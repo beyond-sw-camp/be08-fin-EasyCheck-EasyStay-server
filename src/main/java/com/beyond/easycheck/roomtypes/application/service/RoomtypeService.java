@@ -64,15 +64,11 @@ public class RoomtypeService {
         return roomtypeView;
     }
 
-    @Transactional
     public List<RoomtypeView> readRoomtypes() {
 
         List<RoomtypeEntity> roomTypeEntities = roomTypeRepository.findAll();
 
-        if (roomTypeEntities.isEmpty()) {
-            throw new EasyCheckException(ROOM_TYPE_NOT_FOUND);
-        }
-        List<RoomtypeView> roomtypeViews = roomTypeEntities.stream()
+        return roomTypeEntities.stream()
                 .map(roomTypeEntity -> new RoomtypeView(
                         roomTypeEntity.getRoomTypeId(),
                         roomTypeEntity.getAccommodationEntity().getId(),
@@ -80,8 +76,6 @@ public class RoomtypeService {
                         roomTypeEntity.getDescription(),
                         roomTypeEntity.getMaxOccupancy()
                 )).collect(Collectors.toList());
-
-        return roomtypeViews;
     }
 
     @Transactional
