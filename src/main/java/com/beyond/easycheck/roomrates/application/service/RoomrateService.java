@@ -37,15 +37,15 @@ public class RoomrateService {
     @Transactional
     public void createRoomrate(RoomrateCreateRequest roomrateCreateRequest) {
 
-        if (roomrateCreateRequest.getRateType() == null || roomrateCreateRequest.getRate() == null) {
-            throw new EasyCheckException(RoomrateMessageType.ARGUMENT_NOT_VALID);
-        }
-
         RoomEntity room = roomRepository.findById(roomrateCreateRequest.getRoomEntity())
                 .orElseThrow(() -> new EasyCheckException(ROOM_NOT_FOUND));
 
         SeasonEntity season = seasonRepository.findById(roomrateCreateRequest.getSeasonEntity())
                 .orElseThrow(() -> new EasyCheckException(SEASON_NOT_FOUND));
+
+        if (roomrateCreateRequest.getRateType() == null || roomrateCreateRequest.getRate() == null) {
+            throw new EasyCheckException(RoomrateMessageType.ARGUMENT_NOT_VALID);
+        }
 
         RoomrateEntity roomrate = RoomrateEntity.builder()
                 .roomEntity(room)
@@ -121,7 +121,6 @@ public class RoomrateService {
         }
 
         roomrate.update(roomrateUpdateRequest, roomEntity, seasonEntity);
-
         roomrateRepository.save(roomrate);
     }
 
