@@ -5,7 +5,7 @@ import com.beyond.easycheck.rooms.infrastructure.entity.DailyRoomAvailabilityEnt
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomStatus;
 import com.beyond.easycheck.rooms.infrastructure.repository.DailyRoomAvailabilityRepository;
-import com.beyond.easycheck.rooms.infrastructure.repository.ImageRepository;
+import com.beyond.easycheck.rooms.infrastructure.repository.RoomImageRepository;
 import com.beyond.easycheck.rooms.infrastructure.repository.RoomRepository;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomCreateRequest;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomUpdateRequest;
@@ -36,7 +36,7 @@ public class RoomService {
 
     private final RoomRepository roomRepository;
     private final RoomtypeRepository roomTypeRepository;
-    private final ImageRepository imageRepository;
+    private final RoomImageRepository roomImageRepository;
     private final DailyRoomAvailabilityRepository dailyRoomAvailabilityRepository;
     private final S3Service s3Service;
 
@@ -76,7 +76,7 @@ public class RoomService {
         roomRepository.save(room);
         addImagesToRoom(room, imageUrls);
 
-        return roomRepository.save(room);
+        return room;
     }
 
     public void initializeRoomAvailability(RoomEntity roomEntity) {
@@ -171,7 +171,7 @@ public class RoomService {
 
     @Transactional
     public void updateRoomImage(Long imageId, MultipartFile newImageFile) {
-        RoomEntity.ImageEntity imageToUpdate = imageRepository.findById(imageId)
+        RoomEntity.ImageEntity imageToUpdate = roomImageRepository.findById(imageId)
                 .orElseThrow(() -> new EasyCheckException(IMAGE_NOT_FOUND));
 
         String oldImageUrl = imageToUpdate.getUrl();
