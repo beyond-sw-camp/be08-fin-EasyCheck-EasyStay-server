@@ -13,9 +13,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -29,19 +31,19 @@ public class ThemeParkController {
     private final ThemeParkReadUseCase themeParkReadUseCase;
 
     @Operation(summary = "테마파크를 등록하는 API")
-    @PostMapping("")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponseView<ThemeParkView>> createThemePark(
             @PathVariable Long accommodationId,
-            @RequestBody @Validated ThemeParkCreateRequest request) {
+            @RequestPart("request") @Validated ThemeParkCreateRequest request,  // JSON 데이터
+            @RequestPart("imageFiles") List<MultipartFile> imageFiles) {
 
         ThemeParkCreateCommand command = ThemeParkCreateCommand.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .location(request.getLocation())
-                .image(request.getImage())
                 .build();
 
-        FindThemeParkResult result = themeParkOperationUseCase.saveThemePark(command, accommodationId);
+        FindThemeParkResult result = themeParkOperationUseCase.saveThemePark(command, accommodationId, imageFiles);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponseView<>(new ThemeParkView(result)));
@@ -75,16 +77,16 @@ public class ThemeParkController {
     public ResponseEntity<ApiResponseView<ThemeParkView>> updateThemePark(
             @PathVariable Long accommodationId,
             @PathVariable Long id,
-            @RequestBody @Validated ThemeParkUpdateRequest request) {
+            @RequestPart("request") @Validated ThemeParkCreateRequest request,  // JSON 데이터
+            @RequestPart("imageFiles") List<MultipartFile> imageFiles) {
 
         ThemeParkUpdateCommand command = ThemeParkUpdateCommand.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .location(request.getLocation())
-                .image(request.getImage())
                 .build();
 
-        FindThemeParkResult result = themeParkOperationUseCase.updateThemePark(id, command, accommodationId);
+        FindThemeParkResult result = themeParkOperationUseCase.updateThemePark(id, command, accommodationId, imageFiles);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponseView<>(new ThemeParkView(result)));
