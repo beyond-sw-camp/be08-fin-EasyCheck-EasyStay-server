@@ -3,21 +3,24 @@ package com.beyond.easycheck.roomtypes.application.service;
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationType;
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
-import com.beyond.easycheck.roomtypes.infrastructure.entity.RoomtypeEntity;
+import com.beyond.easycheck.common.exception.EasyCheckException;
+import com.beyond.easycheck.roomtypes.exception.RoomtypeMessageType;
 import com.beyond.easycheck.roomtypes.ui.requestbody.RoomtypeCreateRequest;
 import com.beyond.easycheck.roomtypes.ui.view.RoomtypeView;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles(profiles = {"test"})
@@ -35,6 +38,7 @@ class RoomtypeServiceTest {
     void readRoomtype() {
         // given
         Long accommodationId = 1L;
+        Long roomTypeId = 1L; // RoomType ID 추가
         AccommodationEntity accommodation = AccommodationEntity.builder()
                 .id(accommodationId) // AccommodationEntity의 id를 수동으로 설정
                 .name("호텔")
@@ -42,20 +46,39 @@ class RoomtypeServiceTest {
                 .accommodationType(AccommodationType.HOTEL)
                 .build();
 
-        accommodationRepository.save(accommodation);
+        accommodationRepository.save(accommodation); // Accommodation 저장
+
+        // RoomType 데이터 추가
+        RoomtypeCreateRequest roomtypeRequest = new RoomtypeCreateRequest(roomTypeId, "디럭스", "아늑한 룸", 1);
+        roomtypeService.createRoomtype(roomtypeRequest); // RoomType 생성
 
         // when
-        RoomtypeView result = roomtypeService.readRoomtype(accommodationId);
+        RoomtypeView result = roomtypeService.readRoomtype(roomTypeId); // RoomType ID로 조회
 
         // then
         Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.getRoomTypeId()).isEqualTo(1L);
-        Assertions.assertThat(result.getAccomodationId()).isEqualTo(accommodationId);
-        Assertions.assertThat(result.getTypeName()).isEqualTo("디럭스");
-        Assertions.assertThat(result.getDescription()).isEqualTo("아늑한 룸");
-        Assertions.assertThat(result.getMaxOccupancy()).isEqualTo(1);
+        Assertions.assertThat(result.getRoomTypeId()).isEqualTo(roomTypeId); // RoomType ID 검증
+        Assertions.assertThat(result.getTypeName()).isEqualTo("디럭스"); // RoomType 이름 검증
+        Assertions.assertThat(result.getDescription()).isEqualTo("아늑한 룸"); // RoomType 설명 검증
+        Assertions.assertThat(result.getMaxOccupancy()).isEqualTo(1); // 최대 수용 인원 검증
+    }
+
+    @Test
+    @DisplayName("[객실 유형 조회] - 객실 유형 찾기 실패")
+    void readRoomtype_fail(){
+        // given
+        Long nonExistentRoomTypeId = 999L;
+
+        // when & then
+        Assertions.assertThatThrownBy(
+                () -> {
+                    roomtypeService.readRoomtype(nonExistentRoomTypeId);
+                })
+                .isInstanceOf(EasyCheckException.class)
+                .hasMessage(RoomtypeMessageType.ROOM_TYPE_NOT_FOUND.getMessage());
 
     }
+
 
     @Test
     @DisplayName("[객실 유형 목록 조회] - 성공")
@@ -80,12 +103,14 @@ class RoomtypeServiceTest {
 
     @Test
     @DisplayName("[객실 유형 목록 조회] - 빈 리스트")
+    @Transactional(readOnly = true)
     void readRoomtypes_emptyList(){
-        // when
-        List<RoomtypeView> result = roomtypeService.readRoomtypes();
 
+        // given
+        // when
+        List<RoomtypeView> roomtypeViews = roomtypeService.readRoomtypes();
         // then
-        Assertions.assertThat(result).isEmpty(); // 결과는 빈 리스트여야함.
+        assertThat(roomtypeViews.size()).isZero();
     }
 
 

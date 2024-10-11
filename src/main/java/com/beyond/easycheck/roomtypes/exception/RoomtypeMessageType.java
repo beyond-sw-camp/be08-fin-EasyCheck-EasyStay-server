@@ -9,8 +9,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum RoomtypeMessageType implements MessageType {
 
-    ROOM_TYPE_NOT_FOUND("해당 RoomType ID를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
-    ;
+    ROOM_TYPE_NOT_FOUND("해당 RoomType ID를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 
     private final String message;
     private final HttpStatus status;
