@@ -1,9 +1,11 @@
 package com.beyond.easycheck.roomrates.ui.controller;
 
+import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.roomrates.application.service.RoomrateService;
 import com.beyond.easycheck.roomrates.ui.requestbody.RoomrateCreateRequest;
 import com.beyond.easycheck.roomrates.ui.requestbody.RoomrateUpdateRequest;
 import com.beyond.easycheck.roomrates.ui.view.RoomrateView;
+import com.beyond.easycheck.rooms.infrastructure.repository.RoomRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -12,7 +14,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
+
+import static com.beyond.easycheck.roomrates.exception.RoomrateMessageType.ARGUMENT_NOT_VALID;
+import static com.beyond.easycheck.rooms.exception.RoomMessageType.ROOM_NOT_FOUND;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +27,7 @@ import java.util.List;
 public class RoomrateController {
 
     private final RoomrateService roomrateService;
+    private final RoomRepository roomRepository;
 
     @PostMapping("")
     @Operation(summary = "객실 요금 생성 API")
@@ -46,6 +53,18 @@ public class RoomrateController {
     @PutMapping("/{id}")
     @Operation(summary = "객실 요금 수정 API")
     public ResponseEntity<Void> updateRoomrate(@PathVariable Long id, @RequestBody RoomrateUpdateRequest roomrateUpdateRequest) {
+        if (roomrateUpdateRequest.getRate() == null || roomrateUpdateRequest.getRateType() == null) {
+            throw new EasyCheckException(ARGUMENT_NOT_VALID);
+        }
+
+        if (roomrateUpdateRequest.getRate().compareTo(BigDecimal.ZERO) < 0) {
+            throw new EasyCheckException(ARGUMENT_NOT_VALID);
+        }
+
+        if (!roomRepository.findById(roomrateUpdateRequest.getRoomEntity()).isPresent()) {
+            throw new EasyCheckException(ROOM_NOT_FOUND);
+        }
+
         roomrateService.updateRoomrate(id, roomrateUpdateRequest);
         return ResponseEntity.noContent().build();
     }
@@ -56,4 +75,5 @@ public class RoomrateController {
         roomrateService.deleteRoomrate(id);
         return ResponseEntity.noContent().build();
     }
+    
 }

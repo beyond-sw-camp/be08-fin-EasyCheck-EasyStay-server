@@ -1,6 +1,7 @@
 package com.beyond.easycheck.roomrates.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
+import com.beyond.easycheck.roomrates.exception.RoomrateMessageType;
 import com.beyond.easycheck.roomrates.infrastructure.entity.RoomrateEntity;
 import com.beyond.easycheck.roomrates.infrastructure.repository.RoomrateRepository;
 import com.beyond.easycheck.roomrates.ui.requestbody.RoomrateCreateRequest;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.beyond.easycheck.roomrates.exception.RoomrateMessageType.ROOM_RATE_NOT_FOUND;
+import static com.beyond.easycheck.roomrates.exception.RoomrateMessageType.*;
 import static com.beyond.easycheck.rooms.exception.RoomMessageType.ROOM_NOT_FOUND;
 import static com.beyond.easycheck.roomtypes.exception.RoomtypeMessageType.ROOM_TYPE_NOT_FOUND;
 import static com.beyond.easycheck.seasons.exception.SeasonMessageType.SEASON_NOT_FOUND;
@@ -42,6 +43,10 @@ public class RoomrateService {
         SeasonEntity season = seasonRepository.findById(roomrateCreateRequest.getSeasonEntity())
                 .orElseThrow(() -> new EasyCheckException(SEASON_NOT_FOUND));
 
+        if (roomrateCreateRequest.getRateType() == null || roomrateCreateRequest.getRate() == null) {
+            throw new EasyCheckException(RoomrateMessageType.ARGUMENT_NOT_VALID);
+        }
+
         RoomrateEntity roomrate = RoomrateEntity.builder()
                 .roomEntity(room)
                 .seasonEntity(season)
@@ -49,7 +54,7 @@ public class RoomrateService {
                 .rate(roomrateCreateRequest.getRate())
                 .build();
 
-        roomrate = roomrateRepository.save(roomrate);
+       roomrateRepository.save(roomrate);
     }
 
     public RoomrateView readRoomrate(Long id) {
@@ -84,7 +89,7 @@ public class RoomrateService {
         List<RoomrateEntity> roomrateEntities = roomrateRepository.findAll();
 
         if (roomrateEntities.isEmpty()) {
-            throw new EasyCheckException(ROOM_RATE_NOT_FOUND);
+            throw new EasyCheckException(ROOM_RATES_NOT_FOUND);
         }
         List<RoomrateView> roomrateViews = roomrateEntities.stream()
                 .map(roomrateEntity -> new RoomrateView(
@@ -111,8 +116,11 @@ public class RoomrateService {
         SeasonEntity seasonEntity = seasonRepository.findById(roomrateUpdateRequest.getSeasonEntity())
                 .orElseThrow(() -> new EasyCheckException(SEASON_NOT_FOUND));
 
-        roomrate.update(roomrateUpdateRequest, roomEntity, seasonEntity);
+        if(roomrateUpdateRequest.getRateType() == null || roomrateUpdateRequest.getRate() == null) {
+            throw new EasyCheckException(ARGUMENT_NOT_VALID);
+        }
 
+        roomrate.update(roomrateUpdateRequest, roomEntity, seasonEntity);
         roomrateRepository.save(roomrate);
     }
 
