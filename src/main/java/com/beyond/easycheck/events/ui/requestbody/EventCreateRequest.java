@@ -19,9 +19,6 @@ public class EventCreateRequest {
     private String eventName;
 
     @NotBlank
-    private String image;
-
-    @NotBlank
     private String detail;
 
     @NotNull(message = "이벤트 시작 날짜를 지정해야 합니다.")
@@ -31,4 +28,5 @@ public class EventCreateRequest {
     @NotNull(message = "이벤트 종료 날짜를 지정해야 합니다.")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
+
 }
