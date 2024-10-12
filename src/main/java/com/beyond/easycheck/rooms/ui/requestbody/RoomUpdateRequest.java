@@ -16,9 +16,6 @@ public class RoomUpdateRequest {
     @NotBlank
     private String roomNumber;
 
-    @NotBlank
-    private String roomPic;
-
     @NotNull @Max(10)
     private int roomAmount;
 

@@ -3,6 +3,7 @@ package com.beyond.easycheck.rooms.ui.controller;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.rooms.application.service.RoomService;
 import com.beyond.easycheck.rooms.exception.RoomMessageType;
+import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomCreateRequest;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomUpdateRequest;
 import com.beyond.easycheck.rooms.ui.view.RoomView;
@@ -29,10 +30,12 @@ public class RoomController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "객실 생성 API")
-    public ResponseEntity<Void> createRoom(@RequestPart("description") @Valid RoomCreateRequest roomCreateRequest,
-                                            @RequestPart("pic") List<MultipartFile> imageFiles) {
-        roomService.createRoom(roomCreateRequest, imageFiles);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<RoomEntity> createRoom(
+            @RequestPart("description") @Valid RoomCreateRequest roomCreateRequest,
+            @RequestPart("pic") List<MultipartFile> imageFiles) {
+
+        RoomEntity createdRoom = roomService.createRoom(roomCreateRequest, imageFiles);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdRoom);
     }
 
     @GetMapping("/{id}")
@@ -61,9 +64,9 @@ public class RoomController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping(value = "/{imageId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/images/{imageId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "객실 사진 수정 API")
-    public ResponseEntity<Void> updateRoomImage(@PathVariable Long imageId, @RequestParam MultipartFile newImageFile) {
+    public ResponseEntity<Void> updateRoomImage(@PathVariable Long imageId, @RequestPart MultipartFile newImageFile) {
         roomService.updateRoomImage(imageId, newImageFile);
         return ResponseEntity.noContent().build();
     }
