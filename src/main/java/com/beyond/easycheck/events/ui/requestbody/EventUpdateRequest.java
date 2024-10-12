@@ -21,9 +21,6 @@ public class EventUpdateRequest {
     private String eventName;
 
     @NotBlank
-    private String image;
-
-    @NotBlank
     private String detail;
 
     @NotNull(message = "이벤트 시작 날짜를 지정해야 합니다.")

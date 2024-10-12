@@ -8,8 +8,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,10 +23,13 @@ public class EventController {
 
     private final EventService eventService;
 
-    @PostMapping("")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "이벤트 생성 API")
-    public ResponseEntity<Void> createEvent(@RequestBody EventCreateRequest eventCreateRequest) {
-        eventService.createEvent(eventCreateRequest);
+    public ResponseEntity<Void> createEvent(
+            @RequestPart("description") EventCreateRequest eventCreateRequest,
+            @RequestPart("Image") List<MultipartFile> imageFiles) {
+
+        eventService.createEvent(eventCreateRequest, imageFiles);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -42,10 +47,17 @@ public class EventController {
         return ResponseEntity.ok().body(eventViews);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @Operation(summary = "이벤트 수정 API")
     public ResponseEntity<Void> updateEvent(@PathVariable Long id, @RequestBody EventUpdateRequest eventUpdateRequest) {
         eventService.updateEvent(id, eventUpdateRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping(value = "/images/{imageId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "이벤트 사진 수정 API")
+    public ResponseEntity<Void> updateEventImage(@PathVariable Long imageId, @RequestPart MultipartFile newImageFile) {
+        eventService.updateEventImage(imageId, newImageFile);
         return ResponseEntity.noContent().build();
     }
 
