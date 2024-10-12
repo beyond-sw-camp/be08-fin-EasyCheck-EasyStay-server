@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static com.beyond.easycheck.roomrates.exception.RoomrateMessageType.ARGUMENT_NOT_VALID;
@@ -56,6 +57,10 @@ public class RoomrateController {
             throw new EasyCheckException(ARGUMENT_NOT_VALID);
         }
 
+        if (roomrateUpdateRequest.getRate().compareTo(BigDecimal.ZERO) < 0) {
+            throw new EasyCheckException(ARGUMENT_NOT_VALID);
+        }
+
         if (!roomRepository.findById(roomrateUpdateRequest.getRoomEntity()).isPresent()) {
             throw new EasyCheckException(ROOM_NOT_FOUND);
         }
@@ -70,4 +75,5 @@ public class RoomrateController {
         roomrateService.deleteRoomrate(id);
         return ResponseEntity.noContent().build();
     }
+    
 }

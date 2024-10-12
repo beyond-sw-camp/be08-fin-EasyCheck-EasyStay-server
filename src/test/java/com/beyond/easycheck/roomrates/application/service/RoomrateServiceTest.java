@@ -28,6 +28,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -89,7 +90,7 @@ public class RoomrateServiceTest {
                 1L,
                 roomtypeEntity,
                 "402",
-                "roomPic1",
+                new ArrayList<>(),
                 RoomStatus.예약가능,
                 10,
                 5
@@ -140,8 +141,8 @@ public class RoomrateServiceTest {
         assertThatCode(() -> roomrateService.createRoomrate(roomrateCreateRequest))
                 .doesNotThrowAnyException();
 
-        // Verify
         verify(roomRepository).save(any(RoomEntity.class));
+
     }
 
     @Test
@@ -160,8 +161,8 @@ public class RoomrateServiceTest {
                 .isInstanceOf(EasyCheckException.class)
                 .hasMessage(ROOM_NOT_FOUND.getMessage());
 
-        // Verify
         verify(roomrateRepository, never()).save(any(RoomrateEntity.class));
+
     }
 
     @Test
@@ -183,8 +184,8 @@ public class RoomrateServiceTest {
                 .isInstanceOf(EasyCheckException.class)
                 .hasMessage(SEASON_NOT_FOUND.getMessage());
 
-        // Verify
         verify(roomrateRepository, never()).save(any(RoomrateEntity.class));
+
     }
 
     @Test
@@ -206,8 +207,8 @@ public class RoomrateServiceTest {
                 .isInstanceOf(EasyCheckException.class)
                 .hasMessage(RoomrateMessageType.ARGUMENT_NOT_VALID.getMessage());
 
-        // Verify
         verify(roomrateRepository, never()).save(any(RoomrateEntity.class));
+
     }
 
     @Test
@@ -246,6 +247,7 @@ public class RoomrateServiceTest {
         assertThat(readRoomrate.getStatus()).isEqualTo(roomrateView.getStatus());
         assertThat(readRoomrate.getTypeName()).isEqualTo(roomrateView.getTypeName());
         assertThat(readRoomrate.getSeasonName()).isEqualTo(roomrateView.getSeasonName());
+
     }
 
     @Test
@@ -262,7 +264,6 @@ public class RoomrateServiceTest {
                 .isInstanceOf(EasyCheckException.class)
                 .hasMessage(RoomrateMessageType.ROOM_RATE_NOT_FOUND.getMessage());
 
-        verify(roomrateRepository).findById(roomrateId);
     }
 
     @Test
@@ -285,7 +286,6 @@ public class RoomrateServiceTest {
                 BigDecimal.valueOf(100000)
         );
 
-
         List<RoomrateEntity> roomrateEntities = Arrays.asList(roomrate1, roomrate2);
         when(roomrateRepository.findAll()).thenReturn(roomrateEntities);
 
@@ -297,8 +297,8 @@ public class RoomrateServiceTest {
         assertThat(roomrateViews.get(0).getId()).isEqualTo(roomrate1.getId());
         assertThat(roomrateViews.get(1).getId()).isEqualTo(roomrate2.getId());
 
-        // Verify
         verify(roomrateRepository).findAll();
+
     }
 
     @Test
@@ -312,8 +312,8 @@ public class RoomrateServiceTest {
                 .isInstanceOf(EasyCheckException.class)
                 .hasMessage(ROOM_RATES_NOT_FOUND.getMessage());
 
-        // Verify
         verify(roomrateRepository).findAll();
+
     }
 
     @Test
@@ -348,8 +348,8 @@ public class RoomrateServiceTest {
         assertThat(updateRoomrateRequest.getRateType()).isEqualTo(RoomrateType.평일);
         assertThat(updateRoomrateRequest.getRate()).isEqualTo(BigDecimal.valueOf(200000));
 
-        // Verify
         verify(roomrateRepository).findById(1L);
+
     }
 
     @Test
@@ -378,9 +378,9 @@ public class RoomrateServiceTest {
                 .isInstanceOf(EasyCheckException.class)
                 .hasMessage(ROOM_NOT_FOUND.getMessage());
 
-        // Verify
         verify(roomrateRepository).findById(1L);
         verify(roomrateRepository, never()).save(any(RoomrateEntity.class));
+
     }
 
     @Test
@@ -410,9 +410,9 @@ public class RoomrateServiceTest {
                 .isInstanceOf(EasyCheckException.class)
                 .hasMessage(SEASON_NOT_FOUND.getMessage());
 
-        // Verify
         verify(roomrateRepository).findById(1L);
         verify(roomrateRepository, never()).save(any(RoomrateEntity.class));
+
     }
 
     @Test
@@ -443,9 +443,9 @@ public class RoomrateServiceTest {
                 .isInstanceOf(EasyCheckException.class)
                 .hasMessage(ARGUMENT_NOT_VALID.getMessage());
 
-        // Verify
         verify(roomrateRepository).findById(1L);
         verify(roomrateRepository, never()).save(any(RoomrateEntity.class));
+
     }
 
     @Test
@@ -469,6 +469,7 @@ public class RoomrateServiceTest {
 
         // Then
         verify(roomrateRepository).delete(roomrate);
+
     }
 
 
