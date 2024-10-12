@@ -14,6 +14,4 @@ public class ThemeParkUpdateRequest {
     private String description;
 
     private String location;
-
-    private String image;
 }

@@ -4,6 +4,8 @@ import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase.
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ThemeParkView {
@@ -12,13 +14,13 @@ public class ThemeParkView {
     private final String name;
     private final String description;
     private final String location;
-    private final String image;
+    private final List<String> imageUrls;
 
     public ThemeParkView(FindThemeParkResult themePark) {
         this.id = themePark.getId();
         this.name = themePark.getName();
         this.description = themePark.getDescription();
         this.location = themePark.getLocation();
-        this.image = themePark.getImage();
+        this.imageUrls = themePark.getImageUrls();
     }
 }

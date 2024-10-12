@@ -14,6 +14,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -42,6 +44,26 @@ public class S3Service implements S3OperationUseCase, S3ReadUseCase {
         return s3client.getUrl(bucketName, fileName).toString();
     }
 
+    public List<String> uploadFiles(List<MultipartFile> files, FileManagementCategory category) {
+        List<String> uploadedUrls = new ArrayList<>();
+        for (MultipartFile file : files) {
+            String fileUrl = uploadFile(file, category);
+            uploadedUrls.add(fileUrl);
+        }
+        return uploadedUrls;
+    }
+
+    public void deleteFile(String fileUrl) {
+        s3client.deleteObject(bucketName, fileUrl);
+    }
+
+    public void deleteFiles(List<String> fileUrls) {
+        for (String fileUrl : fileUrls) {
+            String fileName = extractFileNameFromUrl(fileUrl);
+            s3client.deleteObject(bucketName, fileName);
+        }
+    }
+
     private File convertMultiPartToFile(MultipartFile file) throws IOException {
         File convertedFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
         try (FileOutputStream fos = new FileOutputStream(convertedFile)) {
@@ -66,5 +88,9 @@ public class S3Service implements S3OperationUseCase, S3ReadUseCase {
 
     private String getFileExtension(String fileName) {
         return fileName.substring(fileName.lastIndexOf("."));
+    }
+
+    private String extractFileNameFromUrl(String fileUrl) {
+        return fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
     }
 }

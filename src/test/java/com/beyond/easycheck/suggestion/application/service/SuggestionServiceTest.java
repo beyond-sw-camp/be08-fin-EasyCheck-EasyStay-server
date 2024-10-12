@@ -2,8 +2,6 @@ package com.beyond.easycheck.suggestion.application.service;
 
 import com.beyond.easycheck.accomodations.exception.AccommodationMessageType;
 import com.beyond.easycheck.common.exception.EasyCheckException;
-import com.beyond.easycheck.notices.exception.NoticesMessageType;
-import com.beyond.easycheck.notices.ui.requestbody.NoticesCreateRequest;
 import com.beyond.easycheck.suggestion.exception.SuggestionMessageType;
 import com.beyond.easycheck.suggestion.infrastructure.persistence.entity.AgreementType;
 import com.beyond.easycheck.suggestion.infrastructure.persistence.entity.SuggestionEntity;
@@ -20,8 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles(profiles = {"test"})

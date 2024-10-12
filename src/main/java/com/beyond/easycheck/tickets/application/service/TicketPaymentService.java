@@ -7,7 +7,6 @@ import com.beyond.easycheck.tickets.infrastructure.entity.TicketPaymentEntity;
 import com.beyond.easycheck.tickets.infrastructure.repository.TicketOrderRepository;
 import com.beyond.easycheck.tickets.infrastructure.repository.TicketPaymentRepository;
 import com.beyond.easycheck.tickets.ui.requestbody.TicketPaymentRequest;
-import com.beyond.easycheck.user.exception.UserMessageType;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;

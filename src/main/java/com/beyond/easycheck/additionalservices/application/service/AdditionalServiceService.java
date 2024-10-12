@@ -1,5 +1,6 @@
 package com.beyond.easycheck.additionalservices.application.service;
 
+import com.beyond.easycheck.accomodations.exception.AccommodationMessageType;
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
 import com.beyond.easycheck.additionalservices.exception.AdditionalServiceMessageType;
@@ -14,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +33,7 @@ public class AdditionalServiceService {
     public Optional<AdditionalServiceEntity> createAdditionalService(AdditionalServiceCreateRequest additionalServiceCreateRequest) {
 
         AccommodationEntity accommodationEntity = accommodationRepository.findById(additionalServiceCreateRequest.getAccommodationId()).orElseThrow(
-                () -> new EasyCheckException(AdditionalServiceMessageType.ADDITIONAL_SERVICE_NOT_FOUND)
+                () -> new EasyCheckException(AccommodationMessageType.ACCOMMODATION_NOT_FOUND)
         );
 
         AdditionalServiceEntity additionalServiceEntity = AdditionalServiceEntity.builder()

@@ -8,6 +8,9 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.beyond.easycheck.rooms.exception.RoomMessageType.ARGUMENT_NOT_VALID;
 
 @Setter
@@ -31,8 +34,8 @@ public class RoomEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private String roomNumber;
 
-    @Column(nullable = false)
-    private String roomPic;
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ImageEntity> images = new ArrayList<>();
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -51,7 +54,6 @@ public class RoomEntity extends BaseTimeEntity {
 
     public void update(RoomUpdateRequest roomUpdateRequest) {
         roomNumber = roomUpdateRequest.getRoomNumber();
-        roomPic = roomUpdateRequest.getRoomPic();
         roomAmount = roomUpdateRequest.getRoomAmount();
         status = roomUpdateRequest.getStatus();
 
@@ -59,4 +61,36 @@ public class RoomEntity extends BaseTimeEntity {
             throw new EasyCheckException(ARGUMENT_NOT_VALID);
         }
     }
+
+    public void addImage(ImageEntity imageEntity) {
+        this.images.add(imageEntity);
+        imageEntity.setRoom(this);
+    }
+
+    @Entity
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Table(name = "room_image")
+    public static class ImageEntity {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(name = "image_id")
+        private Long id;
+
+        @Column(nullable = false)
+        private String url;
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "room_id", nullable = false)
+        private RoomEntity room;
+
+        public static ImageEntity createImage(String url, RoomEntity room) {
+            return new ImageEntity(null, url, room);
+        }
+
+    }
+
 }

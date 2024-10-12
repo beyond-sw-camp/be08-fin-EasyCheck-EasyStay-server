@@ -6,12 +6,14 @@ import com.beyond.easycheck.accomodations.infrastructure.repository.Accommodatio
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomStatus;
+import com.beyond.easycheck.rooms.infrastructure.repository.RoomImageRepository;
 import com.beyond.easycheck.rooms.infrastructure.repository.RoomRepository;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomCreateRequest;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomUpdateRequest;
 import com.beyond.easycheck.rooms.ui.view.RoomView;
 import com.beyond.easycheck.roomtypes.infrastructure.entity.RoomtypeEntity;
 import com.beyond.easycheck.roomtypes.infrastructure.repository.RoomtypeRepository;
+import com.beyond.easycheck.s3.application.service.S3Service;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,15 +22,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.beyond.easycheck.rooms.exception.RoomMessageType.*;
 import static com.beyond.easycheck.roomtypes.exception.RoomtypeMessageType.ROOM_TYPE_NOT_FOUND;
+import static com.beyond.easycheck.s3.application.domain.FileManagementCategory.ROOM;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -39,6 +40,9 @@ import static org.mockito.Mockito.*;
 public class RoomServiceTest {
 
     @Mock
+    private S3Service s3Service;
+
+    @Mock
     private RoomRepository roomRepository;
 
     @Mock
@@ -46,6 +50,9 @@ public class RoomServiceTest {
 
     @Mock
     private AccommodationRepository accommodationRepository;
+
+    @Mock
+    private RoomImageRepository roomImageRepository;
 
     @InjectMocks
     private RoomService roomService;
@@ -95,30 +102,40 @@ public class RoomServiceTest {
         RoomCreateRequest roomCreateRequest = new RoomCreateRequest(
                 1L,
                 "402",
-                "roomPic1",
                 RoomStatus.예약가능,
                 10,
                 5
         );
 
-        RoomEntity roomEntity = new RoomEntity(
-                1L,
-                roomtype1,
-                "402",
-                "roomPic1",
-                RoomStatus.예약가능,
-                10,
-                5
-        );
+        List<MultipartFile> imageFiles = new ArrayList<>();
+        imageFiles.add(mock(MultipartFile.class));
+        imageFiles.add(mock(MultipartFile.class));
+
+        List<String> imageUrls = List.of("url1", "url2");
+        when(s3Service.uploadFiles(imageFiles, ROOM)).thenReturn(imageUrls);
+
+        RoomEntity roomEntity = RoomEntity.builder()
+                .roomNumber("402")
+                .roomTypeEntity(roomtype1)
+                .status(RoomStatus.예약가능)
+                .roomAmount(10)
+                .remainingRoom(5)
+                .build();
 
         when(roomRepository.save(any(RoomEntity.class))).thenReturn(roomEntity);
 
-        // When & Then
-        assertThatCode(() -> roomService.createRoom(roomCreateRequest))
-                .doesNotThrowAnyException();
+        // When
+        RoomEntity createdRoom = roomService.createRoom(roomCreateRequest, imageFiles);
+
+        // Then
+        assertThat(createdRoom).isNotNull();
+        assertThat(createdRoom.getImages()).hasSize(2);
+        assertThat(createdRoom.getImages()).extracting("url").containsExactlyInAnyOrderElementsOf(imageUrls);
 
         // Verify
-        verify(roomRepository).save(any(RoomEntity.class));
+        verify(roomtypeRepository).findById(1L);
+        verify(s3Service).uploadFiles(imageFiles, ROOM);
+        verify(roomRepository, times(1)).save(any(RoomEntity.class));
     }
 
     @Test
@@ -126,20 +143,25 @@ public class RoomServiceTest {
     void createRoom_fail() {
         // Given
         RoomCreateRequest roomCreateRequest = new RoomCreateRequest(
-                10000L,
+                999L,
                 "402",
-                "roomPic1",
                 RoomStatus.예약가능,
                 10,
                 5
         );
 
+        List<MultipartFile> imageFiles = new ArrayList<>();
+        imageFiles.add(mock(MultipartFile.class));
+        imageFiles.add(mock(MultipartFile.class));
+
         // When & Then
-        assertThatThrownBy(() -> roomService.createRoom(roomCreateRequest))
+        assertThatThrownBy(() -> roomService.createRoom(roomCreateRequest, imageFiles))
                 .isInstanceOf(EasyCheckException.class)
                 .hasMessage(ROOM_TYPE_NOT_FOUND.getMessage());
 
         // Verify
+        verify(roomtypeRepository).findById(999L);
+        verify(s3Service, never()).uploadFiles(anyList(), any());
         verify(roomRepository, never()).save(any(RoomEntity.class));
     }
 
@@ -151,45 +173,26 @@ public class RoomServiceTest {
                 1L,
                 roomtype1,
                 "402",
-                "roomPic1",
+                new ArrayList<>(),
                 RoomStatus.예약가능,
                 10,
                 5
         );
 
-        when(roomRepository.findById(1L)).thenReturn(Optional.of(roomEntity));
+        RoomEntity.ImageEntity image1 = new RoomEntity.ImageEntity(1L, "url1", roomEntity);
+        RoomEntity.ImageEntity image2 = new RoomEntity.ImageEntity(2L, "url2", roomEntity);
+        roomEntity.addImage(image1);
+        roomEntity.addImage(image2);
 
-        RoomView roomView = new RoomView(
-                1L,
-                "402",
-                "roomPic1",
-                10,
-                5,
-                RoomStatus.예약가능,
-                roomtype1.getRoomTypeId(),
-                roomtype1.getAccommodationEntity().getId(),
-                roomtype1.getTypeName(),
-                roomtype1.getDescription(),
-                roomtype1.getMaxOccupancy()
-        );
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(roomEntity));
 
         // When
         RoomView readRoom = roomService.readRoom(1L);
 
         // Then
-        assertThat(readRoom.getRoomId()).isEqualTo(roomView.getRoomId());
-        assertThat(readRoom.getRoomNumber()).isEqualTo(roomView.getRoomNumber());
-        assertThat(readRoom.getRoomPic()).isEqualTo(roomView.getRoomPic());
-        assertThat(readRoom.getRoomAmount()).isEqualTo(roomView.getRoomAmount());
-        assertThat(readRoom.getRemainingRoom()).isEqualTo(roomView.getRemainingRoom());
-        assertThat(readRoom.getStatus()).isEqualTo(roomView.getStatus());
-        assertThat(readRoom.getRoomTypeId()).isEqualTo(roomView.getRoomTypeId());
-        assertThat(readRoom.getAccomodationId()).isEqualTo(roomView.getAccomodationId());
-        assertThat(readRoom.getTypeName()).isEqualTo(roomView.getTypeName());
-        assertThat(readRoom.getDescription()).isEqualTo(roomView.getDescription());
-        assertThat(readRoom.getMaxOccupancy()).isEqualTo(roomView.getMaxOccupancy());
+        assertThat(readRoom.getImages()).hasSize(2);
+        assertThat(readRoom.getImages()).containsExactlyInAnyOrder("url1", "url2");
     }
-
 
     @Test
     @DisplayName("객실 단일 조회 실패 - 존재하지 않는 roomID")
@@ -207,7 +210,6 @@ public class RoomServiceTest {
                 .hasMessage(ROOM_NOT_FOUND.getMessage());
 
         verify(roomRepository).findById(roomId);
-
     }
 
     @Test
@@ -218,7 +220,7 @@ public class RoomServiceTest {
                 1L,
                 roomtype1,
                 "402",
-                "roomPic1",
+                new ArrayList<>(),
                 RoomStatus.예약가능,
                 10,
                 5
@@ -228,7 +230,7 @@ public class RoomServiceTest {
                 2L,
                 roomtype2,
                 "403",
-                "roomPic2",
+                new ArrayList<>(),
                 RoomStatus.예약가능,
                 8,
                 3
@@ -272,7 +274,7 @@ public class RoomServiceTest {
                 1L,
                 roomtype1,
                 "402",
-                "roomPic1",
+                new ArrayList<>(),
                 RoomStatus.예약가능,
                 10,
                 5
@@ -280,7 +282,6 @@ public class RoomServiceTest {
 
         RoomUpdateRequest updateRoom = new RoomUpdateRequest(
                 "403",
-                "roomPic2",
                 5,
                 RoomStatus.예약불가
         );
@@ -292,7 +293,6 @@ public class RoomServiceTest {
 
         // Then
         assertThat(existingRoom.getRoomNumber()).isEqualTo("403");
-        assertThat(existingRoom.getRoomPic()).isEqualTo("roomPic2");
         assertThat(existingRoom.getStatus()).isEqualTo(RoomStatus.예약불가);
         assertThat(existingRoom.getRoomAmount()).isEqualTo(5);
 
@@ -308,7 +308,7 @@ public class RoomServiceTest {
                 1L,
                 roomtype1,
                 "402",
-                "roomPic1",
+                new ArrayList<>(),
                 RoomStatus.예약가능,
                 10,
                 5
@@ -316,7 +316,6 @@ public class RoomServiceTest {
 
         RoomUpdateRequest updateRequest = new RoomUpdateRequest(
                 "403",
-                "roomPic2",
                 -5,
                 RoomStatus.예약불가
         );
@@ -334,16 +333,65 @@ public class RoomServiceTest {
     }
 
     @Test
+    @DisplayName("객실 사진 수정 성공")
+    void updateRoomImage_success() {
+        // Given
+        Long imageId = 1L;
+        MultipartFile newImageFile = mock(MultipartFile.class);
+        String oldImageUrl = "s3://bucket/old/image.jpg";
+        String newImageUrl = "s3://bucket/new/image.jpg";
+
+        RoomEntity.ImageEntity imageEntity = new RoomEntity.ImageEntity(imageId, oldImageUrl, null);
+
+        when(roomImageRepository.findById(imageId)).thenReturn(Optional.of(imageEntity));
+        when(s3Service.uploadFile(newImageFile, ROOM)).thenReturn(newImageUrl);
+
+        // When
+        roomService.updateRoomImage(imageId, newImageFile);
+
+        // Then
+        assertThat(imageEntity.getUrl()).isEqualTo(newImageUrl);
+        verify(s3Service).deleteFile("old/image.jpg");
+        verify(roomImageRepository).findById(imageId);
+    }
+
+    @Test
+    @DisplayName("객실 사진 수정 실패 - 존재하지 않는 이미지 ID")
+    void updateRoomImage_fail() {
+        // Given
+        Long imageId = 999L;
+        MultipartFile newImageFile = mock(MultipartFile.class);
+
+        when(roomImageRepository.findById(imageId)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThatThrownBy(() -> roomService.updateRoomImage(imageId, newImageFile))
+                .isInstanceOf(EasyCheckException.class)
+                .hasMessage(IMAGE_NOT_FOUND.getMessage());
+
+        // Verify
+        verify(roomImageRepository).findById(imageId);
+        verify(s3Service, never()).deleteFile(anyString());
+        verify(s3Service, never()).uploadFile(any(MultipartFile.class), eq(ROOM));
+    }
+
+    @Test
     @DisplayName("객실 정보 삭제 성공")
     void deleteRoom_success() {
         // Given
         Long roomId = 1L;
+        String oldImageUrl1 = "s3://bucket/old/image1.jpg";
+        String oldImageUrl2 = "s3://bucket/old/image2.jpg";
 
+        RoomEntity.ImageEntity image1 = new RoomEntity.ImageEntity(1L, oldImageUrl1, null);
+        RoomEntity.ImageEntity image2 = new RoomEntity.ImageEntity(2L, oldImageUrl2, null);
+
+        List<RoomEntity.ImageEntity> images = Arrays.asList(image1, image2);
         RoomEntity roomEntity = new RoomEntity(
                 roomId,
                 roomtype1,
                 "402",
-                "roomPic1",
+                images,
                 RoomStatus.예약가능,
                 10,
                 5
@@ -355,20 +403,26 @@ public class RoomServiceTest {
         roomService.deleteRoom(roomId);
 
         // Then
+        verify(s3Service).deleteFile("old/image1.jpg");
+        verify(s3Service).deleteFile("old/image2.jpg");
         verify(roomRepository).delete(roomEntity);
     }
 
     @Test
     @DisplayName("객실 정보 삭제 실패 - 잘못된 RoomID")
     void deleteRoom_fail() {
+        // Given
         Long roomId = 999L;
 
         when(roomRepository.findById(roomId)).thenReturn(Optional.empty());
+
+        // When & Then
         assertThatThrownBy(() -> roomService.deleteRoom(roomId))
                 .isInstanceOf(EasyCheckException.class)
                 .hasMessage(ROOM_NOT_FOUND.getMessage());
 
+        // Verify
         verify(roomRepository).findById(roomId);
+        verify(roomRepository, never()).delete(any(RoomEntity.class));
     }
-
 }

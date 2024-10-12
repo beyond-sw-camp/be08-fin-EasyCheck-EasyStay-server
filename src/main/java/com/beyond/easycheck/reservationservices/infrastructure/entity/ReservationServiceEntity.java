@@ -2,7 +2,7 @@ package com.beyond.easycheck.reservationservices.infrastructure.entity;
 
 import com.beyond.easycheck.additionalservices.infrastructure.entity.AdditionalServiceEntity;
 import com.beyond.easycheck.common.entity.BaseTimeEntity;
-import com.beyond.easycheck.reservationroom.infrastructure.entity.ReservationRoomEntity;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationRoomEntity;
 import com.beyond.easycheck.reservationservices.ui.requestbody.ReservationServiceUpdateRequest;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
