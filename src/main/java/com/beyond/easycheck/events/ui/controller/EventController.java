@@ -1,5 +1,6 @@
 package com.beyond.easycheck.events.ui.controller;
 
+import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.events.application.service.EventService;
 import com.beyond.easycheck.events.ui.requestbody.EventCreateRequest;
 import com.beyond.easycheck.events.ui.requestbody.EventUpdateRequest;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+
+import static com.beyond.easycheck.events.exception.EventMessageType.ARGUMENT_NOT_VALID;
 
 @RestController
 @RequiredArgsConstructor
@@ -50,6 +53,10 @@ public class EventController {
     @PatchMapping("/{id}")
     @Operation(summary = "이벤트 수정 API")
     public ResponseEntity<Void> updateEvent(@PathVariable Long id, @RequestBody EventUpdateRequest eventUpdateRequest) {
+        if (eventUpdateRequest.getEventName() == null || eventUpdateRequest.getDetail() == null
+                || eventUpdateRequest.getStartDate() == null || eventUpdateRequest.getEndDate() == null) {
+            throw new EasyCheckException(ARGUMENT_NOT_VALID);
+        }
         eventService.updateEvent(id, eventUpdateRequest);
         return ResponseEntity.noContent().build();
     }
