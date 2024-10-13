@@ -131,12 +131,20 @@ public class ReservationRoomService {
                 .filter(entry -> entry.getValue().size() == checkinDate.datesUntil(checkoutDate.plusDays(1)).count()) // 모든 날짜가 존재하는지 확인
                 .map(entry -> {
                     DailyRoomAvailabilityEntity availability = entry.getValue().get(0);
+
+                    RoomEntity roomEntity = availability.getRoomEntity();
+
+                    List<String> imageUrls = roomEntity.getImages().stream()
+                            .map(RoomEntity.ImageEntity::getUrl)
+                            .collect(Collectors.toList());
+
                     return new RoomAvailabilityView(
-                            availability.getRoomEntity().getRoomId(),
-                            availability.getRoomEntity().getRoomTypeEntity().getTypeName(),
-                            availability.getRoomEntity().getRoomNumber(),
+                            roomEntity.getRoomId(),
+                            roomEntity.getRoomTypeEntity().getTypeName(),
+                            roomEntity.getRoomNumber(),
                             availability.getRemainingRoom(),
-                            availability.getStatus()
+                            availability.getStatus(),
+                            imageUrls
                     );
                 })
                 .collect(Collectors.toList());
@@ -179,12 +187,17 @@ public class ReservationRoomService {
                                         .status(RoomStatus.예약가능)
                                         .build());
 
+                        List<String> imageUrls = room.getImages().stream()
+                                .map(RoomEntity.ImageEntity::getUrl)
+                                .collect(Collectors.toList());
+
                         return new RoomAvailabilityView(
                                 room.getRoomId(),
                                 room.getRoomTypeEntity().getTypeName(),
                                 room.getRoomNumber(),
                                 dailyAvailability.getRemainingRoom(),
-                                dailyAvailability.getStatus()
+                                dailyAvailability.getStatus(),
+                                imageUrls
                         );
                     })
                     .collect(Collectors.toList());
