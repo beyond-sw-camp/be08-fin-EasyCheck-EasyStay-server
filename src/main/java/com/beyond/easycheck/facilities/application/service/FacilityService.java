@@ -10,6 +10,7 @@ import com.beyond.easycheck.facilities.infrastructure.repository.FacilityReposit
 import com.beyond.easycheck.facilities.ui.requestbody.FacilityCreateRequest;
 import com.beyond.easycheck.facilities.ui.requestbody.FacilityUpdateRequest;
 import com.beyond.easycheck.facilities.ui.view.FacilityView;
+import com.beyond.easycheck.s3.application.service.S3Service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,10 +18,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.beyond.easycheck.s3.application.domain.FileManagementCategory.FACILITY;
 
 @Service
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
@@ -29,12 +33,32 @@ public class FacilityService {
     private final FacilityRepository facilityRepository;
     private final AccommodationRepository accommodationRepository;
 
+    private final S3Service s3Service;
+
+    private void addImagesToRoom(FacilityEntity facilityEntity, List<String> imageUrls) {
+        List<FacilityEntity.ImageEntity> newImageEntities = imageUrls.stream()
+                .map(url -> FacilityEntity.ImageEntity.createImage(url, facilityEntity))
+                .toList();
+
+        if (facilityEntity.getImages() == null) {
+            facilityEntity.setImages(new ArrayList<>());
+        }
+
+        for (FacilityEntity.ImageEntity newImage : newImageEntities) {
+            if (!facilityEntity.getImages().contains(newImage)) {
+                facilityEntity.addImage(newImage);
+            }
+        }
+    }
+
     @Transactional
-    public Optional<FacilityEntity> createFacility(FacilityCreateRequest facilityCreateRequest) {
+    public FacilityEntity createFacility(FacilityCreateRequest facilityCreateRequest, List<MultipartFile> imageFiles) {
 
         AccommodationEntity accommodationEntity = accommodationRepository.findById(facilityCreateRequest.getAccommodationId()).orElseThrow(
                 () -> new EasyCheckException(AccommodationMessageType.ACCOMMODATION_NOT_FOUND)
         );
+
+        List<String> imageUrls = s3Service.uploadFiles(imageFiles, FACILITY);
 
         FacilityEntity facilityEntity = FacilityEntity.builder()
                 .accommodationEntity(accommodationEntity)
@@ -43,7 +67,10 @@ public class FacilityService {
                 .availableStatus(facilityCreateRequest.getAvailableStatus())
                 .build();
 
-        return Optional.of(facilityRepository.save(facilityEntity));
+        facilityRepository.save(facilityEntity);
+        addImagesToRoom(facilityEntity, imageUrls);
+
+        return facilityRepository.save(facilityEntity);
     }
 
     @Transactional(readOnly = true)
