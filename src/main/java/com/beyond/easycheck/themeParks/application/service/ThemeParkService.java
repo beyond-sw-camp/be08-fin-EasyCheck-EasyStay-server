@@ -1,5 +1,7 @@
 package com.beyond.easycheck.themeparks.application.service;
 
+import com.amazonaws.SdkClientException;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
 import com.beyond.easycheck.common.exception.EasyCheckException;
@@ -7,6 +9,7 @@ import com.beyond.easycheck.s3.application.domain.FileManagementCategory;
 import com.beyond.easycheck.s3.application.service.S3Service;
 import com.beyond.easycheck.themeparks.exception.ThemeParkMessageType;
 import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
+import com.beyond.easycheck.themeparks.infrastructure.repository.ThemeParkImageRepository;
 import com.beyond.easycheck.themeparks.infrastructure.repository.ThemeParkRepository;
 import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +19,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.beyond.easycheck.accomodations.exception.AccommodationMessageType.ACCOMMODATION_NOT_FOUND;
-import static com.beyond.easycheck.themeparks.exception.ThemeParkMessageType.THEME_PARK_DOES_NOT_BELONG_TO_ACCOMMODATION;
+import static com.beyond.easycheck.common.exception.CommonMessageType.IMAGE_UPDATE_FAILED;
+import static com.beyond.easycheck.common.exception.CommonMessageType.NO_IMAGES_PROVIDED;
+import static com.beyond.easycheck.rooms.exception.RoomMessageType.IMAGE_NOT_FOUND;
+import static com.beyond.easycheck.themeparks.exception.ThemeParkMessageType.*;
 
 @Slf4j
 @Service
@@ -29,6 +36,7 @@ import static com.beyond.easycheck.themeparks.exception.ThemeParkMessageType.THE
 public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperationUseCase {
 
     private final ThemeParkRepository themeParkRepository;
+    private final ThemeParkImageRepository themeParkImageRepository;
     private final AccommodationRepository accommodationRepository;
     private final S3Service s3Service;
 
@@ -57,7 +65,7 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
             return FindThemeParkResult.findByThemeParkEntity(themeParkRepository.save(themeParkEntity));
         } catch (DataAccessException | PersistenceException e) {
             log.error("Database error while saving theme park", e);
-            throw new EasyCheckException(ThemeParkMessageType.DATABASE_CONNECTION_FAILED);
+            throw new EasyCheckException(DATABASE_CONNECTION_FAILED);
         } catch (Exception e) {
             log.error("Unknown error while saving theme park", e);
             throw new EasyCheckException(ThemeParkMessageType.UNKNOWN_ERROR);
@@ -66,30 +74,69 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
 
     @Override
     @Transactional
-    public FindThemeParkResult updateThemePark(Long id, ThemeParkUpdateCommand command, Long accommodationId, List<MultipartFile> imageFiles) {
+    public FindThemeParkResult updateThemePark(Long id, ThemeParkUpdateCommand command, Long accommodationId) {
 
         ThemeParkEntity themeParkEntity = themeParkRepository.findById(id)
-                .orElseThrow(() -> new EasyCheckException(ThemeParkMessageType.THEME_PARK_NOT_FOUND));
+                .orElseThrow(() -> new EasyCheckException(THEME_PARK_NOT_FOUND));
 
         validateThemeParkBelongsToAccommodation(themeParkEntity, accommodationId);
         command.validate();
 
         try {
-            if (imageFiles != null && !imageFiles.isEmpty()) {
-                List<String> newImageUrls = s3Service.uploadFiles(imageFiles, FileManagementCategory.THEME_PARK);
-
-                addImagesToThemePark(themeParkEntity, newImageUrls);
-            }
-
             themeParkEntity.update(command.getName(), command.getDescription(), command.getLocation());
 
             return FindThemeParkResult.findByThemeParkEntity(themeParkRepository.save(themeParkEntity));
+
         } catch (DataAccessException | PersistenceException e) {
             log.error("Database error while updating theme park", e);
-            throw new EasyCheckException(ThemeParkMessageType.DATABASE_CONNECTION_FAILED);
+            throw new EasyCheckException(DATABASE_CONNECTION_FAILED);
         } catch (Exception e) {
             log.error("Unknown error while updating theme park", e);
-            throw new EasyCheckException(ThemeParkMessageType.UNKNOWN_ERROR);
+            throw new EasyCheckException(UNKNOWN_ERROR);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void updateThemeParkImages(Long id, List<MultipartFile> imageFiles) {
+        ThemeParkEntity themeParkEntity = themeParkRepository.findById(id)
+                .orElseThrow(() -> new EasyCheckException(ThemeParkMessageType.THEME_PARK_NOT_FOUND));
+
+        if (imageFiles == null || imageFiles.isEmpty()) {
+            throw new EasyCheckException(NO_IMAGES_PROVIDED);
+        }
+
+        List<ThemeParkEntity.ImageEntity> existingImages = themeParkEntity.getImages();
+
+        try {
+            List<String> newImageUrls = s3Service.uploadFiles(imageFiles, FileManagementCategory.THEME_PARK);
+
+            List<String> oldImageUrls = existingImages.stream()
+                    .map(ThemeParkEntity.ImageEntity::getUrl)
+                    .toList();
+
+            List<String> imagesToDelete = oldImageUrls.stream()
+                    .filter(url -> !newImageUrls.contains(url))
+                    .toList();
+
+            List<String> fileNamesToDelete = imagesToDelete.stream()
+                    .map(this::extractFileNameFromUrl)
+                    .toList();
+
+            s3Service.deleteFiles(fileNamesToDelete);
+
+            themeParkEntity.getImages().removeIf(image -> imagesToDelete.contains(image.getUrl()));
+
+            for (String newImageUrl : newImageUrls) {
+                ThemeParkEntity.ImageEntity newImageEntity = ThemeParkEntity.ImageEntity.createImage(newImageUrl, themeParkEntity);
+                themeParkEntity.addImage(newImageEntity);
+            }
+
+            themeParkRepository.save(themeParkEntity);
+
+        } catch (SdkClientException e) {
+            log.error("S3 이미지 삭제/업로드 오류", e);
+            throw new EasyCheckException(IMAGE_UPDATE_FAILED);
         }
     }
 
@@ -97,7 +144,7 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
     @Transactional
     public void deleteThemePark(Long id, Long accommodationId) {
         ThemeParkEntity themeParkEntity = themeParkRepository.findById(id)
-                .orElseThrow(() -> new EasyCheckException(ThemeParkMessageType.THEME_PARK_NOT_FOUND));
+                .orElseThrow(() -> new EasyCheckException(THEME_PARK_NOT_FOUND));
 
         validateThemeParkBelongsToAccommodation(themeParkEntity, accommodationId);
 
@@ -110,7 +157,7 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
             themeParkRepository.deleteById(id);
         } catch (DataAccessException | PersistenceException e) {
             log.error("Database error while deleting theme park", e);
-            throw new EasyCheckException(ThemeParkMessageType.DATABASE_CONNECTION_FAILED);
+            throw new EasyCheckException(DATABASE_CONNECTION_FAILED);
         } catch (Exception e) {
             log.error("Unknown error while deleting theme park", e);
             throw new EasyCheckException(ThemeParkMessageType.UNKNOWN_ERROR);
@@ -161,6 +208,13 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
 
     private ThemeParkEntity retrieveThemeParkEntityById(Long id) {
         return themeParkRepository.findById(id)
-                .orElseThrow(() -> new EasyCheckException(ThemeParkMessageType.THEME_PARK_NOT_FOUND));
+                .orElseThrow(() -> new EasyCheckException(THEME_PARK_NOT_FOUND));
+    }
+
+    private String extractFileNameFromUrl(String url) {
+        String[] parts = url.split("/");
+        return String.join("/", Arrays.copyOfRange(parts, 3, parts.length));
     }
 }
+
+

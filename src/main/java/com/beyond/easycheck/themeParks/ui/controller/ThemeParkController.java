@@ -73,12 +73,11 @@ public class ThemeParkController {
     }
 
     @Operation(summary = "테마파크를 수정하는 API")
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponseView<ThemeParkView>> updateThemePark(
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> updateThemePark(
             @PathVariable Long accommodationId,
             @PathVariable Long id,
-            @RequestPart("request") @Validated ThemeParkCreateRequest request,  // JSON 데이터
-            @RequestPart("imageFiles") List<MultipartFile> imageFiles) {
+            @RequestBody ThemeParkUpdateRequest request) {
 
         ThemeParkUpdateCommand command = ThemeParkUpdateCommand.builder()
                 .name(request.getName())
@@ -86,11 +85,22 @@ public class ThemeParkController {
                 .location(request.getLocation())
                 .build();
 
-        FindThemeParkResult result = themeParkOperationUseCase.updateThemePark(id, command, accommodationId, imageFiles);
+        themeParkOperationUseCase.updateThemePark(id, command, accommodationId);
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponseView<>(new ThemeParkView(result)));
+        return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "테마파크 이미지를 수정하는 API")
+    @PatchMapping(value = "/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> updateThemeParkImages(
+            @PathVariable Long id,
+            @RequestPart List<MultipartFile> imageFiles) {
+
+        themeParkOperationUseCase.updateThemeParkImages(id, imageFiles);
+
+        return ResponseEntity.noContent().build();
+    }
+
 
     @Operation(summary = "테마파크를 삭제하는 API")
     @DeleteMapping("/{id}")

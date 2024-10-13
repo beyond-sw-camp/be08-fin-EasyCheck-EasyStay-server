@@ -1,6 +1,7 @@
 package com.beyond.easycheck.s3.application.service;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.beyond.easycheck.s3.application.domain.FileManagementCategory;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 
 @Slf4j
@@ -60,7 +58,9 @@ public class S3Service implements S3OperationUseCase, S3ReadUseCase {
     public void deleteFiles(List<String> fileUrls) {
         for (String fileUrl : fileUrls) {
             String fileName = extractFileNameFromUrl(fileUrl);
-            s3client.deleteObject(bucketName, fileName);
+            String[] parts = fileName.split("/");
+            String deleteImageUrl = String.join("/", Arrays.copyOfRange(parts, 3, parts.length));
+            s3client.deleteObject(bucketName, deleteImageUrl);
         }
     }
 
