@@ -452,5 +452,5 @@ public class EventServiceTest {
         verify(eventRepository).findById(eventId);
         verify(eventRepository, never()).delete(any(EventEntity.class));
     }
-    
+
 }

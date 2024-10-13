@@ -1,7 +1,11 @@
 package com.beyond.easycheck.events.ui.controller;
 
+import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
+import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.events.application.service.EventService;
+import com.beyond.easycheck.events.infrastructure.entity.EventEntity;
+import com.beyond.easycheck.events.infrastructure.repository.EventRepository;
 import com.beyond.easycheck.events.ui.requestbody.EventCreateRequest;
 import com.beyond.easycheck.events.ui.requestbody.EventUpdateRequest;
 import com.beyond.easycheck.events.ui.view.EventView;
@@ -16,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+import static com.beyond.easycheck.accomodations.exception.AccommodationMessageType.ACCOMMODATION_NOT_FOUND;
 import static com.beyond.easycheck.events.exception.EventMessageType.ARGUMENT_NOT_VALID;
 
 @RestController
@@ -25,15 +30,17 @@ import static com.beyond.easycheck.events.exception.EventMessageType.ARGUMENT_NO
 public class EventController {
 
     private final EventService eventService;
+    private final EventRepository eventRepository;
+    private final AccommodationRepository accommodationRepository;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "이벤트 생성 API")
-    public ResponseEntity<Void> createEvent(
+    public ResponseEntity<EventEntity> createEvent(
             @RequestPart("description") EventCreateRequest eventCreateRequest,
             @RequestPart("Image") List<MultipartFile> imageFiles) {
 
-        eventService.createEvent(eventCreateRequest, imageFiles);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        EventEntity eventEntity = eventService.createEvent(eventCreateRequest, imageFiles);
+        return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(eventEntity); // 생성된 이벤트를 본문에 추가
     }
 
     @GetMapping("/{id}")
@@ -57,6 +64,10 @@ public class EventController {
                 || eventUpdateRequest.getStartDate() == null || eventUpdateRequest.getEndDate() == null) {
             throw new EasyCheckException(ARGUMENT_NOT_VALID);
         }
+
+        AccommodationEntity accommodation = accommodationRepository.findById(eventUpdateRequest.getAccommodationId())
+                .orElseThrow(() -> new EasyCheckException(ACCOMMODATION_NOT_FOUND));
+
         eventService.updateEvent(id, eventUpdateRequest);
         return ResponseEntity.noContent().build();
     }

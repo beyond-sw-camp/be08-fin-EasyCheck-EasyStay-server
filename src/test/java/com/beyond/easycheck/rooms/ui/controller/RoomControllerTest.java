@@ -135,7 +135,7 @@ public class RoomControllerTest {
                 multipart("/api/v1/rooms")
                         .file("pic", imageFiles.get(0).getBytes())
                         .file("pic", imageFiles.get(1).getBytes())
-                        .file("description", objectMapper.writeValueAsBytes(roomCreateRequest)) // 수정된 부분
+                        .file("description", objectMapper.writeValueAsBytes(roomCreateRequest))
                         .contentType(MediaType.MULTIPART_FORM_DATA)
         );
 
