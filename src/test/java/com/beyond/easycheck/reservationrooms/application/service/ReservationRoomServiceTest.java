@@ -2,15 +2,14 @@ package com.beyond.easycheck.reservationrooms.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.mail.application.service.MailService;
-import com.beyond.easycheck.reservationrooms.infrastructure.entity.PaymentStatus;
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationRoomEntity;
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationStatus;
 import com.beyond.easycheck.reservationrooms.infrastructure.repository.ReservationRoomRepository;
 import com.beyond.easycheck.reservationrooms.ui.requestbody.ReservationRoomCreateRequest;
-import com.beyond.easycheck.reservationrooms.ui.requestbody.ReservationRoomUpdateRequest;
-import com.beyond.easycheck.reservationservices.infrastructure.repository.ReservationServiceRepository;
+import com.beyond.easycheck.reservationrooms.ui.view.ReservationRoomView;
 import com.beyond.easycheck.rooms.infrastructure.entity.DailyRoomAvailabilityEntity;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
+import com.beyond.easycheck.rooms.infrastructure.entity.RoomStatus;
 import com.beyond.easycheck.rooms.infrastructure.repository.DailyRoomAvailabilityRepository;
 import com.beyond.easycheck.rooms.infrastructure.repository.RoomRepository;
 import com.beyond.easycheck.roomtypes.infrastructure.entity.RoomtypeEntity;
@@ -24,12 +23,15 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-public class ReservationRoomServiceTest {
+class ReservationRoomServiceTest {
 
     @InjectMocks
     private ReservationRoomService reservationRoomService;
@@ -44,121 +46,169 @@ public class ReservationRoomServiceTest {
     private UserJpaRepository userJpaRepository;
 
     @Mock
-    private MailService mailService;
-
-    @Mock
     private DailyRoomAvailabilityRepository dailyRoomAvailabilityRepository;
 
     @Mock
-    private ReservationServiceRepository reservationServiceRepository;
-
-    private ReservationRoomEntity reservationRoomEntity;
-    private UserEntity userEntity;
-    private RoomEntity roomEntity;
-    private DailyRoomAvailabilityEntity dailyRoomAvailabilityEntity;
+    private MailService mailService;
 
     @BeforeEach
     void setUp() {
-
         MockitoAnnotations.openMocks(this);
-
-        userEntity = mock(UserEntity.class);
-        roomEntity = mock(RoomEntity.class);
-        dailyRoomAvailabilityEntity = mock(DailyRoomAvailabilityEntity.class);
-        reservationRoomEntity = mock(ReservationRoomEntity.class);
-
-        when(userEntity.getEmail()).thenReturn("test@test.com");
-        when(roomEntity.getRoomTypeEntity()).thenReturn(mock(RoomtypeEntity.class));
-        when(roomEntity.getRoomTypeEntity().getTypeName()).thenReturn("Deluxe");
     }
 
     @Test
-    void testCreateReservation_success() {
+    void createReservation_Success() {
 
         // given
-        when(userJpaRepository.findById(1L)).thenReturn(Optional.of(userEntity));
-        when(roomRepository.findById(1L)).thenReturn(Optional.of(roomEntity));
+        Long userId = 1L;
+        Long roomId = 1L;
 
-        LocalDate checkinDate = LocalDate.of(2024, 10, 11);
-        LocalDate checkoutDate = LocalDate.of(2024, 10, 13);
+        UserEntity mockUserEntity = mock(UserEntity.class);
+        when(mockUserEntity.getId()).thenReturn(userId);
+        when(mockUserEntity.getName()).thenReturn("John Doe");
+        when(mockUserEntity.getEmail()).thenReturn("johndoe@example.com");
 
-        when(dailyRoomAvailabilityRepository.findByRoomEntityAndDate(any(), any())).thenReturn(Optional.of(dailyRoomAvailabilityEntity));
-        when(dailyRoomAvailabilityEntity.getRemainingRoom()).thenReturn(1);  // Room available
+        RoomEntity mockRoomEntity = mock(RoomEntity.class);
+        when(mockRoomEntity.getRoomId()).thenReturn(roomId);
 
-        when(reservationRoomRepository.save(any(ReservationRoomEntity.class))).thenReturn(reservationRoomEntity);
+        RoomtypeEntity mockRoomTypeEntity = mock(RoomtypeEntity.class);
+        when(mockRoomTypeEntity.getTypeName()).thenReturn("Deluxe");
 
-        ReservationRoomCreateRequest request = new ReservationRoomCreateRequest();
-        request.setRoom(1L, LocalDateTime.now(), checkinDate, checkoutDate, ReservationStatus.RESERVATION, 10000, null);
+        when(mockRoomEntity.getRoomTypeEntity()).thenReturn(mockRoomTypeEntity);
+
+        ReservationRoomCreateRequest request = new ReservationRoomCreateRequest(
+                roomId,
+                LocalDateTime.now(),
+                LocalDate.of(2024, 10, 1),
+                LocalDate.of(2024, 10, 3),
+                null,
+                10000,
+                null
+        );
+
+        DailyRoomAvailabilityEntity mockDailyAvailability = mock(DailyRoomAvailabilityEntity.class);
+        when(mockDailyAvailability.getRemainingRoom()).thenReturn(5);
+        when(mockDailyAvailability.getStatus()).thenReturn(RoomStatus.예약가능);
+
+        given(userJpaRepository.findById(userId)).willReturn(Optional.of(mockUserEntity));
+        given(roomRepository.findById(roomId)).willReturn(Optional.of(mockRoomEntity));
+        given(dailyRoomAvailabilityRepository.findByRoomEntityAndDate(any(RoomEntity.class), any(LocalDateTime.class)))
+                .willReturn(Optional.of(mockDailyAvailability));
+
+        doNothing().when(mailService).sendReservationConfirmationEmail(anyString(), any(ReservationRoomView.class));
 
         // when
-        ReservationRoomEntity result = reservationRoomService.createReservation(1L, request);
+        ReservationRoomEntity result = reservationRoomService.createReservation(userId, request);
 
         // then
         assertNotNull(result);
-        verify(reservationRoomRepository, times(1)).save(any(ReservationRoomEntity.class));
-        verify(mailService, times(1)).sendReservationConfirmationEmail(anyString(), any());
+        assertEquals(result.getUserEntity(), mockUserEntity);
+        assertEquals(result.getRoomEntity(), mockRoomEntity);
+        assertEquals(result.getTotalPrice(), request.getTotalPrice());
+        verify(reservationRoomRepository).save(any(ReservationRoomEntity.class));
+        verify(mailService).sendReservationConfirmationEmail(eq("johndoe@example.com"), any(ReservationRoomView.class));
     }
 
     @Test
-    void testCreateReservation_userNotFound() {
+    void createReservation_Failure_UserNotFound() {
 
         // given
-        when(userJpaRepository.findById(1L)).thenReturn(Optional.empty());
+        Long userId = 1L;
+        ReservationRoomCreateRequest request = new ReservationRoomCreateRequest(
+                1L,
+                LocalDateTime.now(),
+                LocalDate.of(2024, 10, 1),
+                LocalDate.of(2024, 10, 3),
+                ReservationStatus.RESERVATION,
+                10000,
+                null
+        );
 
-        // when & then
-        ReservationRoomCreateRequest request = new ReservationRoomCreateRequest();
-        request.setRoom(1L, LocalDateTime.now(), LocalDate.of(2024, 10, 11), LocalDate.of(2024, 10, 13),
-                ReservationStatus.RESERVATION, 10000, PaymentStatus.UNPAID);
+        given(userJpaRepository.findById(userId)).willReturn(Optional.empty());
 
-        EasyCheckException exception = assertThrows(EasyCheckException.class, () ->
-                reservationRoomService.createReservation(1L, request));
+        // when / then
+        EasyCheckException exception = assertThrows(EasyCheckException.class,
+                () -> reservationRoomService.createReservation(userId, request));
 
         assertEquals("User not found in the system", exception.getMessage());
     }
 
     @Test
-    void testCreateReservation_roomNotFound() {
+    void createReservation_Failure_RoomNotFound() {
 
         // given
-        when(userJpaRepository.findById(1L)).thenReturn(Optional.of(userEntity));
-        when(roomRepository.findById(1L)).thenReturn(Optional.empty());
+        Long userId = 1L;
+        Long roomId = 1L;
 
-        // when & then
-        ReservationRoomCreateRequest request = new ReservationRoomCreateRequest();
-        request.setRoom(1L, LocalDateTime.now(), LocalDate.of(2024, 10, 11), LocalDate.of(2024, 10, 13),
-                ReservationStatus.RESERVATION, 10000, PaymentStatus.UNPAID);
+        UserEntity mockUserEntity = mock(UserEntity.class);
+        when(mockUserEntity.getId()).thenReturn(userId);
+        when(mockUserEntity.getName()).thenReturn("John Doe");
 
-        EasyCheckException exception = assertThrows(EasyCheckException.class, () ->
-                reservationRoomService.createReservation(1L, request));
+        RoomEntity mockRoomEntity = mock(RoomEntity.class);
+        when(mockRoomEntity.getRoomId()).thenReturn(roomId);
 
-        assertEquals("Room not found", exception.getMessage());
+        ReservationRoomCreateRequest request = new ReservationRoomCreateRequest(
+                roomId,
+                LocalDateTime.now(),
+                LocalDate.of(2024, 10, 1),
+                LocalDate.of(2024, 10, 3),
+                ReservationStatus.RESERVATION,
+                10000,
+                null
+        );
+
+        given(userJpaRepository.findById(userId)).willReturn(Optional.of(mockUserEntity));
+        given(roomRepository.findById(roomId)).willReturn(Optional.empty());
+
+        // when / then
+        EasyCheckException exception = assertThrows(EasyCheckException.class,
+                () -> reservationRoomService.createReservation(userId, request));
+
+        assertEquals("해당 ID의 룸이 존재하지 않습니다.", exception.getMessage());
     }
 
     @Test
-    void testCancelReservation_success() {
+    void getReservationById_Success() {
 
         // given
-        when(reservationRoomRepository.findById(1L)).thenReturn(Optional.of(reservationRoomEntity));
+        Long reservationId = 1L;
 
-        LocalDate checkinDate = LocalDate.of(2024, 10, 11);
-        LocalDate checkoutDate = LocalDate.of(2024, 10, 13);
-        when(reservationRoomEntity.getCheckinDate()).thenReturn(checkinDate);
-        when(reservationRoomEntity.getCheckoutDate()).thenReturn(checkoutDate);
-        when(reservationRoomEntity.getRoomEntity()).thenReturn(roomEntity);
+        UserEntity mockUserEntity = mock(UserEntity.class);
+        when(mockUserEntity.getName()).thenReturn("John Doe");
 
-        when(dailyRoomAvailabilityRepository.findByRoomEntityAndDate(any(RoomEntity.class), any(LocalDateTime.class)))
-                .thenReturn(Optional.of(dailyRoomAvailabilityEntity));
+        RoomtypeEntity mockRoomTypeEntity = mock(RoomtypeEntity.class);
+        when(mockRoomTypeEntity.getTypeName()).thenReturn("Deluxe");
 
-        when(dailyRoomAvailabilityEntity.getRemainingRoom()).thenReturn(1);
+        RoomEntity mockRoomEntity = mock(RoomEntity.class);
+        when(mockRoomEntity.getRoomId()).thenReturn(1L);
+        when(mockRoomEntity.getImages()).thenReturn(List.of());
+        when(mockRoomEntity.getRoomTypeEntity()).thenReturn(mockRoomTypeEntity);
 
-        ReservationRoomUpdateRequest updateRequest = new ReservationRoomUpdateRequest();
-        updateRequest.setReservationStatus(ReservationStatus.CANCELED);
+        ReservationRoomEntity reservationRoomEntity = mock(ReservationRoomEntity.class);
+        when(reservationRoomEntity.getRoomEntity()).thenReturn(mockRoomEntity);
+        when(reservationRoomEntity.getUserEntity()).thenReturn(mockUserEntity);
+
+        given(reservationRoomRepository.findById(reservationId)).willReturn(Optional.of(reservationRoomEntity));
 
         // when
-        reservationRoomService.cancelReservation(1L, updateRequest);
+        ReservationRoomView result = reservationRoomService.getReservationById(reservationId);
 
         // then
-        verify(reservationRoomRepository, times(1)).save(any(ReservationRoomEntity.class));
-        verify(dailyRoomAvailabilityRepository, times(3)).save(any(DailyRoomAvailabilityEntity.class)); // 3 days
+        assertNotNull(result);
+        verify(reservationRoomRepository).findById(reservationId);
+    }
+
+    @Test
+    void getReservationById_Failure_ReservationNotFound() {
+        // given
+        Long reservationId = 1L;
+
+        given(reservationRoomRepository.findById(reservationId)).willReturn(Optional.empty());
+
+        // when / then
+        EasyCheckException exception = assertThrows(EasyCheckException.class,
+                () -> reservationRoomService.getReservationById(reservationId));
+
+        assertEquals("Reservation not found", exception.getMessage());
     }
 }

@@ -1,17 +1,18 @@
 package com.beyond.easycheck.reservationrooms.ui.controller;
 
+import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.reservationrooms.application.service.ReservationRoomService;
+import com.beyond.easycheck.reservationrooms.exception.ReservationRoomMessageType;
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.PaymentStatus;
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationRoomEntity;
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationStatus;
 import com.beyond.easycheck.reservationrooms.ui.requestbody.ReservationRoomCreateRequest;
 import com.beyond.easycheck.reservationrooms.ui.requestbody.ReservationRoomUpdateRequest;
-import com.beyond.easycheck.reservationrooms.ui.view.DayRoomAvailabilityView;
 import com.beyond.easycheck.reservationrooms.ui.view.ReservationRoomView;
-import com.beyond.easycheck.reservationrooms.ui.view.RoomAvailabilityView;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,13 +24,11 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -50,20 +49,21 @@ public class ReservationRoomControllerTest {
 
     private ReservationRoomEntity reservationRoomEntity;
     private ReservationRoomCreateRequest reservationRoomCreateRequest;
-    private ReservationRoomUpdateRequest reservationRoomUpdateRequest;
+
 
     @BeforeEach
     void setUp() {
+        MockitoAnnotations.openMocks(this);
 
         reservationRoomEntity = new ReservationRoomEntity();
         reservationRoomCreateRequest = new ReservationRoomCreateRequest();
-        reservationRoomUpdateRequest = new ReservationRoomUpdateRequest();
     }
 
     @Test
     @WithMockUser(roles = "USER")
-    void testCreateReservation() throws Exception {
+    void createReservation_Success() throws Exception {
 
+        // given
         reservationRoomCreateRequest.setRoom(1L, LocalDateTime.now(), LocalDate.of(2024, 10, 11), LocalDate.of(2024, 10, 13), ReservationStatus.RESERVATION, 10000, PaymentStatus.PAID);
 
         // when
@@ -81,80 +81,102 @@ public class ReservationRoomControllerTest {
 
     @Test
     @WithMockUser(roles = "USER")
-    void testGetAvailableRooms() throws Exception {
+    void createReservation_Failure_InvalidInput() throws Exception {
 
-        // when
-        List<RoomAvailabilityView> availableRooms = Collections.singletonList(new RoomAvailabilityView(1L, "Deluxe", "101", 1, null));
-        when(reservationRoomService.getAvailableRoomsByCheckInCheckOut(any(LocalDate.class), any(LocalDate.class))).thenReturn(availableRooms);
+        // given
+        ReservationRoomCreateRequest request = new ReservationRoomCreateRequest(
+                null,
+                LocalDateTime.now(),
+                LocalDate.of(2024, 10, 1),
+                LocalDate.of(2024, 10, 3),
+                null,
+                10000,
+                null
+        );
 
-        // perform
-        mockMvc.perform(get("/api/v1/reservation-room/available")
-                        .param("checkinDate", "2024-10-11")
-                        .param("checkoutDate", "2024-10-13"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()").value(1))
-                .andExpect(jsonPath("$[0].roomNumber").value("101"));
+        // when / then
+        mockMvc.perform(post("/api/v1/reservation-room")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     @WithMockUser(roles = "USER")
-    void testGetRoomAvailabilityByMonth() throws Exception {
+    void getAllReservations_Success() throws Exception {
 
-        // when
-        List<DayRoomAvailabilityView> availability = Collections.singletonList(new DayRoomAvailabilityView(LocalDate.of(2024, 10, 11), "Monday", Collections.emptyList()));
-        when(reservationRoomService.getAvailableRoomsByMonth(anyInt(), anyInt())).thenReturn(availability);
+        // given
+        ReservationRoomView mockReservationRoomView = new ReservationRoomView(
+                1L, "John Doe", 1L, "Deluxe", List.of(), null, LocalDate.of(2024, 10, 1),
+                LocalDate.of(2024, 10, 3), null, 10000, null);
 
-        // perform
-        mockMvc.perform(get("/api/v1/reservation-room/room-list")
-                        .param("year", "2024")
-                        .param("month", "10"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()").value(1))
-                .andExpect(jsonPath("$[0].date").value("2024-10-11"));
-    }
+        given(reservationRoomService.getAllReservations(0, 10)).willReturn(List.of(mockReservationRoomView));
 
-    @Test
-    @WithMockUser(roles = "USER")
-    void testGetAllReservations() throws Exception {
-
-        // when
-        List<ReservationRoomView> reservations = Collections.singletonList(new ReservationRoomView());
-        when(reservationRoomService.getAllReservations(anyInt(), anyInt())).thenReturn(reservations);
-
-        // perform
+        // when / then
         mockMvc.perform(get("/api/v1/reservation-room")
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()").value(1));
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].userName").value("John Doe"));
+
+        verify(reservationRoomService).getAllReservations(0, 10);
     }
 
     @Test
     @WithMockUser(roles = "USER")
-    void testGetReservationById() throws Exception {
+    void getReservationById_Success() throws Exception {
 
-        // when
-        ReservationRoomView reservationRoomView = new ReservationRoomView();
-        when(reservationRoomService.getReservationById(any(Long.class))).thenReturn(reservationRoomView);
+        // given
+        Long reservationId = 1L;
+        ReservationRoomView mockReservationRoomView = new ReservationRoomView(
+                1L, "John Doe", 1L, "Deluxe", List.of(), null, LocalDate.of(2024, 10, 1),
+                LocalDate.of(2024, 10, 3), null, 10000, null);
 
-        // perform
-        mockMvc.perform(get("/api/v1/reservation-room/{id}", 1L))
-                .andExpect(status().isOk());
+        given(reservationRoomService.getReservationById(reservationId)).willReturn(mockReservationRoomView);
+
+        // when / then
+        mockMvc.perform(get("/api/v1/reservation-room/{id}", reservationId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.userName").value("John Doe"));
+
+        verify(reservationRoomService).getReservationById(reservationId);
     }
 
     @Test
     @WithMockUser(roles = "USER")
-    void testCancelReservation() throws Exception {
+    void getReservationById_Failure_NotFound() throws Exception {
+
+        // given
+        Long reservationId = 1L;
+
+        doThrow(new EasyCheckException(ReservationRoomMessageType.RESERVATION_NOT_FOUND))
+                .when(reservationRoomService).getReservationById(reservationId);
+
+        // when / then
+        mockMvc.perform(get("/api/v1/reservation-room/{id}", reservationId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void cancelReservation_Success() throws Exception {
+
+        // given
+        Long reservationId = 1L;
+        ReservationRoomUpdateRequest updateRequest = new ReservationRoomUpdateRequest(null);
 
         // when
-        doNothing().when(reservationRoomService).cancelReservation(any(Long.class), any(ReservationRoomUpdateRequest.class));
-
-        String requestJson = objectMapper.writeValueAsString(reservationRoomUpdateRequest);
+        doNothing().when(reservationRoomService).cancelReservation(eq(reservationId), any(ReservationRoomUpdateRequest.class));
 
         // perform
-        mockMvc.perform(put("/api/v1/reservation-room/{id}", 1L)
+        mockMvc.perform(put("/api/v1/reservation-room/{id}", reservationId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
+                        .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isNoContent());
+
+        // verify
+        verify(reservationRoomService).cancelReservation(eq(reservationId), any(ReservationRoomUpdateRequest.class));
     }
 }
