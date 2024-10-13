@@ -90,13 +90,14 @@ public class ThemeParkController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "테마파크 이미지를 수정하는 API")
+    @Operation(summary = "테마파크 이미지를 수정하는 API (일부 이미지 삭제 및 새로운 이미지 추가)")
     @PatchMapping(value = "/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updateThemeParkImages(
             @PathVariable Long id,
-            @RequestPart List<MultipartFile> imageFiles) {
+            @RequestPart(value = "imageFiles", required = false) List<MultipartFile> imageFiles,
+            @RequestPart(value = "imageIdsToDelete", required = false) List<Long> imageIdsToDelete) {
 
-        themeParkOperationUseCase.updateThemeParkImages(id, imageFiles);
+        themeParkOperationUseCase.updateThemeParkImages(id, imageFiles, imageIdsToDelete);
 
         return ResponseEntity.noContent().build();
     }

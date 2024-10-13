@@ -4,7 +4,6 @@ import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase.FindThemeParkResult;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -17,7 +16,7 @@ public interface ThemeParkOperationUseCase {
 
     FindThemeParkResult updateThemePark(Long id, ThemeParkUpdateCommand command, Long accommodationId);
 
-    void updateThemeParkImages(Long id, List<MultipartFile> imageFiles);
+    void updateThemeParkImages(Long id, List<MultipartFile> imageFiles, List<Long> imageIdsToDelete);
 
     void deleteThemePark(Long id, Long accommodationId);
 

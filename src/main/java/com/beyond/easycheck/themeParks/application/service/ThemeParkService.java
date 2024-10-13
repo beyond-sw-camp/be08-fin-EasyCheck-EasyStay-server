@@ -1,7 +1,6 @@
 package com.beyond.easycheck.themeparks.application.service;
 
 import com.amazonaws.SdkClientException;
-import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
 import com.beyond.easycheck.common.exception.EasyCheckException;
@@ -9,7 +8,6 @@ import com.beyond.easycheck.s3.application.domain.FileManagementCategory;
 import com.beyond.easycheck.s3.application.service.S3Service;
 import com.beyond.easycheck.themeparks.exception.ThemeParkMessageType;
 import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
-import com.beyond.easycheck.themeparks.infrastructure.repository.ThemeParkImageRepository;
 import com.beyond.easycheck.themeparks.infrastructure.repository.ThemeParkRepository;
 import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +34,6 @@ import static com.beyond.easycheck.themeparks.exception.ThemeParkMessageType.*;
 public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperationUseCase {
 
     private final ThemeParkRepository themeParkRepository;
-    private final ThemeParkImageRepository themeParkImageRepository;
     private final AccommodationRepository accommodationRepository;
     private final S3Service s3Service;
 
@@ -98,7 +95,7 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
 
     @Override
     @Transactional
-    public void updateThemeParkImages(Long id, List<MultipartFile> imageFiles) {
+    public void updateThemeParkImages(Long id, List<MultipartFile> imageFiles, List<Long> imageIdsToDelete) {
         ThemeParkEntity themeParkEntity = themeParkRepository.findById(id)
                 .orElseThrow(() -> new EasyCheckException(ThemeParkMessageType.THEME_PARK_NOT_FOUND));
 
@@ -106,26 +103,29 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
             throw new EasyCheckException(NO_IMAGES_PROVIDED);
         }
 
+        // 기존 이미지 삭제
         List<ThemeParkEntity.ImageEntity> existingImages = themeParkEntity.getImages();
+        log.info("기존 이미지 URL 목록: {}", existingImages.stream().map(ThemeParkEntity.ImageEntity::getUrl).toList());
 
         try {
+            if (imageIdsToDelete != null && !imageIdsToDelete.isEmpty()) {
+                List<ThemeParkEntity.ImageEntity> imagesToDelete = existingImages.stream()
+                        .filter(image -> imageIdsToDelete.contains(image.getId()))
+                        .toList();
+
+                log.info("삭제할 이미지 목록: {}", imagesToDelete.stream().map(ThemeParkEntity.ImageEntity::getUrl).toList());
+
+                // 이미지 삭제
+                for (ThemeParkEntity.ImageEntity imageToDelete : imagesToDelete) {
+                    String fileNameToDelete = extractFileNameFromUrl(imageToDelete.getUrl());
+                    s3Service.deleteFile(fileNameToDelete);
+                    themeParkEntity.getImages().remove(imageToDelete);
+                }
+            }
+
+            // 새 이미지 업로드
             List<String> newImageUrls = s3Service.uploadFiles(imageFiles, FileManagementCategory.THEME_PARK);
-
-            List<String> oldImageUrls = existingImages.stream()
-                    .map(ThemeParkEntity.ImageEntity::getUrl)
-                    .toList();
-
-            List<String> imagesToDelete = oldImageUrls.stream()
-                    .filter(url -> !newImageUrls.contains(url))
-                    .toList();
-
-            List<String> fileNamesToDelete = imagesToDelete.stream()
-                    .map(this::extractFileNameFromUrl)
-                    .toList();
-
-            s3Service.deleteFiles(fileNamesToDelete);
-
-            themeParkEntity.getImages().removeIf(image -> imagesToDelete.contains(image.getUrl()));
+            log.info("새로 업로드된 이미지 URL 목록: {}", newImageUrls);
 
             for (String newImageUrl : newImageUrls) {
                 ThemeParkEntity.ImageEntity newImageEntity = ThemeParkEntity.ImageEntity.createImage(newImageUrl, themeParkEntity);
@@ -133,12 +133,22 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
             }
 
             themeParkRepository.save(themeParkEntity);
+            log.info("테마파크 이미지 업데이트 완료");
 
         } catch (SdkClientException e) {
             log.error("S3 이미지 삭제/업로드 오류", e);
             throw new EasyCheckException(IMAGE_UPDATE_FAILED);
         }
     }
+
+
+    private String extractFileNameFromUrl(String url) {
+        String[] parts = url.split("/");
+        String fileName = String.join("/", Arrays.copyOfRange(parts, 3, parts.length));
+        log.info("추출한 파일 이름: {}", fileName);
+        return fileName;
+    }
+
 
     @Override
     @Transactional
@@ -211,10 +221,14 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
                 .orElseThrow(() -> new EasyCheckException(THEME_PARK_NOT_FOUND));
     }
 
-    private String extractFileNameFromUrl(String url) {
-        String[] parts = url.split("/");
-        return String.join("/", Arrays.copyOfRange(parts, 3, parts.length));
-    }
+//    private String extractFileNameFromUrl(String url) {
+//        int lastSlashIndex = url.lastIndexOf("/");
+//        if (lastSlashIndex != -1) {
+//            return url.substring(lastSlashIndex + 1);
+//        } else {
+//            throw new IllegalArgumentException("유효하지 않은 URL입니다: " + url);
+//        }
+//    }
 }
 
 
