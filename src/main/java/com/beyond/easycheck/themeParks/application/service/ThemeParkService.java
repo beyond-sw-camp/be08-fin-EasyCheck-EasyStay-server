@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import static com.beyond.easycheck.accomodations.exception.AccommodationMessageType.ACCOMMODATION_NOT_FOUND;
 import static com.beyond.easycheck.common.exception.CommonMessageType.IMAGE_UPDATE_FAILED;
 import static com.beyond.easycheck.common.exception.CommonMessageType.NO_IMAGES_PROVIDED;
-import static com.beyond.easycheck.rooms.exception.RoomMessageType.IMAGE_NOT_FOUND;
 import static com.beyond.easycheck.themeparks.exception.ThemeParkMessageType.*;
 
 @Slf4j
@@ -221,14 +220,6 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
                 .orElseThrow(() -> new EasyCheckException(THEME_PARK_NOT_FOUND));
     }
 
-//    private String extractFileNameFromUrl(String url) {
-//        int lastSlashIndex = url.lastIndexOf("/");
-//        if (lastSlashIndex != -1) {
-//            return url.substring(lastSlashIndex + 1);
-//        } else {
-//            throw new IllegalArgumentException("유효하지 않은 URL입니다: " + url);
-//        }
-//    }
 }
 
 
