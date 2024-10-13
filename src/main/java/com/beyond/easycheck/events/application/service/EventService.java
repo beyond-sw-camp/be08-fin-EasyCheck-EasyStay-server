@@ -3,6 +3,7 @@ package com.beyond.easycheck.events.application.service;
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
 import com.beyond.easycheck.common.exception.EasyCheckException;
+import com.beyond.easycheck.events.exception.EventMessageType;
 import com.beyond.easycheck.events.infrastructure.entity.EventEntity;
 import com.beyond.easycheck.events.infrastructure.repository.EventImageRepository;
 import com.beyond.easycheck.events.infrastructure.repository.EventRepository;
@@ -12,6 +13,7 @@ import com.beyond.easycheck.events.ui.view.EventView;
 import com.beyond.easycheck.s3.application.service.S3Service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,8 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.beyond.easycheck.accomodations.exception.AccommodationMessageType.ACCOMMODATION_NOT_FOUND;
-import static com.beyond.easycheck.events.exception.EventMessageType.EVENT_NOT_FOUND;
-import static com.beyond.easycheck.rooms.exception.RoomMessageType.IMAGE_NOT_FOUND;
+import static com.beyond.easycheck.events.exception.EventMessageType.*;
 import static com.beyond.easycheck.s3.application.domain.FileManagementCategory.EVENT;
 import static com.beyond.easycheck.s3.application.domain.FileManagementCategory.ROOM;
 
@@ -100,7 +101,7 @@ public class EventService {
         List<EventEntity> eventEntities = eventRepository.findAll();
 
         if (eventEntities.isEmpty()) {
-            throw new EasyCheckException(EVENT_NOT_FOUND);
+            throw new EasyCheckException(EVENTS_NOT_FOUND);
         }
 
         List<EventView> eventViews = eventEntities.stream()
@@ -126,13 +127,18 @@ public class EventService {
     }
 
     @Transactional
-    public void updateEvent(Long id, EventUpdateRequest eventUpdateRequest) {
+    public void updateEvent(Long id, @NotNull EventUpdateRequest eventUpdateRequest) {
 
         EventEntity event = eventRepository.findById(id)
                 .orElseThrow(() -> new EasyCheckException(EVENT_NOT_FOUND));
 
         AccommodationEntity accommodationEntity = accommodationRepository.findById(eventUpdateRequest.getAccommodationId())
                 .orElseThrow(() -> new EasyCheckException(ACCOMMODATION_NOT_FOUND));
+
+        if (eventUpdateRequest.getEventName() == null || eventUpdateRequest.getDetail() == null ||
+                eventUpdateRequest.getStartDate() == null || eventUpdateRequest.getEndDate() == null) {
+            throw new EasyCheckException(ARGUMENT_NOT_VALID);
+        }
 
         event.update(eventUpdateRequest, accommodationEntity);
 
