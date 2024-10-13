@@ -2,9 +2,7 @@ package com.beyond.easycheck.events.ui.requestbody;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -12,6 +10,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class EventUpdateRequest {
 
     @NotNull
