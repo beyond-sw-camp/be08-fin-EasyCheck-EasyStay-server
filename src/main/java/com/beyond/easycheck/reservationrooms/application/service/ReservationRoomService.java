@@ -116,7 +116,7 @@ public class ReservationRoomService {
     }
 
     @Transactional(readOnly = true)
-    public List<RoomAvailabilityView> getAvailableRooms(LocalDate checkinDate, LocalDate checkoutDate) {
+    public List<RoomAvailabilityView> getAvailableRoomsByCheckInCheckOut(LocalDate checkinDate, LocalDate checkoutDate) {
 
         List<DailyRoomAvailabilityEntity> availableRoomsByDateRange = dailyRoomAvailabilityRepository.findAvailabilityByDateRange(
                 checkinDate.atStartOfDay(),
@@ -153,7 +153,7 @@ public class ReservationRoomService {
     }
 
     @Transactional(readOnly = true)
-    public List<DayRoomAvailabilityView> getRoomAvailabilityByMonth(int year, int month) {
+    public List<DayRoomAvailabilityView> getAvailableRoomsByMonth(int year, int month) {
 
         LocalDate startDate = LocalDate.of(year, month, 1);
         LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());

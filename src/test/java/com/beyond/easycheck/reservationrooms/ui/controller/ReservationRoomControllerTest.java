@@ -85,7 +85,7 @@ public class ReservationRoomControllerTest {
 
         // when
         List<RoomAvailabilityView> availableRooms = Collections.singletonList(new RoomAvailabilityView(1L, "Deluxe", "101", 1, null));
-        when(reservationRoomService.getAvailableRooms(any(LocalDate.class), any(LocalDate.class))).thenReturn(availableRooms);
+        when(reservationRoomService.getAvailableRoomsByCheckInCheckOut(any(LocalDate.class), any(LocalDate.class))).thenReturn(availableRooms);
 
         // perform
         mockMvc.perform(get("/api/v1/reservation-room/available")
@@ -102,7 +102,7 @@ public class ReservationRoomControllerTest {
 
         // when
         List<DayRoomAvailabilityView> availability = Collections.singletonList(new DayRoomAvailabilityView(LocalDate.of(2024, 10, 11), "Monday", Collections.emptyList()));
-        when(reservationRoomService.getRoomAvailabilityByMonth(anyInt(), anyInt())).thenReturn(availability);
+        when(reservationRoomService.getAvailableRoomsByMonth(anyInt(), anyInt())).thenReturn(availability);
 
         // perform
         mockMvc.perform(get("/api/v1/reservation-room/room-list")

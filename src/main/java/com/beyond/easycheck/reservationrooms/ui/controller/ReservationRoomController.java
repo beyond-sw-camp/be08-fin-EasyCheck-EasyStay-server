@@ -45,7 +45,7 @@ public class ReservationRoomController {
             @RequestParam LocalDate checkinDate,
             @RequestParam LocalDate checkoutDate) {
 
-        List<RoomAvailabilityView> availableRooms = reservationRoomService.getAvailableRooms(checkinDate, checkoutDate);
+        List<RoomAvailabilityView> availableRooms = reservationRoomService.getAvailableRoomsByCheckInCheckOut(checkinDate, checkoutDate);
         return ResponseEntity.ok(availableRooms);
     }
 
@@ -55,7 +55,7 @@ public class ReservationRoomController {
             @RequestParam int year,
             @RequestParam int month) {
 
-        List<DayRoomAvailabilityView> availability = reservationRoomService.getRoomAvailabilityByMonth(year, month);
+        List<DayRoomAvailabilityView> availability = reservationRoomService.getAvailableRoomsByMonth(year, month);
         return ResponseEntity.ok(availability);
     }
 
