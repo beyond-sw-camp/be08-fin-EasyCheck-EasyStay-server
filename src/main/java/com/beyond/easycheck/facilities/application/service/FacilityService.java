@@ -35,7 +35,7 @@ public class FacilityService {
 
     private final S3Service s3Service;
 
-    private void addImagesToRoom(FacilityEntity facilityEntity, List<String> imageUrls) {
+    private void addImagesToFacility(FacilityEntity facilityEntity, List<String> imageUrls) {
         List<FacilityEntity.ImageEntity> newImageEntities = imageUrls.stream()
                 .map(url -> FacilityEntity.ImageEntity.createImage(url, facilityEntity))
                 .toList();
@@ -68,7 +68,7 @@ public class FacilityService {
                 .build();
 
         facilityRepository.save(facilityEntity);
-        addImagesToRoom(facilityEntity, imageUrls);
+        addImagesToFacility(facilityEntity, imageUrls);
 
         return facilityRepository.save(facilityEntity);
     }
