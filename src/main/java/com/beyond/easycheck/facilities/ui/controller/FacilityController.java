@@ -68,6 +68,18 @@ public class FacilityController {
         return ResponseEntity.ok(updatedFacility);
     }
 
+//    @Operation(summary = "부대시설 이미지를 수정하는 API")
+//    @PatchMapping(value = "/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public ResponseEntity<Void> updateFacilityImages(
+//            @PathVariable Long id,
+//            @RequestPart(value = "imageFiles", required = false) List<MultipartFile> imageFiles,
+//            @RequestPart(value = "imageIdsToDelete", required = false) List<Long> imageIdsToDelete) {
+//
+//        facilityService.updateFacilityImages(id, imageFiles, imageIdsToDelete);
+//
+//        return ResponseEntity.noContent().build();
+//    }
+
     @Operation(summary = "부대시설을 삭제하는 API")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFacility(@PathVariable Long id) {

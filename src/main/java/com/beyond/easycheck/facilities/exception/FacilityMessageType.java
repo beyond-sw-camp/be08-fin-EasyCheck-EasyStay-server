@@ -14,6 +14,8 @@ public enum FacilityMessageType implements MessageType {
     INTERNAL_SERVER_ERROR("An error occurred inside the server.", HttpStatus.INTERNAL_SERVER_ERROR),
     FACILITY_NOT_FOUND("Facility not found", HttpStatus.NOT_FOUND),
     METHOD_NOT_ALLOWED("your request method not allowed", HttpStatus.METHOD_NOT_ALLOWED),
+    NO_IMAGES_PROVIDED("업로드 이미지가 없습니다.", HttpStatus.BAD_REQUEST),
+    IMAGE_UPDATE_FAILED("이미지 업로드에 실패했습니다.", HttpStatus.BAD_REQUEST),
     ;
 
     private final String message;
