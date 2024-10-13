@@ -1,7 +1,6 @@
 package com.beyond.easycheck.s3.application.service;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.beyond.easycheck.s3.application.domain.FileManagementCategory;
 import lombok.RequiredArgsConstructor;

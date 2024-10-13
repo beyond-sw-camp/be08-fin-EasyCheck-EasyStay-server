@@ -171,12 +171,11 @@ class ThemeParkServiceTest {
                 CreateCommand, accommodationEntity
         );
 
-        List<MultipartFile> mockFiles = Collections.emptyList();
         when(themeParkRepository.findById(1L)).thenReturn(Optional.of(themeParkEntity));
         when(accommodationRepository.findById(1L)).thenReturn(Optional.of(accommodationEntity));
         when(themeParkRepository.save(any())).thenReturn(themeParkEntity);
 
-        FindThemeParkResult result = themeParkService.updateThemePark(1L, UpdateCommand, 1L, mockFiles);
+        FindThemeParkResult result = themeParkService.updateThemePark(1L, UpdateCommand, 1L);
 
         assertNotNull(result);
         verify(themeParkRepository, times(1)).save(any(ThemeParkEntity.class));
