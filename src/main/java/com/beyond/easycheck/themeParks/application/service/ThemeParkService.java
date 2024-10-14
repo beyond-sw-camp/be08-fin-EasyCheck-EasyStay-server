@@ -60,11 +60,14 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
 
             return FindThemeParkResult.findByThemeParkEntity(themeParkRepository.save(themeParkEntity));
         } catch (DataAccessException | PersistenceException e) {
-            log.error("Database error while saving theme park", e);
+            log.error("데이터베이스 오류", e);
             throw new EasyCheckException(DATABASE_CONNECTION_FAILED);
+        } catch (SdkClientException e) {
+            log.error("S3 이미지 삭제/업로드 오류", e);
+            throw new EasyCheckException(IMAGE_UPDATE_FAILED);
         } catch (Exception e) {
-            log.error("Unknown error while saving theme park", e);
-            throw new EasyCheckException(ThemeParkMessageType.UNKNOWN_ERROR);
+            log.error("알 수 없는 오류", e);
+            throw new EasyCheckException(UNKNOWN_ERROR);
         }
     }
 
@@ -84,10 +87,10 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
             return FindThemeParkResult.findByThemeParkEntity(themeParkRepository.save(themeParkEntity));
 
         } catch (DataAccessException | PersistenceException e) {
-            log.error("Database error while updating theme park", e);
+            log.error("데이터베이스 오류", e);
             throw new EasyCheckException(DATABASE_CONNECTION_FAILED);
         } catch (Exception e) {
-            log.error("Unknown error while updating theme park", e);
+            log.error("알 수 없는 오류", e);
             throw new EasyCheckException(UNKNOWN_ERROR);
         }
     }
@@ -134,9 +137,15 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
             themeParkRepository.save(themeParkEntity);
             log.info("테마파크 이미지 업데이트 완료");
 
+        } catch (DataAccessException | PersistenceException e) {
+            log.error("데이터베이스 오류", e);
+            throw new EasyCheckException(DATABASE_CONNECTION_FAILED);
         } catch (SdkClientException e) {
             log.error("S3 이미지 삭제/업로드 오류", e);
             throw new EasyCheckException(IMAGE_UPDATE_FAILED);
+        } catch (Exception e) {
+            log.error("알 수 없는 오류", e);
+            throw new EasyCheckException(UNKNOWN_ERROR);
         }
     }
 
@@ -164,12 +173,12 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
             s3Service.deleteFiles(imageUrls);
 
             themeParkRepository.deleteById(id);
-        } catch (DataAccessException | PersistenceException e) {
-            log.error("Database error while deleting theme park", e);
+        }catch (DataAccessException | PersistenceException e) {
+            log.error("데이터베이스 오류", e);
             throw new EasyCheckException(DATABASE_CONNECTION_FAILED);
         } catch (Exception e) {
-            log.error("Unknown error while deleting theme park", e);
-            throw new EasyCheckException(ThemeParkMessageType.UNKNOWN_ERROR);
+            log.error("알 수 없는 오류", e);
+            throw new EasyCheckException(UNKNOWN_ERROR);
         }
     }
 
