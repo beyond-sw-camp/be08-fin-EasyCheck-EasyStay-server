@@ -42,17 +42,16 @@ public class SmsController {
 
 
     @Autowired
-    public SmsController(@Value("${coolsms.easycheck.apikey}")
-                         String apiKey,
-                         @Value("${coolsms.easycheck.apisecret}")
-                         String apiSecret,
+    public SmsController(@Value("${coolsms.easycheck.apikey}") String apiKey,
+                         @Value("${coolsms.easycheck.apisecret}") String apiSecret,
+                         @Value("${coolsms.easycheck.representative-number}") String senderPhoneNumber,
                          SmsVerificationCodeRepository smsVerificationCodeRepository,
-                         SmsVerifiedPhoneRepository smsVerifiedPhoneRepository
-    ) {
-        log.info("[SmsController] apiKey = {} apiSecret = {}", apiKey, apiSecret);
-        this.defaultMessageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, "https://api.coolsms.co.kr");
+                         SmsVerifiedPhoneRepository smsVerifiedPhoneRepository,
+                         DefaultMessageService defaultMessageService) {
+        this.senderPhoneNumber = senderPhoneNumber;
         this.smsVerificationCodeRepository = smsVerificationCodeRepository;
         this.smsVerifiedPhoneRepository = smsVerifiedPhoneRepository;
+        this.defaultMessageService = defaultMessageService;
     }
 
     @PostMapping("/code")
