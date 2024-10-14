@@ -39,6 +39,7 @@ public class RoomService {
     private final RoomImageRepository roomImageRepository;
     private final DailyRoomAvailabilityRepository dailyRoomAvailabilityRepository;
     private final S3Service s3Service;
+    private final RoomtypeRepository roomtypeRepository;
 
 
     private void addImagesToRoom(RoomEntity roomEntity, List<String> imageUrls) {
@@ -62,6 +63,11 @@ public class RoomService {
 
         RoomtypeEntity roomType = roomTypeRepository.findById(roomCreateRequest.getRoomTypeId())
                 .orElseThrow(() -> new EasyCheckException(ROOM_TYPE_NOT_FOUND));
+
+        if (roomCreateRequest.getStatus() == null || roomCreateRequest.getRoomNumber() == null ||
+        roomCreateRequest.getRemainingRoom() < 0 || roomCreateRequest.getRoomAmount() < 0) {
+            throw new EasyCheckException(ARGUMENT_NOT_VALID);
+        }
 
         List<String> imageUrls = s3Service.uploadFiles(imageFiles, ROOM);
 
@@ -165,6 +171,9 @@ public class RoomService {
 
         RoomEntity room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new EasyCheckException(ROOM_NOT_FOUND));
+
+        RoomtypeEntity roomtypeEntity = roomtypeRepository.findById(roomUpdateRequest.getRoomtypeEntity())
+                        .orElseThrow(() -> new EasyCheckException(ROOM_TYPE_NOT_FOUND));
 
         room.update(roomUpdateRequest);
     }
