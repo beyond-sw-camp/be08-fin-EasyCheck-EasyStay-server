@@ -5,9 +5,9 @@ import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationTyp
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.rooms.application.service.RoomService;
-import com.beyond.easycheck.rooms.exception.RoomMessageType;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomStatus;
+import com.beyond.easycheck.rooms.infrastructure.repository.RoomImageRepository;
 import com.beyond.easycheck.rooms.infrastructure.repository.RoomRepository;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomCreateRequest;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomUpdateRequest;
@@ -36,7 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
-import static com.beyond.easycheck.rooms.exception.RoomMessageType.ROOM_NOT_FOUND;
+import static com.beyond.easycheck.rooms.exception.RoomMessageType.*;
 import static com.beyond.easycheck.roomtypes.exception.RoomtypeMessageType.ROOM_TYPE_NOT_FOUND;
 import static com.beyond.easycheck.s3.application.domain.FileManagementCategory.ROOM;
 import static org.mockito.ArgumentMatchers.any;
@@ -71,6 +71,9 @@ public class RoomControllerTest {
     @MockBean
     private AccommodationRepository accommodationRepository;
 
+    @MockBean
+    RoomImageRepository roomImageRepository;
+
     AccommodationEntity accommodationEntity;
     RoomtypeEntity roomtypeEntity;
 
@@ -93,9 +96,13 @@ public class RoomControllerTest {
                 1
         );
 
+        RoomEntity.ImageEntity existingImage = new RoomEntity.ImageEntity();
+        existingImage.setId(1L);
+        existingImage.setUrl("existing-image-url.jpg");
+
         when(accommodationRepository.findById(accommodationEntity.getId())).thenReturn(Optional.of(accommodationEntity));
         when(roomtypeRepository.findById(roomtypeEntity.getRoomTypeId())).thenReturn(Optional.of(roomtypeEntity));
-
+        when(roomImageRepository.findById(1L)).thenReturn(Optional.of(existingImage));
     }
 
     @Test
@@ -146,7 +153,6 @@ public class RoomControllerTest {
                 .andExpect(jsonPath("$.roomNumber").value("402"))
                 .andExpect(jsonPath("$.roomAmount").value(10))
                 .andExpect(jsonPath("$.status").value("예약가능"));
-
     }
 
     @Test
@@ -181,7 +187,39 @@ public class RoomControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.errors[0].errorType").value(ROOM_TYPE_NOT_FOUND.name()))
                 .andExpect(jsonPath("$.errors[0].errorMessage").value(ROOM_TYPE_NOT_FOUND.getMessage()));
+    }
 
+    @Test
+    @DisplayName("객실 생성 실패 - 잘못된 입력값")
+    @WithEasyCheckMockUser(role = "SUPER_ADMIN")
+    void createRoom_fail_wrongValue() throws Exception {
+        // Given
+        Long roomtypeId = 1L;
+
+        RoomCreateRequest roomCreateRequest = new RoomCreateRequest(
+                roomtypeId,
+                null,
+                null,
+                -5,
+                -5
+        );
+
+        when(roomService.createRoom(any(RoomCreateRequest.class), anyList())).thenThrow(new EasyCheckException(ARGUMENT_NOT_VALID));
+
+        // When
+        ResultActions perform = mockMvc.perform(
+                multipart("/api/v1/rooms")
+                        .file("pic", new byte[]{1, 2, 3})
+                        .file("pic", new byte[]{4, 5, 6})
+                        .file("description", objectMapper.writeValueAsBytes(roomCreateRequest))
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+        );
+
+        // Then
+        perform.andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errors[0].errorType").value(ARGUMENT_NOT_VALID.name()))
+                .andExpect(jsonPath("$.errors[0].errorMessage").value(ARGUMENT_NOT_VALID.getMessage()));
     }
 
     @Test
@@ -230,7 +268,6 @@ public class RoomControllerTest {
         perform.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.roomId").value(id));
-
     }
 
     @Test
@@ -251,7 +288,6 @@ public class RoomControllerTest {
                 .andExpect(jsonPath("$.errors").isArray())
                 .andExpect(jsonPath("$.errors[0].errorType").value(ROOM_NOT_FOUND.name()))
                 .andExpect(jsonPath("$.errors[0].errorMessage").value(ROOM_NOT_FOUND.getMessage()));
-
     }
 
     @Test
@@ -301,7 +337,6 @@ public class RoomControllerTest {
         perform.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2));
-
     }
 
     @Test
@@ -319,7 +354,6 @@ public class RoomControllerTest {
         perform.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(0));
-
     }
 
     @Test
@@ -329,6 +363,7 @@ public class RoomControllerTest {
         // Given
         Long roomId = 1L;
         RoomUpdateRequest roomUpdateRequest = new RoomUpdateRequest(
+                1L,
                 "501",
                 8,
                 RoomStatus.예약불가
@@ -341,7 +376,30 @@ public class RoomControllerTest {
 
         // Then
         perform.andExpect(status().isNoContent());
+    }
 
+    @Test
+    @DisplayName("객실 수정 실패 - 존재하지 않은 roomtypeId")
+    @WithEasyCheckMockUser(role = "SUPER_ADMIN")
+    void updateRoom_fail_wrongRoomtypeId() throws Exception {
+        // Given
+        Long roomtypeId = 999L;
+        RoomUpdateRequest roomUpdateRequest = new RoomUpdateRequest(
+                roomtypeId,
+                "402",
+                -5,
+                RoomStatus.예약불가
+        );
+
+        // When
+        ResultActions perform = mockMvc.perform(patch("/api/v1/rooms/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(roomUpdateRequest)));
+
+        // Then
+        perform.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.errors[0].errorType").value(ROOM_TYPE_NOT_FOUND.name()))
+                .andExpect(jsonPath("$.errors[0].errorMessage").value(ROOM_TYPE_NOT_FOUND.getMessage()));
     }
 
     @Test
@@ -351,6 +409,7 @@ public class RoomControllerTest {
         // Given
         Long roomId = 1L;
         RoomUpdateRequest roomUpdateRequest = new RoomUpdateRequest(
+                1L,
                 "402",
                 -5,
                 RoomStatus.예약불가
@@ -363,9 +422,8 @@ public class RoomControllerTest {
 
         // Then
         perform.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0].errorType").value(RoomMessageType.ARGUMENT_NOT_VALID.name()))
-                .andExpect(jsonPath("$.errors[0].errorMessage").value(RoomMessageType.ARGUMENT_NOT_VALID.getMessage()));
-
+                .andExpect(jsonPath("$.errors[0].errorType").value(ARGUMENT_NOT_VALID.name()))
+                .andExpect(jsonPath("$.errors[0].errorMessage").value(ARGUMENT_NOT_VALID.getMessage()));
     }
 
     @Test
@@ -385,7 +443,28 @@ public class RoomControllerTest {
 
         // Then
         perform.andExpect(status().isNoContent());
+    }
 
+    @Test
+    @DisplayName("객실 사진 삭제 실패 - 존재하지 않는 imageId")
+    @WithEasyCheckMockUser(role = "SUPER_ADMIN")
+    void updateRoomImage_fail_wrongImageId() throws Exception {
+        // Given
+        Long imageId = 1L;
+        MockMultipartFile newImageFile = new MockMultipartFile("newImageFile", "newImage.jpg", MediaType.IMAGE_JPEG_VALUE, "image content".getBytes());
+
+        doThrow(new EasyCheckException(ROOM_IMAGE_NOT_FOUND)).when(roomService).updateRoomImage(imageId, newImageFile);
+
+        // When
+        ResultActions perform = mockMvc.perform(multipart(HttpMethod.PATCH, "/api/v1/rooms/images/{imageId}", imageId)
+                .file(newImageFile)
+                .contentType(MediaType.MULTIPART_FORM_DATA));
+
+        // Then
+        perform.andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errors[0].errorType").value(ROOM_IMAGE_NOT_FOUND.name()))
+                .andExpect(jsonPath("$.errors[0].errorMessage").value(ROOM_IMAGE_NOT_FOUND.getMessage()));
     }
 
     @Test
@@ -421,7 +500,6 @@ public class RoomControllerTest {
 
         // Then
         perform.andExpect(status().isNoContent());
-
     }
 
     @Test
@@ -443,5 +521,4 @@ public class RoomControllerTest {
                 .andExpect(jsonPath("$.errors[0].errorType").value(ROOM_NOT_FOUND.name()))
                 .andExpect(jsonPath("$.errors[0].errorMessage").value(ROOM_NOT_FOUND.getMessage()));
     }
-
 }
