@@ -1,10 +1,12 @@
 package com.beyond.easycheck.attractions.application.service;
 
-import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
-import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationType;
+import com.amazonaws.SdkClientException;
+import com.beyond.easycheck.attractions.exception.AttractionMessageType;
 import com.beyond.easycheck.attractions.infrastructure.entity.AttractionEntity;
 import com.beyond.easycheck.attractions.infrastructure.repository.AttractionRepository;
+import com.beyond.easycheck.attractions.application.service.AttractionReadUseCase.FindAttractionResult;
 import com.beyond.easycheck.common.exception.EasyCheckException;
+import com.beyond.easycheck.s3.application.service.S3Service;
 import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
 import com.beyond.easycheck.themeparks.infrastructure.repository.ThemeParkRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,12 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.dao.DataAccessException;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-import static com.beyond.easycheck.attractions.exception.AttractionMessageType.ATTRACTION_NOT_FOUND;
+import static com.beyond.easycheck.common.exception.CommonMessageType.IMAGE_UPDATE_FAILED;
+import static com.beyond.easycheck.common.exception.CommonMessageType.NO_IMAGES_PROVIDED;
 import static com.beyond.easycheck.themeparks.exception.ThemeParkMessageType.THEME_PARK_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,126 +28,137 @@ import static org.mockito.Mockito.*;
 
 class AttractionServiceTest {
 
-    @InjectMocks
-    private AttractionService attractionService;
-
     @Mock
     private AttractionRepository attractionRepository;
 
     @Mock
     private ThemeParkRepository themeParkRepository;
 
+    @Mock
+    private S3Service s3Service;
+
+    @InjectMocks
+    private AttractionService attractionService;
+
+    private ThemeParkEntity themeParkEntity;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        themeParkEntity = new ThemeParkEntity(1L, "Theme Park Name", "Description", "Location", null, List.of());
     }
 
-    // 어트랙션 생성 테스트
+    // 어트랙션 생성 성공 테스트
     @Test
-    void shouldCreateAttractionSuccessfully() {
-        // Given
-        AttractionOperationUseCase.AttractionCreateCommand command = new AttractionOperationUseCase.AttractionCreateCommand(
-                1L, "어트랙션 이름", "설명", "이미지_주소");
+    void createAttraction_Success() {
+        AttractionEntity attraction = mock(AttractionEntity.class);
+        when(themeParkRepository.findById(anyLong())).thenReturn(Optional.of(themeParkEntity));
+        when(attractionRepository.save(any(AttractionEntity.class))).thenReturn(attraction);
+        when(s3Service.uploadFiles(anyList(), any())).thenReturn(List.of("imageUrl"));
 
-        AccommodationEntity accommodationEntity = AccommodationEntity.builder()
-                .id(1L)
-                .name("숙소 이름")
-                .address("숙소 주소")
-                .accommodationType(AccommodationType.HOTEL)
-                .build();
+        FindAttractionResult result = attractionService.createAttraction(new AttractionOperationUseCase.AttractionCreateCommand(1L, "Attraction", "Desc"), List.of(mock(MultipartFile.class)));
 
-        ThemeParkEntity themeParkEntity = new ThemeParkEntity(1L, "테마파크", "설명", "서울", accommodationEntity, new ArrayList<>());
-        AttractionEntity attractionEntity = new AttractionEntity(1L, "어트랙션 이름", "설명", "이미지_주소", themeParkEntity);
-
-        when(themeParkRepository.findById(1L)).thenReturn(Optional.of(themeParkEntity));
-        when(attractionRepository.save(any())).thenReturn(attractionEntity);
-
-        // When
-        AttractionReadUseCase.FindAttractionResult result = attractionService.createAttraction(command);
-
-        // Then
         assertNotNull(result);
-        assertEquals("어트랙션 이름", result.getName());
         verify(attractionRepository, times(1)).save(any(AttractionEntity.class));
     }
 
-    // 테마파크가 없을 때 예외 처리 테스트
+    // 어트랙션 생성 시 테마파크를 찾지 못하는 경우 예외 처리 테스트
     @Test
-    void shouldThrowExceptionWhenThemeParkNotFound() {
-        // Given
-        AttractionOperationUseCase.AttractionCreateCommand command = new AttractionOperationUseCase.AttractionCreateCommand(
-                1L, "어트랙션 이름", "설명", "이미지_주소");
+    void createAttraction_ThemeParkNotFound() {
+        when(themeParkRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        when(themeParkRepository.findById(1L)).thenReturn(Optional.empty());
-
-        // When & Then
-        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> attractionService.createAttraction(command));
+        EasyCheckException exception = assertThrows(EasyCheckException.class, () ->
+                attractionService.createAttraction(new AttractionOperationUseCase.AttractionCreateCommand(1L, "Attraction", "Desc"), List.of(mock(MultipartFile.class))));
         assertEquals(THEME_PARK_NOT_FOUND.getMessage(), exception.getMessage());
     }
 
-    // 어트랙션 업데이트 테스트
+    // S3 이미지 업로드 실패 시 예외 처리 테스트
     @Test
-    void shouldUpdateAttractionSuccessfully() {
-        // Given
-        AttractionOperationUseCase.AttractionUpdateCommand command = new AttractionOperationUseCase.AttractionUpdateCommand(
-                "업데이트된 이름", "업데이트된 설명", "업데이트된 이미지");
+    void createAttraction_S3UploadFailure() {
+        when(themeParkRepository.findById(anyLong())).thenReturn(Optional.of(themeParkEntity));
+        when(s3Service.uploadFiles(anyList(), any())).thenThrow(SdkClientException.class);
 
-        AccommodationEntity accommodationEntity = AccommodationEntity.builder()
-                .id(1L)
-                .name("숙소 이름")
-                .address("숙소 주소")
-                .accommodationType(AccommodationType.HOTEL)
+        EasyCheckException exception = assertThrows(EasyCheckException.class, () ->
+                attractionService.createAttraction(new AttractionOperationUseCase.AttractionCreateCommand(1L, "Attraction", "Desc"), List.of(mock(MultipartFile.class))));
+        assertEquals(IMAGE_UPDATE_FAILED.getMessage(), exception.getMessage());
+    }
+
+    // 어트랙션 업데이트 성공 테스트
+    @Test
+    void updateAttraction_Success() {
+        AttractionEntity attraction = new AttractionEntity(1L, "Attraction", "Description", themeParkEntity, null);
+        when(attractionRepository.findById(anyLong())).thenReturn(Optional.of(attraction));
+
+        AttractionOperationUseCase.AttractionUpdateCommand command = AttractionOperationUseCase.AttractionUpdateCommand.builder()
+                .name("New Name")
+                .description("New Description")
                 .build();
 
-        ThemeParkEntity themeParkEntity = new ThemeParkEntity(1L, "테마파크", "설명", "서울", accommodationEntity, new ArrayList<>());
-        AttractionEntity attractionEntity = new AttractionEntity(1L, "어트랙션 이름", "설명", "이미지_주소", themeParkEntity);
+        FindAttractionResult result = attractionService.updateAttraction(1L, command);
 
-        when(attractionRepository.findById(1L)).thenReturn(Optional.of(attractionEntity));
-
-        // When
-        AttractionReadUseCase.FindAttractionResult result = attractionService.updateAttraction(1L, command);
-
-        // Then
-        assertNotNull(result);
-        assertEquals("업데이트된 이름", result.getName());
-        verify(attractionRepository, times(1)).findById(1L);
+        assertEquals("New Name", result.getName());
+        assertEquals("New Description", result.getDescription());
+        verify(attractionRepository, times(1)).findById(anyLong());
     }
 
-    // 어트랙션 업데이트 시 어트랙션이 없을 때 예외 처리 테스트
+    // 어트랙션 업데이트 시 어트랙션을 찾지 못하는 경우 예외 처리 테스트
     @Test
-    void shouldThrowExceptionWhenAttractionNotFoundOnUpdate() {
-        // Given
-        AttractionOperationUseCase.AttractionUpdateCommand command = new AttractionOperationUseCase.AttractionUpdateCommand(
-                "업데이트된 이름", "업데이트된 설명", "업데이트된 이미지");
+    void updateAttraction_NotFound() {
+        when(attractionRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        when(attractionRepository.findById(1L)).thenReturn(Optional.empty());
+        AttractionOperationUseCase.AttractionUpdateCommand command = AttractionOperationUseCase.AttractionUpdateCommand.builder()
+                .name("New Name")
+                .description("New Description")
+                .build();
 
-        // When & Then
-        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> attractionService.updateAttraction(1L, command));
-        assertEquals(ATTRACTION_NOT_FOUND.getMessage(), exception.getMessage());
+        EasyCheckException exception = assertThrows(EasyCheckException.class, () ->
+                attractionService.updateAttraction(1L, command));
+        assertEquals(AttractionMessageType.ATTRACTION_NOT_FOUND.getMessage(), exception.getMessage());
     }
 
-    // 어트랙션 삭제 테스트
+    // 이미지 업데이트 성공 테스트
     @Test
-    void shouldDeleteAttractionSuccessfully() {
-        // Given
-        when(attractionRepository.existsById(1L)).thenReturn(true);
+    void updateAttractionImages_Success() {
+        AttractionEntity attraction = mock(AttractionEntity.class);
+        when(attractionRepository.findById(anyLong())).thenReturn(Optional.of(attraction));
+        when(s3Service.uploadFiles(anyList(), any())).thenReturn(List.of("newImageUrl"));
 
-        // When
+        attractionService.updateAttractionImages(1L, List.of(mock(MultipartFile.class)), List.of(1L));
+
+        verify(attractionRepository, times(1)).findById(anyLong());
+        verify(s3Service, times(1)).uploadFiles(anyList(), any());
+        verify(s3Service, times(1)).deleteFiles(anyList());
+    }
+
+    // 이미지가 제공되지 않을 때 예외 처리 테스트
+    @Test
+    void updateAttractionImages_NoImagesProvided() {
+        AttractionEntity attraction = mock(AttractionEntity.class);
+        when(attractionRepository.findById(anyLong())).thenReturn(Optional.of(attraction));
+
+        EasyCheckException exception = assertThrows(EasyCheckException.class, () ->
+                attractionService.updateAttractionImages(1L, List.of(), List.of(1L)));
+        assertEquals(NO_IMAGES_PROVIDED.getMessage(), exception.getMessage());
+    }
+
+    // 어트랙션 삭제 성공 테스트
+    @Test
+    void deleteAttraction_Success() {
+        when(attractionRepository.existsById(anyLong())).thenReturn(true);
+
         attractionService.deleteAttraction(1L);
 
-        // Then
-        verify(attractionRepository, times(1)).deleteById(1L);
+        verify(attractionRepository, times(1)).deleteById(anyLong());
     }
 
-    // 어트랙션 삭제 시 어트랙션이 없을 때 예외 처리 테스트
+    // 어트랙션 삭제 시 어트랙션을 찾지 못하는 경우 예외 처리 테스트
     @Test
-    void shouldThrowExceptionWhenAttractionNotFoundOnDelete() {
-        // Given
-        when(attractionRepository.existsById(1L)).thenReturn(false);
+    void deleteAttraction_NotFound() {
+        when(attractionRepository.existsById(anyLong())).thenReturn(false);
 
-        // When & Then
-        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> attractionService.deleteAttraction(1L));
-        assertEquals(ATTRACTION_NOT_FOUND.getMessage(), exception.getMessage());
+        EasyCheckException exception = assertThrows(EasyCheckException.class, () ->
+                attractionService.deleteAttraction(1L));
+        assertEquals(AttractionMessageType.ATTRACTION_NOT_FOUND.getMessage(), exception.getMessage());
     }
 }
