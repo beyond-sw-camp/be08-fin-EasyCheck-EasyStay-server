@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum FileManagementCategory {
     RESORT("resort", "리조트"),
     THEME_PARK("theme-park", "테마파크"),
+    ATTRACTION("attraction", "어트랙션"),
     USER("user", "사용자"),
     SUGGESTION("suggestion", "건의사항"),
     RESERVATION("reservation", "예약"),
