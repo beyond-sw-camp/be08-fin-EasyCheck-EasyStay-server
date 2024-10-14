@@ -56,7 +56,7 @@ public class TicketOrderController {
     }
 
     @Operation(summary = "입장권 주문 취소하는 API")
-    @PutMapping("/{orderId}/cancel")
+    @PatchMapping("/{orderId}/cancel")
     public ResponseEntity<Void> cancelOrder(
             @AuthenticationPrincipal Long userId,
             @PathVariable Long orderId) {
@@ -66,7 +66,7 @@ public class TicketOrderController {
     }
 
     @Operation(summary = "입장권 사용자가 사용해서 사용완료로 상태를 변경하는 API")
-    @PutMapping("/{orderId}/complete")
+    @PatchMapping("/{orderId}/complete")
     public ResponseEntity<Void> completeOrder(
             @AuthenticationPrincipal Long userId,
             @PathVariable Long orderId) {

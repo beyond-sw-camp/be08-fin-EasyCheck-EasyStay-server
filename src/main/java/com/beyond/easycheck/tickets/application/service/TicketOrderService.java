@@ -103,6 +103,10 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
             throw new EasyCheckException(UNAUTHORIZED_ACCESS);
         }
 
+        if (order.getOrderStatus() == OrderStatus.COMPLETED) {
+            throw new EasyCheckException(ORDER_ALREADY_COMPLETED);
+        }
+
         if (order.getOrderStatus() != OrderStatus.CONFIRMED) {
             throw new EasyCheckException(INVALID_ORDER_STATUS_FOR_COMPLETION);
         }
