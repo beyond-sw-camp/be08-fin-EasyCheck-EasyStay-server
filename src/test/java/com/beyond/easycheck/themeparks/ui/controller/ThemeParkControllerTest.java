@@ -6,6 +6,7 @@ import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase.
 import com.beyond.easycheck.themeparks.ui.requestbody.ThemeParkCreateRequest;
 import com.beyond.easycheck.themeparks.ui.requestbody.ThemeParkUpdateRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -44,9 +45,16 @@ class ThemeParkControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private AutoCloseable closeable;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        closeable.close(); // 자원을 해제
     }
 
     @Test

@@ -9,6 +9,7 @@ import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.s3.application.service.S3Service;
 import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
 import com.beyond.easycheck.themeparks.infrastructure.repository.ThemeParkRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -42,12 +43,20 @@ class AttractionServiceTest {
 
     private ThemeParkEntity themeParkEntity;
 
+    private AutoCloseable closeable;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-
+        closeable = MockitoAnnotations.openMocks(this);
         themeParkEntity = new ThemeParkEntity(1L, "Theme Park Name", "Description", "Location", null, List.of());
     }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        closeable.close(); // 자원을 해제
+    }
+
+
 
     // 어트랙션 생성 성공 테스트
     @Test

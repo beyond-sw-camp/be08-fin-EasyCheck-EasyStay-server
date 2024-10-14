@@ -11,7 +11,6 @@ import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUse
 import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase.FindThemeParkResult;
 import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
 import com.beyond.easycheck.themeparks.infrastructure.repository.ThemeParkRepository;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -277,9 +276,7 @@ class ThemeParkServiceTest {
         when(s3Service.uploadFiles(any(), any())).thenThrow(SdkClientException.class);
 
         // When
-        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> {
-            themeParkService.saveThemePark(command, 1L, List.of(mock(MultipartFile.class)));
-        });
+        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> themeParkService.saveThemePark(command, 1L, List.of(mock(MultipartFile.class))));
 
         // Then
         assertEquals(IMAGE_UPDATE_FAILED.getMessage(), exception.getMessage());
