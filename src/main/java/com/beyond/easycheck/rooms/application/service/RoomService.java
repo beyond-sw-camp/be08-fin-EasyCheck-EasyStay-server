@@ -63,6 +63,10 @@ public class RoomService {
         RoomtypeEntity roomType = roomTypeRepository.findById(roomCreateRequest.getRoomTypeId())
                 .orElseThrow(() -> new EasyCheckException(ROOM_TYPE_NOT_FOUND));
 
+        if (roomCreateRequest.getStatus() == null || roomCreateRequest.getRoomNumber() == null ||
+                roomCreateRequest.getRemainingRoom() < 0 || roomCreateRequest.getRoomAmount() < 0) {
+            throw new EasyCheckException(ARGUMENT_NOT_VALID);
+        }
         List<String> imageUrls = s3Service.uploadFiles(imageFiles, ROOM);
 
         RoomEntity room = RoomEntity.builder()
@@ -166,13 +170,16 @@ public class RoomService {
         RoomEntity room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new EasyCheckException(ROOM_NOT_FOUND));
 
+        RoomtypeEntity roomtypeEntity = roomTypeRepository.findById(roomUpdateRequest.getRoomtypeEntity())
+                .orElseThrow(() -> new EasyCheckException(ROOM_TYPE_NOT_FOUND));
+
         room.update(roomUpdateRequest);
     }
 
     @Transactional
     public void updateRoomImage(Long imageId, MultipartFile newImageFile) {
         RoomEntity.ImageEntity imageToUpdate = roomImageRepository.findById(imageId)
-                .orElseThrow(() -> new EasyCheckException(IMAGE_NOT_FOUND));
+                .orElseThrow(() -> new EasyCheckException(ROOM_IMAGE_NOT_FOUND));
 
         String oldImageUrl = imageToUpdate.getUrl();
 

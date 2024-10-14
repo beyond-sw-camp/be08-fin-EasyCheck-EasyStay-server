@@ -13,6 +13,9 @@ import lombok.*;
 @AllArgsConstructor
 public class RoomUpdateRequest {
 
+    @NotNull
+    private Long roomtypeEntity;
+
     @NotBlank
     private String roomNumber;
 
