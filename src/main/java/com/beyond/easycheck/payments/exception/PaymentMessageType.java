@@ -14,6 +14,7 @@ public enum PaymentMessageType implements MessageType {
     INTERNAL_SERVER_ERROR("An error occurred inside the server.", HttpStatus.INTERNAL_SERVER_ERROR),
     PAYMENT_NOT_FOUND("Payment not found", HttpStatus.NOT_FOUND),
     METHOD_NOT_ALLOWED("your request method not allowed", HttpStatus.METHOD_NOT_ALLOWED),
+    INVALID_PAYMENT_AMOUNT("The payment amount does not match the reservation total price.", HttpStatus.BAD_REQUEST),
     ;
 
     private final String message;

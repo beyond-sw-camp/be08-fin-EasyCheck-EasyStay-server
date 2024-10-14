@@ -1,11 +1,14 @@
 package com.beyond.easycheck.payments.application.service;
 
+import com.beyond.easycheck.common.exception.EasyCheckException;
+import com.beyond.easycheck.payments.exception.PaymentMessageType;
 import com.beyond.easycheck.payments.infrastructure.entity.CompletionStatus;
 import com.beyond.easycheck.payments.infrastructure.entity.PaymentEntity;
 import com.beyond.easycheck.payments.infrastructure.repository.PaymentRepository;
 import com.beyond.easycheck.payments.ui.requestbody.PaymentCreateRequest;
 import com.beyond.easycheck.payments.ui.requestbody.PaymentUpdateRequest;
 import com.beyond.easycheck.payments.ui.view.PaymentView;
+import com.beyond.easycheck.reservationrooms.exception.ReservationRoomMessageType;
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.PaymentStatus;
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationRoomEntity;
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationStatus;
@@ -25,8 +28,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class PaymentServiceTest {
@@ -143,5 +145,52 @@ class PaymentServiceTest {
 
         // Then
         verify(paymentRepository, times(1)).save(paymentEntity);
+    }
+
+    @Test
+    void testProcessReservationPayment_ReservationNotFound() {
+
+        // Given
+        Long reservationId = 1L;
+        when(reservationRoomRepository.findById(reservationId)).thenReturn(Optional.empty());
+
+        // When & Then
+        EasyCheckException exception = assertThrows(EasyCheckException.class,
+                () -> paymentService.processReservationPayment(reservationId, paymentCreateRequest));
+
+        assertEquals(ReservationRoomMessageType.RESERVATION_NOT_FOUND.getMessage(), exception.getMessage());
+        verify(reservationRoomRepository, times(1)).findById(reservationId);
+    }
+
+    @Test
+    void testGetPaymentById_PaymentNotFound() {
+
+        // Given
+        Long paymentId = 1L;
+        when(paymentRepository.findById(paymentId)).thenReturn(Optional.empty());
+
+        // When & Then
+        EasyCheckException exception = assertThrows(EasyCheckException.class,
+                () -> paymentService.getPaymentById(paymentId));
+
+        assertEquals(PaymentMessageType.PAYMENT_NOT_FOUND.getMessage(), exception.getMessage());
+        verify(paymentRepository, times(1)).findById(paymentId);
+    }
+
+    @Test
+    void testCancelPayment_PaymentNotFound() {
+
+        // Given
+        Long paymentId = 1L;
+        PaymentUpdateRequest paymentUpdateRequest = new PaymentUpdateRequest();
+        when(paymentRepository.findById(paymentId)).thenReturn(Optional.empty());
+
+        // When & Then
+        EasyCheckException exception = assertThrows(EasyCheckException.class,
+                () -> paymentService.cancelPayment(paymentId, paymentUpdateRequest));
+
+        assertEquals(PaymentMessageType.PAYMENT_NOT_FOUND.getMessage(), exception.getMessage());
+        verify(paymentRepository, times(1)).findById(paymentId);
+        verify(paymentRepository, times(0)).save(any(PaymentEntity.class));
     }
 }
