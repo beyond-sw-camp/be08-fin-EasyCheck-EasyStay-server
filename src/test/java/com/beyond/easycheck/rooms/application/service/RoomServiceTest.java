@@ -24,7 +24,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static com.beyond.easycheck.rooms.exception.RoomMessageType.*;
 import static com.beyond.easycheck.roomtypes.exception.RoomtypeMessageType.ROOM_TYPE_NOT_FOUND;
@@ -132,7 +135,6 @@ public class RoomServiceTest {
         assertThat(createdRoom.getImages()).hasSize(2);
         assertThat(createdRoom.getImages()).extracting("url").containsExactlyInAnyOrderElementsOf(imageUrls);
 
-        // Verify
         verify(roomtypeRepository).findById(1L);
         verify(s3Service).uploadFiles(imageFiles, ROOM);
         verify(roomRepository, times(1)).save(any(RoomEntity.class));
@@ -140,7 +142,7 @@ public class RoomServiceTest {
 
     @Test
     @DisplayName("객실 생성 실패 - 존재하지 않는 roomtypeID")
-    void createRoom_fail() {
+    void createRoom_fail_wrongRoomtypeId() {
         // Given
         RoomCreateRequest roomCreateRequest = new RoomCreateRequest(
                 999L,
@@ -159,8 +161,33 @@ public class RoomServiceTest {
                 .isInstanceOf(EasyCheckException.class)
                 .hasMessage(ROOM_TYPE_NOT_FOUND.getMessage());
 
-        // Verify
         verify(roomtypeRepository).findById(999L);
+        verify(s3Service, never()).uploadFiles(anyList(), any());
+        verify(roomRepository, never()).save(any(RoomEntity.class));
+    }
+
+    @Test
+    @DisplayName("객실 생성 실패 - 잘못된 입력값")
+    void createRoom_fail_wrongValue() {
+        // Given
+        RoomCreateRequest roomCreateRequest = new RoomCreateRequest(
+                1L,
+                null,
+                null,
+                -5,
+                -5
+        );
+
+        List<MultipartFile> imageFiles = new ArrayList<>();
+        imageFiles.add(mock(MultipartFile.class));
+        imageFiles.add(mock(MultipartFile.class));
+
+        // When & Then
+        assertThatThrownBy(() -> roomService.createRoom(roomCreateRequest, imageFiles))
+                .isInstanceOf(EasyCheckException.class)
+                .hasMessage(ARGUMENT_NOT_VALID.getMessage());
+
+        verify(roomtypeRepository).findById(1L);
         verify(s3Service, never()).uploadFiles(anyList(), any());
         verify(roomRepository, never()).save(any(RoomEntity.class));
     }
@@ -247,12 +274,11 @@ public class RoomServiceTest {
         assertThat(roomViews.get(0).getRoomId()).isEqualTo(room1.getRoomId());
         assertThat(roomViews.get(1).getRoomId()).isEqualTo(room2.getRoomId());
 
-        // Verify
         verify(roomRepository).findAll();
     }
 
     @Test
-    @DisplayName("객실 전체 조회 실패")
+    @DisplayName("객실 전체 조회 실패 - 빈 객실")
     void readRooms_fail() {
         // Given
         when(roomRepository.findAll()).thenThrow(new EasyCheckException(ROOMS_NOT_FOUND));
@@ -262,7 +288,6 @@ public class RoomServiceTest {
                 .isInstanceOf(EasyCheckException.class)
                 .hasMessage(ROOMS_NOT_FOUND.getMessage());
 
-        // Verify
         verify(roomRepository).findAll();
     }
 
@@ -281,6 +306,7 @@ public class RoomServiceTest {
         );
 
         RoomUpdateRequest updateRoom = new RoomUpdateRequest(
+                roomtype1.getRoomTypeId(),
                 "403",
                 5,
                 RoomStatus.예약불가
@@ -296,8 +322,40 @@ public class RoomServiceTest {
         assertThat(existingRoom.getStatus()).isEqualTo(RoomStatus.예약불가);
         assertThat(existingRoom.getRoomAmount()).isEqualTo(5);
 
-        // Verify
         verify(roomRepository).findById(1L);
+    }
+
+    @Test
+    @DisplayName("객실 정보 수정 실패 - 존재하지 않는 roomtypeId")
+    void updateRoom_fail_wrongRoomtypeId() {
+        // Given
+        Long roomtypeId = 999L;
+        RoomEntity existingRoom = new RoomEntity(
+                1L,
+                roomtype1,
+                "402",
+                new ArrayList<>(),
+                RoomStatus.예약가능,
+                10,
+                5
+        );
+
+        RoomUpdateRequest updateRequest = new RoomUpdateRequest(
+                roomtypeId,
+                "403",
+                -5,
+                RoomStatus.예약불가
+        );
+
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(existingRoom));
+
+        // When & Then
+        assertThatThrownBy(() -> roomService.updateRoom(1L, updateRequest))
+                .isInstanceOf(EasyCheckException.class)
+                .hasMessage(ROOM_TYPE_NOT_FOUND.getMessage());
+
+        verify(roomRepository).findById(1L);
+        verify(roomRepository, never()).save(any(RoomEntity.class));
     }
 
     @Test
@@ -315,6 +373,7 @@ public class RoomServiceTest {
         );
 
         RoomUpdateRequest updateRequest = new RoomUpdateRequest(
+                roomtype1.getRoomTypeId(),
                 "403",
                 -5,
                 RoomStatus.예약불가
@@ -327,7 +386,6 @@ public class RoomServiceTest {
                 .isInstanceOf(EasyCheckException.class)
                 .hasMessage(ARGUMENT_NOT_VALID.getMessage());
 
-        // Verify
         verify(roomRepository).findById(1L);
         verify(roomRepository, never()).save(any(RoomEntity.class));
     }
@@ -367,9 +425,8 @@ public class RoomServiceTest {
         // When & Then
         assertThatThrownBy(() -> roomService.updateRoomImage(imageId, newImageFile))
                 .isInstanceOf(EasyCheckException.class)
-                .hasMessage(IMAGE_NOT_FOUND.getMessage());
+                .hasMessage(ROOM_IMAGE_NOT_FOUND.getMessage());
 
-        // Verify
         verify(roomImageRepository).findById(imageId);
         verify(s3Service, never()).deleteFile(anyString());
         verify(s3Service, never()).uploadFile(any(MultipartFile.class), eq(ROOM));
@@ -421,7 +478,6 @@ public class RoomServiceTest {
                 .isInstanceOf(EasyCheckException.class)
                 .hasMessage(ROOM_NOT_FOUND.getMessage());
 
-        // Verify
         verify(roomRepository).findById(roomId);
         verify(roomRepository, never()).delete(any(RoomEntity.class));
     }
