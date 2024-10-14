@@ -142,7 +142,6 @@ public class RoomrateServiceTest {
                 .doesNotThrowAnyException();
 
         verify(roomRepository).save(any(RoomEntity.class));
-
     }
 
     @Test
@@ -162,7 +161,6 @@ public class RoomrateServiceTest {
                 .hasMessage(ROOM_NOT_FOUND.getMessage());
 
         verify(roomrateRepository, never()).save(any(RoomrateEntity.class));
-
     }
 
     @Test
@@ -185,7 +183,6 @@ public class RoomrateServiceTest {
                 .hasMessage(SEASON_NOT_FOUND.getMessage());
 
         verify(roomrateRepository, never()).save(any(RoomrateEntity.class));
-
     }
 
     @Test
@@ -208,7 +205,6 @@ public class RoomrateServiceTest {
                 .hasMessage(RoomrateMessageType.ARGUMENT_NOT_VALID.getMessage());
 
         verify(roomrateRepository, never()).save(any(RoomrateEntity.class));
-
     }
 
     @Test
@@ -247,7 +243,6 @@ public class RoomrateServiceTest {
         assertThat(readRoomrate.getStatus()).isEqualTo(roomrateView.getStatus());
         assertThat(readRoomrate.getTypeName()).isEqualTo(roomrateView.getTypeName());
         assertThat(readRoomrate.getSeasonName()).isEqualTo(roomrateView.getSeasonName());
-
     }
 
     @Test
@@ -263,7 +258,6 @@ public class RoomrateServiceTest {
         assertThatThrownBy(() -> roomrateService.readRoomrate(roomrateId))
                 .isInstanceOf(EasyCheckException.class)
                 .hasMessage(RoomrateMessageType.ROOM_RATE_NOT_FOUND.getMessage());
-
     }
 
     @Test
@@ -298,11 +292,10 @@ public class RoomrateServiceTest {
         assertThat(roomrateViews.get(1).getId()).isEqualTo(roomrate2.getId());
 
         verify(roomrateRepository).findAll();
-
     }
 
     @Test
-    @DisplayName("객실 요금 전체 조회 실패")
+    @DisplayName("객실 요금 전체 조회 실패 - 빈 리스트")
     void readRoomrates_fail() {
         // Given
         when(roomrateRepository.findAll()).thenThrow(new EasyCheckException(ROOM_RATES_NOT_FOUND));
@@ -313,7 +306,6 @@ public class RoomrateServiceTest {
                 .hasMessage(ROOM_RATES_NOT_FOUND.getMessage());
 
         verify(roomrateRepository).findAll();
-
     }
 
     @Test
@@ -349,7 +341,6 @@ public class RoomrateServiceTest {
         assertThat(updateRoomrateRequest.getRate()).isEqualTo(BigDecimal.valueOf(200000));
 
         verify(roomrateRepository).findById(1L);
-
     }
 
     @Test
@@ -380,7 +371,6 @@ public class RoomrateServiceTest {
 
         verify(roomrateRepository).findById(1L);
         verify(roomrateRepository, never()).save(any(RoomrateEntity.class));
-
     }
 
     @Test
@@ -412,7 +402,6 @@ public class RoomrateServiceTest {
 
         verify(roomrateRepository).findById(1L);
         verify(roomrateRepository, never()).save(any(RoomrateEntity.class));
-
     }
 
     @Test
@@ -445,7 +434,6 @@ public class RoomrateServiceTest {
 
         verify(roomrateRepository).findById(1L);
         verify(roomrateRepository, never()).save(any(RoomrateEntity.class));
-
     }
 
     @Test
@@ -469,9 +457,7 @@ public class RoomrateServiceTest {
 
         // Then
         verify(roomrateRepository).delete(roomrate);
-
     }
-
 
     @Test
     @DisplayName("객실 요금 정보 삭제 실패 - 잘못된 RoomrateID")
@@ -486,5 +472,4 @@ public class RoomrateServiceTest {
 
         verify(roomrateRepository).findById(roomrateId);
     }
-
 }

@@ -51,7 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class RoomratesControllerTest {
+public class RoomrateControllerTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -120,7 +120,6 @@ public class RoomratesControllerTest {
         when(roomtypeRepository.findById(roomtypeEntity.getRoomTypeId())).thenReturn(Optional.of(roomtypeEntity));
         when(roomRepository.findById(roomEntity.getRoomId())).thenReturn(Optional.of(roomEntity));
         when(seasonRepository.findById(seasonEntity.getId())).thenReturn(Optional.of(seasonEntity));
-
     }
 
     @Test
@@ -143,13 +142,12 @@ public class RoomratesControllerTest {
 
         // Then
         perform.andExpect(status().isCreated());
-
     }
 
     @Test
     @DisplayName("객실 요금 생성 실패 - 존재하지 않는 roomID")
     @WithEasyCheckMockUser(role = "SUPER_ADMIN")
-    void createRoomrates_fail() throws Exception {
+    void createRoomrates_fail_wrongRoomId() throws Exception {
         // Given
         Long roomId = 999L;
         RoomrateCreateRequest roomrateCreateRequest = new RoomrateCreateRequest(
@@ -170,7 +168,57 @@ public class RoomratesControllerTest {
         perform.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.errors[0].errorType").value(ROOM_NOT_FOUND.name()))
                 .andExpect(jsonPath("$.errors[0].errorMessage").value(ROOM_NOT_FOUND.getMessage()));
+    }
 
+    @Test
+    @DisplayName("객실 요금 생성 실패 - 존재하지 않는 seasonId")
+    @WithEasyCheckMockUser(role = "SUPER_ADMIN")
+    void createRoomrates_fail_wrongSeasonId() throws Exception {
+        // Given
+        Long seasonId = 999L;
+        RoomrateCreateRequest roomrateCreateRequest = new RoomrateCreateRequest(
+                1L,
+                999L,
+                RoomrateType.주말,
+                BigDecimal.valueOf(100000)
+        );
+
+        doThrow(new EasyCheckException(SEASON_NOT_FOUND)).when(roomrateService).createRoomrate(any(RoomrateCreateRequest.class));
+
+        // When
+        ResultActions perform = mockMvc.perform(post("/api/v1/roomrates")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(roomrateCreateRequest)));
+
+        // Then
+        perform.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.errors[0].errorType").value(SEASON_NOT_FOUND.name()))
+                .andExpect(jsonPath("$.errors[0].errorMessage").value(SEASON_NOT_FOUND.getMessage()));
+    }
+
+    @Test
+    @DisplayName("객실 요금 생성 실패 - 잘못된 입력값")
+    @WithEasyCheckMockUser(role = "SUPER_ADMIN")
+    void createRoomrates_fail_wrongValue() throws Exception {
+        // Given
+        RoomrateCreateRequest roomrateCreateRequest = new RoomrateCreateRequest(
+                1L,
+                1L,
+                null,
+                null
+        );
+
+        doThrow(new EasyCheckException(ARGUMENT_NOT_VALID)).when(roomrateService).createRoomrate(any(RoomrateCreateRequest.class));
+
+        // When
+        ResultActions perform = mockMvc.perform(post("/api/v1/roomrates")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(roomrateCreateRequest)));
+
+        // Then
+        perform.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0].errorType").value(ARGUMENT_NOT_VALID.name()))
+                .andExpect(jsonPath("$.errors[0].errorMessage").value(ARGUMENT_NOT_VALID.getMessage()));
     }
 
     @Test
@@ -197,7 +245,6 @@ public class RoomratesControllerTest {
         // Then
         perform.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L));
-
     }
 
     @Test
@@ -254,7 +301,6 @@ public class RoomratesControllerTest {
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[1].id").value(2L));
-
     }
 
     @Test
@@ -293,7 +339,6 @@ public class RoomratesControllerTest {
 
         // Then
         perform.andExpect(status().isNoContent());
-
     }
 
     @Test
@@ -317,7 +362,6 @@ public class RoomratesControllerTest {
         perform.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.errors[0].errorType").value(ROOM_NOT_FOUND.name()))
                 .andExpect(jsonPath("$.errors[0].errorMessage").value(ROOM_NOT_FOUND.getMessage()));
-
     }
 
     @Test
@@ -346,7 +390,6 @@ public class RoomratesControllerTest {
         perform.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.errors[0].errorType").value(SEASON_NOT_FOUND.name()))
                 .andExpect(jsonPath("$.errors[0].errorMessage").value(SEASON_NOT_FOUND.getMessage()));
-
     }
 
 
@@ -373,7 +416,6 @@ public class RoomratesControllerTest {
         perform.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors[0].errorType").value(ARGUMENT_NOT_VALID.name()))
                 .andExpect(jsonPath("$.errors[0].errorMessage").value(ARGUMENT_NOT_VALID.getMessage()));
-
     }
 
     @Test
@@ -391,7 +433,6 @@ public class RoomratesControllerTest {
 
         // Then
         perform.andExpect(status().isNoContent());
-
     }
 
     @Test
@@ -413,5 +454,4 @@ public class RoomratesControllerTest {
                 .andExpect(jsonPath("$.errors[0].errorType").value(ROOM_RATE_NOT_FOUND.name()))
                 .andExpect(jsonPath("$.errors[0].errorMessage").value(ROOM_RATE_NOT_FOUND.getMessage()));
     }
-
 }

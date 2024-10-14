@@ -31,7 +31,11 @@ public class RoomrateController {
 
     @PostMapping("")
     @Operation(summary = "객실 요금 생성 API")
-    public ResponseEntity<Void> createRoomrate(@RequestBody @Valid RoomrateCreateRequest roomrateCreateRequest) {
+    public ResponseEntity<Void> createRoomrate(@RequestBody RoomrateCreateRequest roomrateCreateRequest) {
+        if (roomrateCreateRequest.getRate() == null || roomrateCreateRequest.getRateType() == null) {
+            throw new EasyCheckException(ARGUMENT_NOT_VALID);
+        }
+
         roomrateService.createRoomrate(roomrateCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
