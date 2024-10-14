@@ -1,11 +1,13 @@
 package com.beyond.easycheck.attractions.application.service;
 
 import com.beyond.easycheck.attractions.infrastructure.entity.AttractionEntity;
+import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public interface AttractionReadUseCase {
 
@@ -20,15 +22,21 @@ public interface AttractionReadUseCase {
         private final Long id;
         private final String name;
         private final String description;
-        private final String image;
-        private final String themeParkId;
+        private final Long themeParkId;
+        private final List<String> imageUrls;
 
         public static FindAttractionResult fromEntity(AttractionEntity attraction) {
+
+            List<String> imageUrls = attraction.getImages().stream()
+                    .map(AttractionEntity.ImageEntity::getUrl)
+                    .toList();
+
             return FindAttractionResult.builder()
                     .id(attraction.getId())
                     .name(attraction.getName())
                     .description(attraction.getDescription())
-                    .image(attraction.getImage())
+                    .themeParkId(attraction.getThemePark().getId())
+                    .imageUrls(imageUrls)
                     .build();
         }
     }
