@@ -13,6 +13,7 @@ public enum ReservationRoomMessageType implements MessageType {
     ROOM_NOT_AVAILABLE("The room is not available for reservation.", HttpStatus.BAD_REQUEST),
     ROOM_ALREADY_FULL("The room is already fully booked.", HttpStatus.CONFLICT),
     RESERVATION_CANCELED("The reservation has been canceled.", HttpStatus.BAD_REQUEST),
+    RESERVATION_ALREADY_PAID("Reservation has already been paid.", HttpStatus.BAD_REQUEST),
     ;
 
     private final String message;
