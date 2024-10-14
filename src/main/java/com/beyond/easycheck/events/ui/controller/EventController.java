@@ -5,12 +5,14 @@ import com.beyond.easycheck.accomodations.infrastructure.repository.Accommodatio
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.events.application.service.EventService;
 import com.beyond.easycheck.events.infrastructure.entity.EventEntity;
+import com.beyond.easycheck.events.infrastructure.repository.EventImageRepository;
 import com.beyond.easycheck.events.infrastructure.repository.EventRepository;
 import com.beyond.easycheck.events.ui.requestbody.EventCreateRequest;
 import com.beyond.easycheck.events.ui.requestbody.EventUpdateRequest;
 import com.beyond.easycheck.events.ui.view.EventView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,6 +24,7 @@ import java.util.List;
 
 import static com.beyond.easycheck.accomodations.exception.AccommodationMessageType.ACCOMMODATION_NOT_FOUND;
 import static com.beyond.easycheck.events.exception.EventMessageType.ARGUMENT_NOT_VALID;
+import static com.beyond.easycheck.events.exception.EventMessageType.IMAGE_NOT_FOUND;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,12 +35,17 @@ public class EventController {
     private final EventService eventService;
     private final EventRepository eventRepository;
     private final AccommodationRepository accommodationRepository;
+    private final EventImageRepository eventImageRepository;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "이벤트 생성 API")
     public ResponseEntity<EventEntity> createEvent(
             @RequestPart("description") EventCreateRequest eventCreateRequest,
             @RequestPart("Image") List<MultipartFile> imageFiles) {
+        if (eventCreateRequest.getEventName() == null || eventCreateRequest.getDetail() == null
+                || eventCreateRequest.getStartDate() == null || eventCreateRequest.getEndDate() == null) {
+            throw new EasyCheckException(ARGUMENT_NOT_VALID);
+        }
 
         EventEntity eventEntity = eventService.createEvent(eventCreateRequest, imageFiles);
         return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(eventEntity); // 생성된 이벤트를 본문에 추가
@@ -75,6 +83,9 @@ public class EventController {
     @PatchMapping(value = "/images/{imageId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "이벤트 사진 수정 API")
     public ResponseEntity<Void> updateEventImage(@PathVariable Long imageId, @RequestPart MultipartFile newImageFile) {
+        EventEntity.ImageEntity image = eventImageRepository.findById(imageId)
+                        .orElseThrow(() -> new EasyCheckException(IMAGE_NOT_FOUND));
+
         eventService.updateEventImage(imageId, newImageFile);
         return ResponseEntity.noContent().build();
     }

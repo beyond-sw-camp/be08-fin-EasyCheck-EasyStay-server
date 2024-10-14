@@ -128,7 +128,7 @@ public class EventServiceTest {
 
     @Test
     @DisplayName("이벤트 생성 실패 - 잘못된 accommodationId")
-    void createEvent_fail() {
+    void createEvent_fail_wrongAccommodationId() {
         // Given
         EventCreateRequest eventCreateRequest = new EventCreateRequest(
                 999L,
@@ -149,6 +149,33 @@ public class EventServiceTest {
 
         // Verify
         verify(accommodationRepository).findById(999L);
+        verify(s3Service, never()).uploadFiles(anyList(), any());
+        verify(eventRepository, never()).save(any(EventEntity.class));
+    }
+
+    @Test
+    @DisplayName("이벤트 생성 실패 - 잘못된 입력값")
+    void createEvent_fail_wrongValue() {
+        // Given
+        EventCreateRequest eventCreateRequest = new EventCreateRequest(
+                1L,
+                null,
+                null,
+                LocalDate.of(2024, 6, 1),
+                LocalDate.of(2024, 8, 31)
+        );
+
+        List<MultipartFile> imageFiles = new ArrayList<>();
+        imageFiles.add(mock(MultipartFile.class));
+        imageFiles.add(mock(MultipartFile.class));
+
+        // When & Then
+        assertThatThrownBy(() -> eventService.createEvent(eventCreateRequest, imageFiles))
+                .isInstanceOf(EasyCheckException.class)
+                .hasMessage(ARGUMENT_NOT_VALID.getMessage());
+
+        // Verify
+        verify(accommodationRepository).findById(1L);
         verify(s3Service, never()).uploadFiles(anyList(), any());
         verify(eventRepository, never()).save(any(EventEntity.class));
     }
@@ -294,7 +321,7 @@ public class EventServiceTest {
     }
 
     @Test
-    @DisplayName("객실 수정 실패 - 잘못된 accommodationId")
+    @DisplayName("이벤트 수정 실패 - 잘못된 accommodationId")
     void updateEvent_fail_wrongAccommodationId() {
         // Given
         EventEntity eventEntity = new EventEntity(

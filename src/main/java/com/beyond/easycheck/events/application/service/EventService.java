@@ -3,7 +3,6 @@ package com.beyond.easycheck.events.application.service;
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
 import com.beyond.easycheck.common.exception.EasyCheckException;
-import com.beyond.easycheck.events.exception.EventMessageType;
 import com.beyond.easycheck.events.infrastructure.entity.EventEntity;
 import com.beyond.easycheck.events.infrastructure.repository.EventImageRepository;
 import com.beyond.easycheck.events.infrastructure.repository.EventRepository;
@@ -57,6 +56,11 @@ public class EventService {
 
         AccommodationEntity accommodationEntity = accommodationRepository.findById(eventCreateRequest.getAccommodationEntity())
                 .orElseThrow(() -> new EasyCheckException(ACCOMMODATION_NOT_FOUND));
+
+        if (eventCreateRequest.getEventName() == null || eventCreateRequest.getDetail() == null
+                || eventCreateRequest.getStartDate() == null || eventCreateRequest.getEndDate() == null) {
+            throw new EasyCheckException(ARGUMENT_NOT_VALID);
+        }
 
         List<String> imageUrls = s3Service.uploadFiles(imageFiles, EVENT);
 
