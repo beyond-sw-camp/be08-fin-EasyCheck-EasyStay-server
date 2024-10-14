@@ -1,8 +1,6 @@
 package com.beyond.easycheck.additionalservices.ui.controller;
 
 import com.beyond.easycheck.additionalservices.application.service.AdditionalServiceService;
-import com.beyond.easycheck.additionalservices.infrastructure.entity.AdditionalServiceEntity;
-import com.beyond.easycheck.additionalservices.infrastructure.repository.AdditionalServiceRepository;
 import com.beyond.easycheck.additionalservices.ui.requestbody.AdditionalServiceCreateRequest;
 import com.beyond.easycheck.additionalservices.ui.requestbody.AdditionalServiceUpdateRequest;
 import com.beyond.easycheck.additionalservices.ui.view.AdditionalServiceView;
@@ -24,7 +22,6 @@ import java.util.List;
 public class AdditionalServiceController {
 
     private final AdditionalServiceService additionalServiceService;
-    private final AdditionalServiceRepository additionalServiceRepository;
 
     @Operation(summary = "부가 서비스를 등록하는 API")
     @PostMapping("")
