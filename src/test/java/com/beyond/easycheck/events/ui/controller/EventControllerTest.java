@@ -6,6 +6,7 @@ import com.beyond.easycheck.accomodations.infrastructure.repository.Accommodatio
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.events.application.service.EventService;
 import com.beyond.easycheck.events.infrastructure.entity.EventEntity;
+import com.beyond.easycheck.events.infrastructure.repository.EventImageRepository;
 import com.beyond.easycheck.events.infrastructure.repository.EventRepository;
 import com.beyond.easycheck.events.ui.requestbody.EventCreateRequest;
 import com.beyond.easycheck.events.ui.requestbody.EventUpdateRequest;
@@ -34,7 +35,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static com.beyond.easycheck.accomodations.exception.AccommodationMessageType.ACCOMMODATION_NOT_FOUND;
-import static com.beyond.easycheck.events.exception.EventMessageType.EVENT_NOT_FOUND;
+import static com.beyond.easycheck.events.exception.EventMessageType.*;
 import static com.beyond.easycheck.s3.application.domain.FileManagementCategory.EVENT;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -65,6 +66,9 @@ public class EventControllerTest {
     @MockBean
     AccommodationRepository accommodationRepository;
 
+    @MockBean
+    EventImageRepository eventImageRepository;
+
     AccommodationEntity accommodationEntity;
 
     @BeforeEach
@@ -78,6 +82,11 @@ public class EventControllerTest {
                 AccommodationType.RESORT
         );
 
+        Long imageId = 1L;
+        EventEntity.ImageEntity imageEntity = new EventEntity.ImageEntity();
+        imageEntity.setId(imageId);
+
+        when(eventImageRepository.findById(imageId)).thenReturn(Optional.of(imageEntity));
         when(accommodationRepository.findById(accommodationEntity.getId())).thenReturn(Optional.of(accommodationEntity));
 
     }
@@ -133,7 +142,7 @@ public class EventControllerTest {
     @Test
     @DisplayName("이벤트 생성 실패 - 존재하지 않는 accommodationID")
     @WithEasyCheckMockUser(role = "SUPER_ADMIN")
-    void createEvent_fail() throws Exception {
+    void createEvent_fail_wrongAccommodationId() throws Exception {
         // Given
         Long accommodationId = 999L;
 
@@ -162,6 +171,34 @@ public class EventControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.errors[0].errorType").value(ACCOMMODATION_NOT_FOUND.name()))
                 .andExpect(jsonPath("$.errors[0].errorMessage").value(ACCOMMODATION_NOT_FOUND.getMessage()));
+    }
+
+    @Test
+    @DisplayName("이벤트 생성 실패 - 잘못된 입력값")
+    @WithEasyCheckMockUser(role = "SUPER_ADMIN")
+    void createEvent_fail_wrongValue() throws Exception {
+        // Given
+        Long accommodationId = 1L;
+        EventCreateRequest eventCreateRequest = new EventCreateRequest(
+                accommodationId,
+                null,
+                null,
+                LocalDate.of(2024, 6, 1),
+                LocalDate.of(2024, 8, 31)
+        );
+
+        // When
+        ResultActions perform = mockMvc.perform(multipart("/api/v1/events")
+                .file("Image", new byte[]{1, 2, 3})
+                .file("Image", new byte[]{4, 5, 6})
+                .file("description", objectMapper.writeValueAsBytes(eventCreateRequest))
+                .contentType(MediaType.MULTIPART_FORM_DATA));
+
+        // Then
+        perform.andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errors[0].errorType").value(ARGUMENT_NOT_VALID.name()))
+                .andExpect(jsonPath("$.errors[0].errorMessage").value(ARGUMENT_NOT_VALID.getMessage()));
 
     }
 
@@ -187,7 +224,7 @@ public class EventControllerTest {
         eventEntity.addImage(image1);
         eventEntity.addImage(image2);
 
-        EventView eventView = new EventView (
+        EventView eventView = new EventView(
                 id,
                 "선셋 리조트",
                 List.of("url1", "url2"),
@@ -207,11 +244,10 @@ public class EventControllerTest {
         perform.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(id));
-
     }
 
     @Test
-    @DisplayName("이벤트 단일 조회 실패 - 존재하지 않는 accommodationId")
+    @DisplayName("이벤트 단일 조회 실패 - 존재하지 않는 이벤트 ID")
     @WithEasyCheckMockUser(role = "SUPER_ADMIN")
     void readEvent_fail() throws Exception {
         // Given
@@ -228,7 +264,6 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.errors").isArray())
                 .andExpect(jsonPath("$.errors[0].errorType").value(EVENT_NOT_FOUND.name()))
                 .andExpect(jsonPath("$.errors[0].errorMessage").value(EVENT_NOT_FOUND.getMessage()));
-
     }
 
     @Test
@@ -236,7 +271,7 @@ public class EventControllerTest {
     @WithEasyCheckMockUser(role = "SUPER_ADMIN")
     void readEvents_success() throws Exception {
         // Given
-        EventView event1 = new EventView (
+        EventView event1 = new EventView(
                 1L,
                 "선셋 리조트",
                 List.of("url1", "url2"),
@@ -246,7 +281,7 @@ public class EventControllerTest {
                 LocalDate.of(2024, 8, 31)
         );
 
-        EventView event2 = new EventView (
+        EventView event2 = new EventView(
                 2L,
                 "선셋 리조트",
                 List.of("url1", "url2"),
@@ -268,7 +303,6 @@ public class EventControllerTest {
         perform.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2));
-
     }
 
     @Test
@@ -286,7 +320,6 @@ public class EventControllerTest {
         perform.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(0));
-
     }
 
     @Test
@@ -310,13 +343,12 @@ public class EventControllerTest {
 
         // Then
         perform.andExpect(status().isNoContent());
-
     }
 
     @Test
     @DisplayName("이벤트 수정 실패 - 잘못된 accommodationId")
     @WithEasyCheckMockUser(role = "SUPER_ADMIN")
-    void updateEvent_fail() throws Exception {
+    void updateEvent_fail_wrongAccommodationId() throws Exception {
         // Given
         Long eventId = 1L;
         EventUpdateRequest updateEventRequest = new EventUpdateRequest(
@@ -339,6 +371,30 @@ public class EventControllerTest {
     }
 
     @Test
+    @DisplayName("이벤트 수정 실패 - 잘못된 입력값")
+    @WithEasyCheckMockUser(role = "SUPER_ADMIN")
+    void updateEvent_fail_wrongValue() throws Exception {
+        Long eventId = 1L;
+        EventUpdateRequest updateEventRequest = new EventUpdateRequest(
+                1L,
+                null,
+                null,
+                LocalDate.of(2024, 8, 15),
+                LocalDate.of(2024, 8, 20)
+        );
+
+        // When
+        ResultActions perform = mockMvc.perform(patch("/api/v1/events/{id}", eventId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateEventRequest)));
+
+        // Then
+        perform.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0].errorType").value(ARGUMENT_NOT_VALID.name()))
+                .andExpect(jsonPath("$.errors[0].errorMessage").value(ARGUMENT_NOT_VALID.getMessage()));
+    }
+
+    @Test
     @DisplayName("이벤트 사진 수정 성공")
     @WithEasyCheckMockUser(role = "SUPER_ADMIN")
     void updateEventImage_success() throws Exception {
@@ -355,8 +411,30 @@ public class EventControllerTest {
 
         // Then
         perform.andExpect(status().isNoContent());
-
     }
+
+    @Test
+    @DisplayName("이벤트 사진 수정 실패 - 존재하지 않는 imageId")
+    @WithEasyCheckMockUser(role = "SUPER_ADMIN")
+    void updateEventImage_fail() throws Exception {
+        // Given
+        Long imageId = 1L;
+        MockMultipartFile newImageFile = new MockMultipartFile("newImageFile", "newImage.jpg", MediaType.IMAGE_JPEG_VALUE, "image content".getBytes());
+
+        doThrow(new EasyCheckException(IMAGE_NOT_FOUND)).when(eventService).updateEventImage(imageId, newImageFile);
+
+        // When
+        ResultActions perform = mockMvc.perform(multipart(HttpMethod.PATCH, "/api/v1/events/images/{imageId}", imageId)
+                .file(newImageFile)
+                .contentType(MediaType.MULTIPART_FORM_DATA));
+
+        // Then
+        perform.andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errors[0].errorType").value(IMAGE_NOT_FOUND.name()))
+                .andExpect(jsonPath("$.errors[0].errorMessage").value(IMAGE_NOT_FOUND.getMessage()));
+    }
+
 
     @Test
     @DisplayName("이벤트 삭제 성공")
@@ -391,7 +469,6 @@ public class EventControllerTest {
 
         // Then
         perform.andExpect(status().isNoContent());
-
     }
 
     @Test
