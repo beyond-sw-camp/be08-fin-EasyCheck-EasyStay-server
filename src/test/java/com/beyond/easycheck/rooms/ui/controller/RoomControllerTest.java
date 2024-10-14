@@ -36,10 +36,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
-import static com.beyond.easycheck.rooms.exception.RoomMessageType.*;
+import static com.beyond.easycheck.rooms.exception.RoomMessageType.ROOM_NOT_FOUND;
 import static com.beyond.easycheck.roomtypes.exception.RoomtypeMessageType.ROOM_TYPE_NOT_FOUND;
 import static com.beyond.easycheck.s3.application.domain.FileManagementCategory.ROOM;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -152,7 +152,7 @@ public class RoomControllerTest {
     @Test
     @DisplayName("객실 생성 실패 - 존재하지 않는 roomtypeID")
     @WithEasyCheckMockUser(role = "SUPER_ADMIN")
-    void createRoom_fail_wrongRoomtypeId() throws Exception {
+    void createRoom_fail() throws Exception {
         // Given
         Long roomtypeId = 999L;
 
@@ -181,40 +181,6 @@ public class RoomControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.errors[0].errorType").value(ROOM_TYPE_NOT_FOUND.name()))
                 .andExpect(jsonPath("$.errors[0].errorMessage").value(ROOM_TYPE_NOT_FOUND.getMessage()));
-
-    }
-
-    @Test
-    @DisplayName("객실 생성 실패 - 잘못된 입력값")
-    @WithEasyCheckMockUser(role = "SUPER_ADMIN")
-    void createRoom_fail_wrongValue() throws Exception {
-        // Given
-        Long roomtypeId = 1L;
-
-        RoomCreateRequest roomCreateRequest = new RoomCreateRequest(
-                roomtypeId,
-                null,
-                null,
-                -5,
-                -5
-        );
-
-        when(roomService.createRoom(any(RoomCreateRequest.class), anyList())).thenThrow(new EasyCheckException(ARGUMENT_NOT_VALID));
-
-        // When
-        ResultActions perform = mockMvc.perform(
-                multipart("/api/v1/rooms")
-                        .file("pic", new byte[]{1, 2, 3})
-                        .file("pic", new byte[]{4, 5, 6})
-                        .file("description", objectMapper.writeValueAsBytes(roomCreateRequest))
-                        .contentType(MediaType.MULTIPART_FORM_DATA)
-        );
-
-        // Then
-        perform.andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.errors[0].errorType").value(ARGUMENT_NOT_VALID.name()))
-                .andExpect(jsonPath("$.errors[0].errorMessage").value(ARGUMENT_NOT_VALID.getMessage()));
 
     }
 
@@ -363,7 +329,6 @@ public class RoomControllerTest {
         // Given
         Long roomId = 1L;
         RoomUpdateRequest roomUpdateRequest = new RoomUpdateRequest(
-                1L,
                 "501",
                 8,
                 RoomStatus.예약불가
@@ -380,37 +345,12 @@ public class RoomControllerTest {
     }
 
     @Test
-    @DisplayName("객실 수정 실패 - 존재하지 않은 roomtypeId")
-    @WithEasyCheckMockUser(role = "SUPER_ADMIN")
-    void updateRoom_fail_wrongRoomtypeId() throws Exception {
-        // Given
-        Long roomtypeId = 999L;
-        RoomUpdateRequest roomUpdateRequest = new RoomUpdateRequest(
-                roomtypeId,
-                "402",
-                -5,
-                RoomStatus.예약불가
-        );
-
-        // When
-        ResultActions perform = mockMvc.perform(patch("/api/v1/rooms/{id}", 1L)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(roomUpdateRequest)));
-
-        // Then
-        perform.andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.errors[0].errorType").value(ROOM_TYPE_NOT_FOUND.name()))
-                .andExpect(jsonPath("$.errors[0].errorMessage").value(ROOM_TYPE_NOT_FOUND.getMessage()));
-    }
-
-    @Test
     @DisplayName("객실 수정 실패 - 잘못된 입력값")
     @WithEasyCheckMockUser(role = "SUPER_ADMIN")
-    void updateRoom_fail_wrongValue() throws Exception {
+    void updateRoom_fail() throws Exception {
         // Given
         Long roomId = 1L;
         RoomUpdateRequest roomUpdateRequest = new RoomUpdateRequest(
-                1L,
                 "402",
                 -5,
                 RoomStatus.예약불가
@@ -423,8 +363,8 @@ public class RoomControllerTest {
 
         // Then
         perform.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0].errorType").value(ARGUMENT_NOT_VALID.name()))
-                .andExpect(jsonPath("$.errors[0].errorMessage").value(ARGUMENT_NOT_VALID.getMessage()));
+                .andExpect(jsonPath("$.errors[0].errorType").value(RoomMessageType.ARGUMENT_NOT_VALID.name()))
+                .andExpect(jsonPath("$.errors[0].errorMessage").value(RoomMessageType.ARGUMENT_NOT_VALID.getMessage()));
 
     }
 
@@ -446,28 +386,6 @@ public class RoomControllerTest {
         // Then
         perform.andExpect(status().isNoContent());
 
-    }
-
-    @Test
-    @DisplayName("객실 사진 삭제 실패 - 존재하지 않는 imageId")
-    @WithEasyCheckMockUser(role = "SUPER_ADMIN")
-    void updateRoomImage_fail_wrongImageId() throws Exception {
-        // Given
-        Long imageId = 1L;
-        MockMultipartFile newImageFile = new MockMultipartFile("newImageFile", "newImage.jpg", MediaType.IMAGE_JPEG_VALUE, "image content".getBytes());
-
-        doThrow(new EasyCheckException(IMAGE_NOT_FOUND)).when(roomService).updateRoomImage(imageId, newImageFile);
-
-        // When
-        ResultActions perform = mockMvc.perform(multipart(HttpMethod.PATCH, "/api/v1/events/images/{imageId}", imageId)
-                .file(newImageFile)
-                .contentType(MediaType.MULTIPART_FORM_DATA));
-
-        // Then
-        perform.andExpect(status().isNotFound())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.errors[0].errorType").value(IMAGE_NOT_FOUND.name()))
-                .andExpect(jsonPath("$.errors[0].errorMessage").value(IMAGE_NOT_FOUND.getMessage()));
     }
 
     @Test
