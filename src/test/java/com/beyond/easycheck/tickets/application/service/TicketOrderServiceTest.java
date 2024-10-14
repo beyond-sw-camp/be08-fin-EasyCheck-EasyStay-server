@@ -7,13 +7,13 @@ import com.beyond.easycheck.tickets.application.service.TicketOperationUseCase.T
 import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
 import com.beyond.easycheck.tickets.infrastructure.entity.*;
 import com.beyond.easycheck.tickets.infrastructure.repository.TicketOrderRepository;
-import com.beyond.easycheck.tickets.infrastructure.repository.TicketPaymentRepository;
 import com.beyond.easycheck.tickets.infrastructure.repository.TicketRepository;
 import com.beyond.easycheck.tickets.ui.requestbody.TicketOrderRequest;
 import com.beyond.easycheck.tickets.ui.view.TicketOrderDTO;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.repository.UserJpaRepository;
 import com.beyond.easycheck.tickets.exception.TicketOrderMessageType;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -48,9 +48,11 @@ class TicketOrderServiceTest {
     private TicketEntity mockTicket;
     private ThemeParkEntity mockThemePark;
 
+    private AutoCloseable closeable;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
         mockUser = UserEntity.createGuestUser("Test User", "010-1234-5678");
 
         AccommodationEntity mockAccommodation = new AccommodationEntity(1L, "Accommodation Name", "Accommodation Address", HOTEL);
@@ -68,6 +70,11 @@ class TicketOrderServiceTest {
                 LocalDateTime.now(),
                 LocalDateTime.now().plusDays(7));
         mockTicket = TicketEntity.createTicket(ticketCommand, mockThemePark);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        closeable.close();
     }
 
     @Test
@@ -100,9 +107,7 @@ class TicketOrderServiceTest {
         when(userJpaRepository.findById(anyLong())).thenReturn(Optional.of(mockUser));
         when(ticketRepository.findById(anyLong())).thenReturn(Optional.of(mockTicket));
 
-        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> {
-            ticketOrderService.createTicketOrder(1L, request);
-        });
+        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> ticketOrderService.createTicketOrder(1L, request));
 
         assertEquals(TICKET_SALE_PERIOD_INVALID.getMessage(), exception.getMessage());
     }
@@ -145,9 +150,7 @@ class TicketOrderServiceTest {
         Optional<TicketOrderEntity> retrievedOrder = ticketOrderRepository.findById(1L);
         System.out.println("찾은 주문: " + retrievedOrder.orElse(null));
 
-        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> {
-            ticketOrderService.cancelTicketOrder(1L, spyOrder.getId());
-        });
+        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> ticketOrderService.cancelTicketOrder(1L, spyOrder.getId()));
 
         System.out.println("예외 메시지: " + exception.getMessage());
         assertEquals(TicketOrderMessageType.UNAUTHORIZED_ACCESS.getMessage(), exception.getMessage());
@@ -159,9 +162,7 @@ class TicketOrderServiceTest {
     void getOrder_orderNotFound() {
         when(ticketOrderRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> {
-            ticketOrderService.getTicketOrder(1L, 999L);
-        });
+        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> ticketOrderService.getTicketOrder(1L, 999L));
 
         assertEquals(TicketOrderMessageType.ORDER_NOT_FOUND.getMessage(), exception.getMessage());
     }
@@ -179,9 +180,7 @@ class TicketOrderServiceTest {
 
         when(ticketOrderRepository.findById(anyLong())).thenReturn(Optional.of(spyOrder));
 
-        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> {
-            ticketOrderService.completeOrder(1L, spyOrder.getId());
-        });
+        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> ticketOrderService.completeOrder(1L, spyOrder.getId()));
 
         assertEquals(TicketOrderMessageType.INVALID_ORDER_STATUS_FOR_COMPLETION.getMessage(), exception.getMessage());
     }
@@ -202,9 +201,7 @@ class TicketOrderServiceTest {
 
         when(ticketOrderRepository.findById(anyLong())).thenReturn(Optional.of(spyOrder));
 
-        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> {
-            ticketOrderService.completeOrder(1L, spyOrder.getId());
-        });
+        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> ticketOrderService.completeOrder(1L, spyOrder.getId()));
 
         System.out.println("Exception Message: " + exception.getMessage());
         assertEquals(TicketOrderMessageType.ORDER_ALREADY_COMPLETED.getMessage(), exception.getMessage());
