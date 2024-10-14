@@ -82,6 +82,20 @@
 
 <br>
 
+### 3. Table Apecification
+
+<br>
+
+### 4. API Apecification
+
+<br>
+
+### 5. Test Case
+
+[Test Case 바로가기](https://docs.google.com/spreadsheets/d/1sKs9u2-jmpIpiN_TV9gyMLveyxQH9EOo/edit?gid=475237107#gid=475237107)
+
+<br>
+
 ## 🖥️ Frontend
 
 ### 1. WireFrame
