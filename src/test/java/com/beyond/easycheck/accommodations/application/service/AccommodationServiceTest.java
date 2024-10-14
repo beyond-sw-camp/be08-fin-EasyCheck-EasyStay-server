@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -63,6 +64,19 @@ public class AccommodationServiceTest {
     }
 
     @Test
+    public void testCreateAccommodation_WithInvalidData() {
+        // given
+        AccommodationCreateRequest request = new AccommodationCreateRequest("", "", null); // 잘못된 요청
+        given(accommodationRepository.save(any(AccommodationEntity.class)))
+                .willThrow(new DataIntegrityViolationException("Invalid data"));
+
+        // when & then
+        assertThrows(DataIntegrityViolationException.class, () -> {
+            accommodationService.createAccommodation(request);
+        });
+    }
+
+    @Test
     public void testGetAllAccommodations() {
         // given
         AccommodationEntity accommodation1 = AccommodationEntity.builder().id(1L).name("Resort 1").build();
@@ -106,7 +120,7 @@ public class AccommodationServiceTest {
         EasyCheckException exception = assertThrows(EasyCheckException.class, () -> {
             accommodationService.getAccommodationById(1L);
         });
-        assertThat(exception.getMessage()).isEqualTo("Accommodation not found");  // 메시지를 수정
+        assertThat(exception.getMessage()).isEqualTo("Accommodation not found");
         verify(accommodationRepository).findById(1L);
     }
 
@@ -127,6 +141,20 @@ public class AccommodationServiceTest {
     }
 
     @Test
+    public void testUpdateAccommodation_NonExistingId() {
+        // given
+        AccommodationUpdateRequest updateRequest = new AccommodationUpdateRequest("New Name", "New Address", AccommodationType.HOTEL);
+        given(accommodationRepository.findById(1L)).willReturn(Optional.empty());
+
+        // when & then
+        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> {
+            accommodationService.updateAccommodation(1L, updateRequest);
+        });
+        assertThat(exception.getMessage()).isEqualTo("Accommodation not found");
+        verify(accommodationRepository).findById(1L);
+    }
+
+    @Test
     public void testDeleteAccommodation() {
         // given
         AccommodationEntity accommodationEntity = AccommodationEntity.builder().id(1L).build();
@@ -137,5 +165,18 @@ public class AccommodationServiceTest {
 
         // then
         verify(accommodationRepository).delete(accommodationEntity);
+    }
+
+    @Test
+    public void testDeleteAccommodation_NonExistingId() {
+        // given
+        given(accommodationRepository.findById(1L)).willReturn(Optional.empty());
+
+        // when & then
+        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> {
+            accommodationService.deleteAccommodation(1L);
+        });
+        assertThat(exception.getMessage()).isEqualTo("Accommodation not found");
+        verify(accommodationRepository).findById(1L);
     }
 }
