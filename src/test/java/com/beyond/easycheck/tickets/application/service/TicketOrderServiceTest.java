@@ -119,7 +119,6 @@ class TicketOrderServiceTest {
 
         TicketOrderEntity mockOrder = new TicketOrderEntity(mockTicket, 2, mockUser,
                 ReceiptMethodType.EMAIL, CollectionAgreementType.Y);
-        mockOrder.cancelOrder();
 
         when(ticketOrderRepository.findById(anyLong())).thenReturn(Optional.of(mockOrder));
 
