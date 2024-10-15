@@ -66,6 +66,8 @@
 
 ### 3. System Architecture
 
+<img width="555" alt="image" src="https://github.com/user-attachments/assets/9519afbd-1b7e-41f0-9398-cb847aa69f18"> <br>
+
 <br>
 
 ## 🛠️ Backend
