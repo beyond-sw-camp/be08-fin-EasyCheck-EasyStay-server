@@ -34,24 +34,14 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
     private final TicketRepository ticketRepository;
     private final UserJpaRepository userJpaRepository;
 
-    @Override
     @Transactional
     public TicketOrderDTO createTicketOrder(Long userId, TicketOrderRequest request) {
 
-        UserEntity userEntity = userJpaRepository.findById(userId)
-                .orElseThrow(() -> new EasyCheckException(UserMessageType.USER_NOT_FOUND));
+        UserEntity userEntity = getUserById(userId);
+        TicketEntity ticket = getTicketById(request.getTicketId());
 
-        TicketEntity ticket = ticketRepository.findById(request.getTicketId())
-                .orElseThrow(() -> new EasyCheckException(TICKET_NOT_FOUND));
-
-        LocalDateTime now = LocalDateTime.now();
-        if (now.isBefore(ticket.getSaleStartDate()) || now.isAfter(ticket.getSaleEndDate())) {
-            throw new EasyCheckException(TICKET_SALE_PERIOD_INVALID);
-        }
-
-        if (request.getQuantity() <= 0) {
-            throw new EasyCheckException(INVALID_QUANTITY);
-        }
+        validateSalePeriod(ticket);
+        validateQuantity(request.getQuantity());
 
         TicketOrderEntity ticketOrder = new TicketOrderEntity(
                 ticket,
@@ -69,7 +59,6 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
     @Override
     @Transactional
     public void cancelTicketOrder(Long userId, Long orderId) {
-
         TicketOrderEntity ticketOrder = getTicketOrderByIdAndUserId(userId, orderId);
 
         if (ticketOrder.getOrderStatus() == OrderStatus.CANCELLED) {
@@ -82,13 +71,7 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
 
     @Transactional
     public void completeOrder(Long userId, Long orderId) {
-
-        TicketOrderEntity order = ticketOrderRepository.findById(orderId)
-                .orElseThrow(() -> new EasyCheckException(ORDER_NOT_FOUND));
-
-        if (!order.getUserEntity().getId().equals(userId)) {
-            throw new EasyCheckException(UNAUTHORIZED_ACCESS);
-        }
+        TicketOrderEntity order = getTicketOrderByIdAndUserId(userId, orderId);
 
         if (order.getOrderStatus() == OrderStatus.CANCELLED) {
             throw new EasyCheckException(INVALID_ORDER_STATUS_FOR_COMPLETION);
@@ -104,20 +87,15 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
 
     @Override
     public TicketOrderDTO getTicketOrder(Long userId, Long orderId) {
-
         TicketOrderEntity ticketOrder = getTicketOrderByIdAndUserId(userId, orderId);
-
-        TicketPaymentEntity payment = ticketPaymentRepository.findByTicketOrderId(orderId)
-                .orElse(null);
+        TicketPaymentEntity payment = ticketPaymentRepository.findByTicketOrderId(orderId).orElse(null);
 
         return convertToDTO(ticketOrder, payment);
     }
 
     @Override
     public List<TicketOrderDTO> getAllOrdersByUserId(Long userId) {
-
         List<TicketOrderEntity> orders = ticketOrderRepository.findByUserEntity_Id(userId);
-
         return orders.stream().map(order -> convertToDTO(order, null)).collect(Collectors.toList());
     }
 
@@ -128,6 +106,29 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
             throw new EasyCheckException(UNAUTHORIZED_ACCESS);
         }
         return ticketOrder;
+    }
+
+    private UserEntity getUserById(Long userId) {
+        return userJpaRepository.findById(userId)
+                .orElseThrow(() -> new EasyCheckException(UserMessageType.USER_NOT_FOUND));
+    }
+
+    private TicketEntity getTicketById(Long ticketId) {
+        return ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new EasyCheckException(TICKET_NOT_FOUND));
+    }
+
+    private void validateSalePeriod(TicketEntity ticket) {
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isBefore(ticket.getSaleStartDate()) || now.isAfter(ticket.getSaleEndDate())) {
+            throw new EasyCheckException(TICKET_SALE_PERIOD_INVALID);
+        }
+    }
+
+    private void validateQuantity(int quantity) {
+        if (quantity <= 0) {
+            throw new EasyCheckException(INVALID_QUANTITY);
+        }
     }
 
     private TicketOrderDTO convertToDTO(TicketOrderEntity ticketOrder, TicketPaymentEntity payment) {
