@@ -119,7 +119,7 @@ class TicketOrderServiceTest {
 
         TicketOrderEntity mockOrder = new TicketOrderEntity(mockTicket, 2, mockUser,
                 ReceiptMethodType.EMAIL, CollectionAgreementType.Y);
-        mockOrder.confirmOrder();
+        mockOrder.cancelOrder();
 
         when(ticketOrderRepository.findById(anyLong())).thenReturn(Optional.of(mockOrder));
 
@@ -142,21 +142,12 @@ class TicketOrderServiceTest {
         TicketOrderEntity spyOrder = spy(mockOrder);
         doReturn(1L).when(spyOrder).getId();
 
-        System.out.println("mockOrder ID: " + spyOrder.getId());
-        System.out.println("mockOrder User ID: " + spyOrder.getUserEntity().getId());
-
         when(ticketOrderRepository.findById(anyLong())).thenReturn(Optional.of(spyOrder));
-
-        Optional<TicketOrderEntity> retrievedOrder = ticketOrderRepository.findById(1L);
-        System.out.println("찾은 주문: " + retrievedOrder.orElse(null));
 
         EasyCheckException exception = assertThrows(EasyCheckException.class, () -> ticketOrderService.cancelTicketOrder(1L, spyOrder.getId()));
 
-        System.out.println("예외 메시지: " + exception.getMessage());
         assertEquals(TicketOrderMessageType.UNAUTHORIZED_ACCESS.getMessage(), exception.getMessage());
     }
-
-
 
     @Test
     void getOrder_orderNotFound() {
@@ -172,15 +163,14 @@ class TicketOrderServiceTest {
         mockUser = spy(mockUser);
         doReturn(1L).when(mockUser).getId();
 
-        TicketOrderEntity mockOrder = new TicketOrderEntity(mockTicket, 2, mockUser,
-                ReceiptMethodType.EMAIL, CollectionAgreementType.Y);
-        mockOrder.cancelOrder();
-        TicketOrderEntity spyOrder = spy(mockOrder);
-        doReturn(1L).when(spyOrder).getId();
+        TicketOrderEntity mockOrder = mock(TicketOrderEntity.class);
+        doReturn(1L).when(mockOrder).getId();
+        doReturn(mockUser).when(mockOrder).getUserEntity();
+        doReturn(OrderStatus.CANCELLED).when(mockOrder).getOrderStatus();
 
-        when(ticketOrderRepository.findById(anyLong())).thenReturn(Optional.of(spyOrder));
+        when(ticketOrderRepository.findById(1L)).thenReturn(Optional.of(mockOrder));
 
-        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> ticketOrderService.completeOrder(1L, spyOrder.getId()));
+        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> ticketOrderService.completeOrder(1L, 1L));
 
         assertEquals(TicketOrderMessageType.INVALID_ORDER_STATUS_FOR_COMPLETION.getMessage(), exception.getMessage());
     }
@@ -196,14 +186,10 @@ class TicketOrderServiceTest {
         TicketOrderEntity spyOrder = spy(mockOrder);
         doReturn(1L).when(spyOrder).getId();
 
-        System.out.println("Order ID: " + spyOrder.getId());
-        System.out.println("Order Status: " + spyOrder.getOrderStatus());
-
         when(ticketOrderRepository.findById(anyLong())).thenReturn(Optional.of(spyOrder));
 
         EasyCheckException exception = assertThrows(EasyCheckException.class, () -> ticketOrderService.completeOrder(1L, spyOrder.getId()));
 
-        System.out.println("Exception Message: " + exception.getMessage());
         assertEquals(TicketOrderMessageType.ORDER_ALREADY_COMPLETED.getMessage(), exception.getMessage());
     }
 }
