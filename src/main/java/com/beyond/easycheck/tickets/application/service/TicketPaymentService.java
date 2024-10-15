@@ -28,17 +28,19 @@ public class TicketPaymentService {
     @Transactional
     public TicketPaymentEntity processPayment(Long orderId, Long userId, TicketPaymentRequest request) {
         TicketOrderEntity order = getOrderById(orderId);
-
         validateUserAccess(order, userId);
         validateOrderStatusForPayment(order);
 
-        return handlePayment(order, request);
+        TicketPaymentEntity payment = handlePayment(order, request);
+        order.completeOrder();
+        ticketOrderRepository.save(order);
+
+        return payment;
     }
 
     @Transactional
     public TicketPaymentEntity cancelPayment(Long orderId, Long userId, String reason) {
         TicketOrderEntity order = getOrderById(orderId);
-
         validateUserAccess(order, userId);
         validateOrderStatusForCancellation(order);
 
@@ -57,7 +59,6 @@ public class TicketPaymentService {
     @Transactional
     public TicketPaymentEntity refundPayment(Long orderId, Long userId, String reason) {
         TicketOrderEntity order = getOrderById(orderId);
-
         validateUserAccess(order, userId);
         validateOrderStatusForRefund(order);
 
@@ -87,7 +88,6 @@ public class TicketPaymentService {
     @Transactional
     public TicketPaymentEntity retryPayment(Long orderId, Long userId, TicketPaymentRequest request) {
         TicketOrderEntity order = getOrderById(orderId);
-
         validateUserAccess(order, userId);
         validateOrderStatusForRetry(order);
 
@@ -133,11 +133,18 @@ public class TicketPaymentService {
     }
 
     private TicketPaymentEntity handlePayment(TicketOrderEntity order, TicketPaymentRequest request) {
-        TicketPaymentEntity payment = TicketPaymentEntity.createPayment(order, request.getPaymentAmount(), request.getPaymentMethod());
-        payment.completePayment();
-        ticketPaymentRepository.save(payment);
+        TicketPaymentEntity payment = new TicketPaymentEntity(order, request.getPaymentAmount(), request.getPaymentMethod());
+        try {
+            payment.completePayment();
+            ticketPaymentRepository.save(payment);
 
-        log.info("주문 ID: {} 결제 성공, 결제 금액: {}", order.getId(), request.getPaymentAmount());
+            log.info("주문 ID: {} 결제 성공, 결제 금액: {}", order.getId(), request.getPaymentAmount());
+        } catch (Exception e) {
+            payment.failPayment();
+            ticketPaymentRepository.save(payment);
+            log.error("주문 ID: {} 결제 실패, 사유: {}", order.getId(), e.getMessage());
+            throw new EasyCheckException(PAYMENT_FAILED);
+        }
         return payment;
     }
 }
