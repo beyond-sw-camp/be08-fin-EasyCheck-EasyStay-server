@@ -50,9 +50,6 @@ public class TicketOrderEntity {
     @Column(nullable = false)
     private LocalDateTime purchaseTimestamp;
 
-    @OneToOne(mappedBy = "ticketOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private TicketPaymentEntity payment;
-
     public TicketOrderEntity(TicketEntity ticket, int quantity, UserEntity userEntity, ReceiptMethodType receiptMethod, CollectionAgreementType collectionAgreement) {
         this.ticket = ticket;
         this.quantity = quantity;
