@@ -23,7 +23,7 @@ public class TicketPaymentController {
     private final TicketPaymentService ticketPaymentService;
 
     @Operation(summary = "입장권 결제 추가하는 API")
-    @PostMapping("")
+    @PostMapping("/{orderId}")
     public ResponseEntity<ApiResponseView<TicketPaymentEntity>> processPayment(
             @PathVariable Long orderId,
             @RequestBody TicketPaymentRequest request,
