@@ -83,10 +83,4 @@ public class TicketPaymentEntity {
         this.cancelDate = LocalDateTime.now();
     }
 
-    public void linkToOrder(TicketOrderEntity ticketOrder) {
-        if (this.ticketOrder != null) {
-            throw new EasyCheckException(ORDER_ALREADY_LINKED);
-        }
-        this.ticketOrder = ticketOrder;
-    }
 }
