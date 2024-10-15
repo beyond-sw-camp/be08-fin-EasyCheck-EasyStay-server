@@ -63,27 +63,14 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
 
         ticketOrderRepository.save(ticketOrder);
 
-        return new TicketOrderDTO(
-                ticketOrder.getId(),
-                ticketOrder.getTicket().getTicketName(),
-                ticketOrder.getQuantity(),
-                ticketOrder.getTotalPrice(),
-                ticketOrder.getUserEntity().getId(),
-                ticketOrder.getPurchaseTimestamp(),
-                ticketOrder.getOrderStatus()
-        );
+        return convertToDTO(ticketOrder, null);
     }
 
     @Override
     @Transactional
     public void cancelTicketOrder(Long userId, Long orderId) {
 
-        TicketOrderEntity ticketOrder = ticketOrderRepository.findById(orderId)
-                .orElseThrow(() -> new EasyCheckException(ORDER_NOT_FOUND));
-
-        if (!ticketOrder.getUserEntity().getId().equals(userId)) {
-            throw new EasyCheckException(UNAUTHORIZED_ACCESS);
-        }
+        TicketOrderEntity ticketOrder = getTicketOrderByIdAndUserId(userId, orderId);
 
         if (ticketOrder.getOrderStatus() == OrderStatus.CANCELLED) {
             throw new EasyCheckException(ORDER_ALREADY_CANCELLED);
@@ -103,12 +90,12 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
             throw new EasyCheckException(UNAUTHORIZED_ACCESS);
         }
 
-        if (order.getOrderStatus() == OrderStatus.COMPLETED) {
-            throw new EasyCheckException(ORDER_ALREADY_COMPLETED);
+        if (order.getOrderStatus() == OrderStatus.CANCELLED) {
+            throw new EasyCheckException(INVALID_ORDER_STATUS_FOR_COMPLETION);
         }
 
-        if (order.getOrderStatus() != OrderStatus.CONFIRMED) {
-            throw new EasyCheckException(INVALID_ORDER_STATUS_FOR_COMPLETION);
+        if (order.getOrderStatus() == OrderStatus.COMPLETED) {
+            throw new EasyCheckException(ORDER_ALREADY_COMPLETED);
         }
 
         order.completeOrder();
@@ -118,16 +105,32 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
     @Override
     public TicketOrderDTO getTicketOrder(Long userId, Long orderId) {
 
-        TicketOrderEntity ticketOrder = ticketOrderRepository.findById(orderId)
-                .orElseThrow(() -> new EasyCheckException(ORDER_NOT_FOUND));
-
-        if (!ticketOrder.getUserEntity().getId().equals(userId)) {
-            throw new EasyCheckException(UNAUTHORIZED_ACCESS);
-        }
+        TicketOrderEntity ticketOrder = getTicketOrderByIdAndUserId(userId, orderId);
 
         TicketPaymentEntity payment = ticketPaymentRepository.findByTicketOrderId(orderId)
                 .orElse(null);
 
+        return convertToDTO(ticketOrder, payment);
+    }
+
+    @Override
+    public List<TicketOrderDTO> getAllOrdersByUserId(Long userId) {
+
+        List<TicketOrderEntity> orders = ticketOrderRepository.findByUserEntity_Id(userId);
+
+        return orders.stream().map(order -> convertToDTO(order, null)).collect(Collectors.toList());
+    }
+
+    private TicketOrderEntity getTicketOrderByIdAndUserId(Long userId, Long orderId) {
+        TicketOrderEntity ticketOrder = ticketOrderRepository.findById(orderId)
+                .orElseThrow(() -> new EasyCheckException(ORDER_NOT_FOUND));
+        if (!ticketOrder.getUserEntity().getId().equals(userId)) {
+            throw new EasyCheckException(UNAUTHORIZED_ACCESS);
+        }
+        return ticketOrder;
+    }
+
+    private TicketOrderDTO convertToDTO(TicketOrderEntity ticketOrder, TicketPaymentEntity payment) {
         return new TicketOrderDTO(
                 ticketOrder.getId(),
                 ticketOrder.getTicket().getTicketName(),
@@ -139,21 +142,5 @@ public class TicketOrderService implements TicketOrderOperationUseCase, TicketOr
                 payment != null ? payment.getPaymentAmount() : null,
                 ticketOrder.getOrderStatus()
         );
-    }
-
-    @Override
-    public List<TicketOrderDTO> getAllOrdersByUserId(Long userId) {
-
-        List<TicketOrderEntity> orders = ticketOrderRepository.findByUserEntity_Id(userId);
-
-        return orders.stream().map(order -> new TicketOrderDTO(
-                order.getId(),
-                order.getTicket().getTicketName(),
-                order.getQuantity(),
-                order.getTotalPrice(),
-                order.getUserEntity().getId(),
-                order.getPurchaseTimestamp(),
-                order.getOrderStatus()
-        )).collect(Collectors.toList());
     }
 }
