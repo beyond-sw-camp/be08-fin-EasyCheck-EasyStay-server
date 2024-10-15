@@ -40,14 +40,15 @@ public class TicketPaymentEntity {
 
     private LocalDateTime paymentDate;
 
-    public static TicketPaymentEntity createPayment(TicketOrderEntity order, BigDecimal amount, String method) {
-        TicketPaymentEntity payment = new TicketPaymentEntity();
-        payment.ticketOrder = order;
-        payment.paymentAmount = amount;
-        payment.paymentMethod = method;
-        payment.paymentStatus = PaymentStatus.PENDING;
-        payment.paymentDate = LocalDateTime.now();
-        return payment;
+    public TicketPaymentEntity(TicketOrderEntity order, BigDecimal amount, String method) {
+        if (order == null) {
+            throw new EasyCheckException(TICKET_ORDER_CANNOT_BE_NULL);
+        }
+        this.ticketOrder = order;
+        this.paymentAmount = amount;
+        this.paymentMethod = method;
+        this.paymentStatus = PaymentStatus.PENDING;
+        this.paymentDate = LocalDateTime.now();
     }
 
     public void completePayment() {
@@ -55,7 +56,6 @@ public class TicketPaymentEntity {
             throw new EasyCheckException(INVALID_PAYMENT_STATUS_FOR_COMPLETION);
         }
         this.paymentStatus = PaymentStatus.COMPLETED;
-
     }
 
     public void failPayment() {
@@ -63,7 +63,6 @@ public class TicketPaymentEntity {
             throw new EasyCheckException(INVALID_PAYMENT_STATUS_FOR_FAILURE);
         }
         this.paymentStatus = PaymentStatus.FAILED;
-
     }
 
     public void cancelPayment(String reason) {
@@ -71,7 +70,6 @@ public class TicketPaymentEntity {
             throw new EasyCheckException(INVALID_PAYMENT_STATUS_FOR_CANCELLATION);
         }
         this.paymentStatus = PaymentStatus.CANCELLED;
-
         this.cancelReason = reason;
         this.cancelDate = LocalDateTime.now();
     }
@@ -83,5 +81,12 @@ public class TicketPaymentEntity {
         this.paymentStatus = PaymentStatus.REFUNDED;
         this.cancelReason = reason;
         this.cancelDate = LocalDateTime.now();
+    }
+
+    public void linkToOrder(TicketOrderEntity ticketOrder) {
+        if (this.ticketOrder != null) {
+            throw new EasyCheckException(ORDER_ALREADY_LINKED);
+        }
+        this.ticketOrder = ticketOrder;
     }
 }
