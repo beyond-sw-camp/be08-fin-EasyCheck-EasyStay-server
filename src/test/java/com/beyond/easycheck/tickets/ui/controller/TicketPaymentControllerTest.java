@@ -1,6 +1,5 @@
 package com.beyond.easycheck.tickets.ui.controller;
 
-import com.beyond.easycheck.common.ui.view.ApiResponseView;
 import com.beyond.easycheck.tickets.application.service.TicketPaymentService;
 import com.beyond.easycheck.tickets.infrastructure.entity.TicketPaymentEntity;
 import com.beyond.easycheck.tickets.ui.requestbody.TicketPaymentRequest;
@@ -15,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -66,7 +64,7 @@ class TicketPaymentControllerTest {
 
     @Test
     void cancelPayment_shouldReturnOk() throws Exception {
-        Long orderId = 1L;
+        long orderId = 1L;
         TicketPaymentEntity paymentEntity = new TicketPaymentEntity();
 
         when(ticketPaymentService.cancelPayment(anyLong(), anyLong(), any(String.class))).thenReturn(paymentEntity);
@@ -80,7 +78,7 @@ class TicketPaymentControllerTest {
 
     @Test
     void refundPayment_shouldReturnOk() throws Exception {
-        Long orderId = 1L;
+        long orderId = 1L;
         TicketPaymentEntity paymentEntity = new TicketPaymentEntity();
 
         when(ticketPaymentService.refundPayment(anyLong(), anyLong(), any(String.class))).thenReturn(paymentEntity);
@@ -94,7 +92,7 @@ class TicketPaymentControllerTest {
 
     @Test
     void getPaymentStatus_shouldReturnOk() throws Exception {
-        Long orderId = 1L;
+        long orderId = 1L;
         TicketPaymentEntity paymentEntity = new TicketPaymentEntity();
 
         when(ticketPaymentService.getPaymentStatus(anyLong())).thenReturn(paymentEntity);

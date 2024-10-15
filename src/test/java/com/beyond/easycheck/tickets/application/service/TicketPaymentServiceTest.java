@@ -41,8 +41,6 @@ class TicketPaymentServiceTest {
 
     private TicketOrderEntity mockOrder;
     private TicketPaymentEntity mockPayment;
-    private UserEntity mockUser;
-    private TicketEntity mockTicket;
     private AutoCloseable closeable;
 
     @BeforeEach
@@ -63,22 +61,22 @@ class TicketPaymentServiceTest {
                 LocalDateTime.now().plusDays(1),
                 LocalDateTime.now(),
                 LocalDateTime.now().plusDays(7));
-        mockTicket = TicketEntity.createTicket(ticketCommand, mockThemePark);
+        TicketEntity mockTicket = TicketEntity.createTicket(ticketCommand, mockThemePark);
 
-        mockUser = UserEntity.createGuestUser("Test User", "010-1234-5678");
-        setEntityId(mockUser, 1L);
+        UserEntity mockUser = UserEntity.createGuestUser("Test User", "010-1234-5678");
+        setEntityId(mockUser);
 
         mockOrder = new TicketOrderEntity(mockTicket, 2, mockUser, ReceiptMethodType.EMAIL, CollectionAgreementType.Y);
-        setEntityId(mockOrder, 1L);
+        setEntityId(mockOrder);
 
         mockPayment = new TicketPaymentEntity(mockOrder, BigDecimal.valueOf(1000), "CARD");
-        setEntityId(mockPayment, 1L);
+        setEntityId(mockPayment);
     }
 
-    private void setEntityId(Object entity, Long id) throws Exception {
+    private void setEntityId(Object entity) throws Exception {
         Field idField = entity.getClass().getDeclaredField("id");
         idField.setAccessible(true);
-        idField.set(entity, id);
+        idField.set(entity, 1L);
     }
 
     @AfterEach
@@ -120,10 +118,7 @@ class TicketPaymentServiceTest {
     void cancelPayment_success() {
         when(ticketOrderRepository.findById(anyLong())).thenReturn(Optional.of(mockOrder));
         when(ticketPaymentRepository.findByTicketOrderId(anyLong())).thenReturn(Optional.of(mockPayment));
-        when(ticketPaymentRepository.save(any(TicketPaymentEntity.class))).thenAnswer(invocation -> {
-            TicketPaymentEntity payment = invocation.getArgument(0);
-            return payment;
-        });
+        when(ticketPaymentRepository.save(any(TicketPaymentEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         TicketPaymentEntity result = ticketPaymentService.cancelPayment(1L, 1L, "User requested cancellation");
 
