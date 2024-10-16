@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum FileManagementCategory {
+    ACCOMMODATION("accommodation", "사업장"),
     ACCOMMODATION_THUMBNAIL("accommodation_thumbmail", "사업장 썸네일"),
     ACCOMMODATION_LANDSCAPE("accommodation_landscape", "사업장 풍경"),
     RESORT("resort", "리조트"),

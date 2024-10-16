@@ -30,9 +30,10 @@ public class AccommodationController {
     public ResponseEntity<Void> createAccommodation(
             @RequestPart("accommodation") @Valid AccommodationCreateRequest accommodationCreateRequest,
             @RequestPart("thumbnails") List<MultipartFile> thumbnailFiles,
-            @RequestPart("landscapes") List<MultipartFile> landscapeFiles) {
+            @RequestPart("landscapes") List<MultipartFile> landscapeFiles,
+            @RequestPart("directions") MultipartFile directionsUrl) {
 
-        accommodationService.createAccommodation(accommodationCreateRequest, thumbnailFiles, landscapeFiles);
+        accommodationService.createAccommodation(accommodationCreateRequest, thumbnailFiles, landscapeFiles, directionsUrl);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

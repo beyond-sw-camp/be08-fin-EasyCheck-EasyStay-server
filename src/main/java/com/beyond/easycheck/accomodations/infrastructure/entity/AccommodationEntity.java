@@ -33,8 +33,18 @@ public class AccommodationEntity extends BaseTimeEntity {
     @ElementCollection
     @Column(name = "landscape_urls", nullable = false)
     private List<String> landscapeUrls;
+
+    @Column(nullable = false)
+    private String directionsUrl;
+
     @Column(nullable = false)
     private String address;
+
+    @Column(nullable = false)
+    private String latitude;
+
+    @Column(nullable = false)
+    private String longitude;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -52,5 +62,9 @@ public class AccommodationEntity extends BaseTimeEntity {
 
     public void setLandscapeUrls(List<String> landscapeUrls) {
         this.landscapeUrls = landscapeUrls;
+    }
+
+    public void setDirectionsUrl(String directionsUrl) {
+        this.directionsUrl = directionsUrl;
     }
 }
