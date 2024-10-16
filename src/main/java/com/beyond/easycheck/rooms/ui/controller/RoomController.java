@@ -4,9 +4,12 @@ import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.rooms.application.service.RoomService;
 import com.beyond.easycheck.rooms.exception.RoomMessageType;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
+import com.beyond.easycheck.rooms.infrastructure.repository.RoomImageRepository;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomCreateRequest;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomUpdateRequest;
 import com.beyond.easycheck.rooms.ui.view.RoomView;
+import com.beyond.easycheck.roomtypes.infrastructure.entity.RoomtypeEntity;
+import com.beyond.easycheck.roomtypes.infrastructure.repository.RoomtypeRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -19,6 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+import static com.beyond.easycheck.rooms.exception.RoomMessageType.ROOM_IMAGE_NOT_FOUND;
+import static com.beyond.easycheck.roomtypes.exception.RoomtypeMessageType.ROOM_TYPE_NOT_FOUND;
+
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Room", description = "객실 관리 API")
@@ -26,6 +32,8 @@ import java.util.List;
 public class RoomController {
 
     private final RoomService roomService;
+    private final RoomtypeRepository roomtypeRepository;
+    private final RoomImageRepository roomImageRepository;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "객실 생성 API")
@@ -54,8 +62,12 @@ public class RoomController {
     @PatchMapping("/{id}")
     @Operation(summary = "객실 수정 API")
     public ResponseEntity<Void> updateRoom(@PathVariable Long id, @RequestBody RoomUpdateRequest roomUpdateRequest) {
+
+        RoomtypeEntity roomtypeEntity = roomtypeRepository.findById(roomUpdateRequest.getRoomtypeEntity())
+                .orElseThrow(() -> new EasyCheckException(ROOM_TYPE_NOT_FOUND));
+
         if (roomUpdateRequest.getRoomNumber() == null || roomUpdateRequest.getRoomNumber().isEmpty()
-        || roomUpdateRequest.getRoomAmount() < 0) {
+                || roomUpdateRequest.getRoomAmount() < 0) {
             throw new EasyCheckException(RoomMessageType.ARGUMENT_NOT_VALID);
         }
 
@@ -66,6 +78,9 @@ public class RoomController {
     @PatchMapping(value = "/images/{imageId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "객실 사진 수정 API")
     public ResponseEntity<Void> updateRoomImage(@PathVariable Long imageId, @RequestPart MultipartFile newImageFile) {
+        RoomEntity.ImageEntity imageEntity = roomImageRepository.findById(imageId)
+                .orElseThrow(() -> new EasyCheckException(ROOM_IMAGE_NOT_FOUND));
+
         roomService.updateRoomImage(imageId, newImageFile);
         return ResponseEntity.noContent().build();
     }

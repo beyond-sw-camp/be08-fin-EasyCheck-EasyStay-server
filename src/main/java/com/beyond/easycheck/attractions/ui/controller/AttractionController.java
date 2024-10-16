@@ -5,18 +5,18 @@ import com.beyond.easycheck.attractions.application.service.AttractionOperationU
 import com.beyond.easycheck.attractions.application.service.AttractionOperationUseCase.AttractionUpdateCommand;
 import com.beyond.easycheck.attractions.application.service.AttractionReadUseCase;
 import com.beyond.easycheck.attractions.application.service.AttractionReadUseCase.FindAttractionResult;
-import com.beyond.easycheck.attractions.ui.requestbody.AttractionRequest;
 import com.beyond.easycheck.attractions.ui.view.AttractionView;
 import com.beyond.easycheck.common.ui.view.ApiResponseView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-
 
 @Tag(name = "Attraction", description = "어트랙션 시설 정보 관리 API")
 @RestController
@@ -28,23 +28,48 @@ public class AttractionController {
     private final AttractionReadUseCase attractionReadUseCase;
 
     @Operation(summary = "어트랙션 시설을 등록하는 API")
-    @PostMapping("")
-    public ResponseEntity<ApiResponseView<AttractionView>> createAttraction(@PathVariable Long themeParkId,
-                                                                            @RequestBody AttractionRequest request) {
-        AttractionCreateCommand command = AttractionCreateCommand.builder()
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponseView<FindAttractionResult>> createAttraction(
+            @PathVariable Long themeParkId,
+            @RequestPart("imageFiles") List<MultipartFile> imageFiles,
+            @RequestPart("request") AttractionCreateCommand command) {
+
+        AttractionCreateCommand completeCommand = AttractionCreateCommand.builder()
                 .themeParkId(themeParkId)
-                .name(request.getName())
-                .description(request.getDescription())
-                .image(request.getImage())
+                .name(command.getName())
+                .description(command.getDescription())
                 .build();
 
-        FindAttractionResult attraction = attractionOperationUseCase.createAttraction(command);
+        FindAttractionResult attraction = attractionOperationUseCase.createAttraction(completeCommand, imageFiles);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponseView<>(new AttractionView(attraction)));
+                .body(new ApiResponseView<>(attraction));
     }
 
-    @Operation(summary = "테마파크 내의 어트랙션 시설정보를 전체 조회하는 API")
+    @Operation(summary = "어트랙션 시설의 내용을 수정하는 API")
+    @PatchMapping("/{attractionId}")
+    public ResponseEntity<Void> updateAttraction(
+            @PathVariable Long attractionId,
+            @RequestBody AttractionUpdateCommand command) {
+
+        attractionOperationUseCase.updateAttraction(attractionId, command);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "어트랙션 시설의 이미지를 수정하는 API")
+    @PatchMapping(value = "/{attractionId}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> updateAttractionImages(
+            @PathVariable Long attractionId,
+            @RequestPart("imageFiles") List<MultipartFile> imageFiles,
+            @RequestPart("imageIdsToDelete") List<Long> imageIdsToDelete) {
+
+        attractionOperationUseCase.updateAttractionImages(attractionId, imageFiles, imageIdsToDelete);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "테마파크 내의 어트랙션 시설 정보를 전체 조회하는 API")
     @GetMapping("")
     public ResponseEntity<ApiResponseView<List<AttractionView>>> getAttractions(@PathVariable Long themeParkId) {
         List<FindAttractionResult> attractions = attractionReadUseCase.getAttractionsByThemePark(themeParkId);
@@ -64,22 +89,6 @@ public class AttractionController {
                 .body(new ApiResponseView<>(new AttractionView(result)));
     }
 
-    @Operation(summary = "어트랙션 시설을 수정하는 API")
-    @PutMapping("/{attractionId}")
-    public ResponseEntity<ApiResponseView<AttractionView>> updateAttraction(@PathVariable Long attractionId,
-                                                                            @RequestBody AttractionRequest request) {
-        AttractionUpdateCommand command = AttractionUpdateCommand.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .image(request.getImage())
-                .build();
-
-        FindAttractionResult result = attractionOperationUseCase.updateAttraction(attractionId, command);
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponseView<>(new AttractionView(result)));
-    }
-    
     @Operation(summary = "어트랙션 시설을 삭제하는 API")
     @DeleteMapping("/{attractionId}")
     public ResponseEntity<Void> deleteAttraction(@PathVariable Long attractionId) {

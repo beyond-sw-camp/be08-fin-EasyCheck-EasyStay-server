@@ -1,5 +1,6 @@
 package com.beyond.easycheck.themeparks.application.service;
 
+import com.amazonaws.SdkClientException;
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationType;
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.beyond.easycheck.accomodations.exception.AccommodationMessageType.ACCOMMODATION_NOT_FOUND;
+import static com.beyond.easycheck.common.exception.CommonMessageType.IMAGE_UPDATE_FAILED;
 import static com.beyond.easycheck.themeparks.exception.ThemeParkMessageType.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -248,5 +250,57 @@ class ThemeParkServiceTest {
 
         EasyCheckException exception = assertThrows(EasyCheckException.class, () -> themeParkService.deleteThemePark(1L, 1L));
         assertEquals(THEME_PARK_DOES_NOT_BELONG_TO_ACCOMMODATION.getMessage(), exception.getMessage());
+    }
+
+    // S3 이미지 업로드 실패 시 예외 처리 테스트
+    @Test
+    void shouldThrowExceptionWhenS3ImageUploadFails() {
+        // Given
+        ThemeParkCreateCommand command = ThemeParkCreateCommand.builder()
+                .name("테마파크 1")
+                .description("설명")
+                .location("서울")
+                .build();
+
+        AccommodationEntity accommodationEntity = AccommodationEntity.builder()
+                .id(1L)
+                .name("숙소 이름")
+                .address("숙소 주소")
+                .accommodationType(AccommodationType.HOTEL)
+                .build();
+
+        when(accommodationRepository.findById(1L)).thenReturn(Optional.of(accommodationEntity));
+        when(themeParkRepository.existsByNameAndLocation(command.getName(), command.getLocation())).thenReturn(false);
+
+        // S3 업로드 실패 시 SdkClientException 발생
+        when(s3Service.uploadFiles(any(), any())).thenThrow(SdkClientException.class);
+
+        // When
+        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> themeParkService.saveThemePark(command, 1L, List.of(mock(MultipartFile.class))));
+
+        // Then
+        assertEquals(IMAGE_UPDATE_FAILED.getMessage(), exception.getMessage());
+    }
+
+    // 입력값 검증 실패 시 예외 처리 테스트
+    @Test
+    void shouldThrowExceptionWhenValidationFails() {
+        ThemeParkCreateCommand invalidCommand = ThemeParkCreateCommand.builder()
+                .name("") // 빈 이름으로 잘못된 값 설정
+                .description("설명")
+                .location("서울")
+                .build();
+
+        AccommodationEntity accommodationEntity = AccommodationEntity.builder()
+                .id(1L)
+                .name("숙소 이름")
+                .address("숙소 주소")
+                .accommodationType(AccommodationType.HOTEL)
+                .build();
+
+        when(accommodationRepository.findById(1L)).thenReturn(Optional.of(accommodationEntity));
+
+        EasyCheckException exception = assertThrows(EasyCheckException.class, () -> themeParkService.saveThemePark(invalidCommand, 1L, Collections.emptyList()));
+        assertEquals(VALIDATION_FAILED.getMessage(), exception.getMessage());
     }
 }

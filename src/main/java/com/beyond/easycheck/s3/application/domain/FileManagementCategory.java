@@ -8,6 +8,7 @@ public enum FileManagementCategory {
     ACCOMMODATION_LANDSCAPE("accommodation_landscape", "사업장 풍경"),
     RESORT("resort", "리조트"),
     THEME_PARK("theme-park", "테마파크"),
+    ATTRACTION("attraction", "어트랙션"),
     USER("user", "사용자"),
     SUGGESTION("suggestion", "건의사항"),
     RESERVATION("reservation", "예약"),

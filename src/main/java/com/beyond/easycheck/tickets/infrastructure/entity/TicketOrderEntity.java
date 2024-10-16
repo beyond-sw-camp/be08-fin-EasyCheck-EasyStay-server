@@ -29,7 +29,6 @@ public class TicketOrderEntity {
     @Min(1)
     private int quantity;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity userEntity;
@@ -64,9 +63,7 @@ public class TicketOrderEntity {
 
     public void cancelOrder() { this.orderStatus = CANCELLED; }
 
-    public void confirmOrder() { this.orderStatus = CONFIRMED; }
-
     public void completeOrder() { this.orderStatus = COMPLETED; }
 
-    public void failOrder() { this.orderStatus = FAILED; }
+    public void markAsRefunded() { this.orderStatus = CANCELLED; }
 }
