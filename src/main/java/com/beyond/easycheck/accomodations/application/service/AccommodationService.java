@@ -30,11 +30,13 @@ public class AccommodationService {
     private final S3Service s3Service;
 
     @Transactional
-    public Optional<AccommodationEntity> createAccommodation(AccommodationCreateRequest accommodationCreateRequest, List<MultipartFile> thumbnailFiles, List<MultipartFile> landscapeFiles) {
+    public Optional<AccommodationEntity> createAccommodation(AccommodationCreateRequest accommodationCreateRequest, List<MultipartFile> thumbnailFiles, List<MultipartFile> landscapeFiles, MultipartFile directionsFile) {
 
         AccommodationEntity accommodationEntity = AccommodationEntity.builder()
                 .name(accommodationCreateRequest.getName())
                 .address(accommodationCreateRequest.getAddress())
+                .latitude(accommodationCreateRequest.getLatitude())
+                .longitude(accommodationCreateRequest.getLongitude())
                 .accommodationType(accommodationCreateRequest.getAccommodationType())
                 .build();
 
@@ -43,6 +45,11 @@ public class AccommodationService {
                     .map(file -> s3Service.uploadFile(file, FileManagementCategory.ACCOMMODATION_THUMBNAIL))
                     .collect(Collectors.toList());
             accommodationEntity.setThumbnailUrls(thumbnailUrls);
+        }
+
+        if (directionsFile != null && !directionsFile.isEmpty()) {
+            String landscapeUrl = s3Service.uploadFile(directionsFile, FileManagementCategory.ACCOMMODATION);
+            accommodationEntity.setDirectionsUrl(landscapeUrl);
         }
 
         if (landscapeFiles != null && !landscapeFiles.isEmpty()) {

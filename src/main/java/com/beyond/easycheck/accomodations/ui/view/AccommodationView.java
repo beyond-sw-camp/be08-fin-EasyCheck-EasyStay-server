@@ -23,6 +23,12 @@ public class AccommodationView {
 
     private String address;
 
+    private String directionsUrl;
+
+    private String latitude;
+
+    private String longitude;
+
     private AccommodationType accommodationType;
 
     public static List<AccommodationView> listOf(List<AccommodationEntity> filteredAccommodation) {
@@ -40,6 +46,9 @@ public class AccommodationView {
                 accommodationEntity.getThumbnailUrls(),
                 accommodationEntity.getLandscapeUrls(),
                 accommodationEntity.getAddress(),
+                accommodationEntity.getDirectionsUrl(),
+                accommodationEntity.getLatitude(),
+                accommodationEntity.getLongitude(),
                 accommodationEntity.getAccommodationType()
         );
     }
