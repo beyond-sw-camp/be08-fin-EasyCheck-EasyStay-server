@@ -7,6 +7,8 @@ import com.beyond.easycheck.accomodations.ui.requestbody.AccommodationCreateRequ
 import com.beyond.easycheck.accomodations.ui.requestbody.AccommodationUpdateRequest;
 import com.beyond.easycheck.accomodations.ui.view.AccommodationView;
 import com.beyond.easycheck.common.exception.EasyCheckException;
+import com.beyond.easycheck.s3.application.domain.FileManagementCategory;
+import com.beyond.easycheck.s3.application.service.S3Service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,15 +27,30 @@ import java.util.stream.Collectors;
 public class AccommodationService {
 
     private final AccommodationRepository accommodationRepository;
+    private final S3Service s3Service;
 
     @Transactional
-    public Optional<AccommodationEntity> createAccommodation(AccommodationCreateRequest accommodationCreateRequest) {
+    public Optional<AccommodationEntity> createAccommodation(AccommodationCreateRequest accommodationCreateRequest, List<MultipartFile> thumbnailFiles, List<MultipartFile> landscapeFiles) {
 
         AccommodationEntity accommodationEntity = AccommodationEntity.builder()
                 .name(accommodationCreateRequest.getName())
                 .address(accommodationCreateRequest.getAddress())
                 .accommodationType(accommodationCreateRequest.getAccommodationType())
                 .build();
+
+        if (thumbnailFiles != null && !thumbnailFiles.isEmpty()) {
+            List<String> thumbnailUrls = thumbnailFiles.stream()
+                    .map(file -> s3Service.uploadFile(file, FileManagementCategory.ACCOMMODATION_THUMBNAIL))
+                    .collect(Collectors.toList());
+            accommodationEntity.setThumbnailUrls(thumbnailUrls);
+        }
+
+        if (landscapeFiles != null && !landscapeFiles.isEmpty()) {
+            List<String> landscapeUrls = landscapeFiles.stream()
+                    .map(file -> s3Service.uploadFile(file, FileManagementCategory.ACCOMMODATION_LANDSCAPE))
+                    .collect(Collectors.toList());
+            accommodationEntity.setLandscapeUrls(landscapeUrls);
+        }
 
         return Optional.of(accommodationRepository.save(accommodationEntity));
     }

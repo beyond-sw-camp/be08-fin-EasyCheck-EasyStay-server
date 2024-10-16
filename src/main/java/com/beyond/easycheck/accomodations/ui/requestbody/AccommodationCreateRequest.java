@@ -4,9 +4,11 @@ import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationTyp
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor(access = lombok.AccessLevel.PUBLIC)
 @AllArgsConstructor

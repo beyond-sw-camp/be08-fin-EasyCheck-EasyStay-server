@@ -10,8 +10,10 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -24,10 +26,13 @@ public class AccommodationController {
     private final AccommodationService accommodationService;
 
     @Operation(summary = "시설을 등록하는 API")
-    @PostMapping("")
-    public ResponseEntity<Void> createAccommodation(@RequestBody @Valid AccommodationCreateRequest accommodationCreateRequest) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> createAccommodation(
+            @RequestPart("accommodation") @Valid AccommodationCreateRequest accommodationCreateRequest,
+            @RequestPart("thumbnails") List<MultipartFile> thumbnailFiles,
+            @RequestPart("landscapes") List<MultipartFile> landscapeFiles) {
 
-        accommodationService.createAccommodation(accommodationCreateRequest);
+        accommodationService.createAccommodation(accommodationCreateRequest, thumbnailFiles, landscapeFiles);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Optional;
 
 @NoArgsConstructor
@@ -25,6 +26,13 @@ public class AccommodationEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private String name;
 
+    @ElementCollection
+    @Column(name = "thumbnail_urls", nullable = false)
+    private List<String> thumbnailUrls;
+
+    @ElementCollection
+    @Column(name = "landscape_urls", nullable = false)
+    private List<String> landscapeUrls;
     @Column(nullable = false)
     private String address;
 
@@ -36,5 +44,13 @@ public class AccommodationEntity extends BaseTimeEntity {
         Optional.ofNullable(accommodationUpdateRequest.getName()).ifPresent(name -> this.name = name);
         Optional.ofNullable(accommodationUpdateRequest.getAddress()).ifPresent(address -> this.address = address);
         Optional.ofNullable(accommodationUpdateRequest.getAccommodationType()).ifPresent(accommodationType -> this.accommodationType = accommodationType);
+    }
+
+    public void setThumbnailUrls(List<String> thumbnailUrls) {
+        this.thumbnailUrls = thumbnailUrls;
+    }
+
+    public void setLandscapeUrls(List<String> landscapeUrls) {
+        this.landscapeUrls = landscapeUrls;
     }
 }
