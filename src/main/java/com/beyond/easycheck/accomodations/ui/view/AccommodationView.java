@@ -17,6 +17,10 @@ public class AccommodationView {
 
     private String name;
 
+    private List<String> thumbnailUrls;
+
+    private List<String> landscapeUrls;
+
     private String address;
 
     private AccommodationType accommodationType;
@@ -33,6 +37,8 @@ public class AccommodationView {
 
                 accommodationEntity.getId(),
                 accommodationEntity.getName(),
+                accommodationEntity.getThumbnailUrls(),
+                accommodationEntity.getLandscapeUrls(),
                 accommodationEntity.getAddress(),
                 accommodationEntity.getAccommodationType()
         );
