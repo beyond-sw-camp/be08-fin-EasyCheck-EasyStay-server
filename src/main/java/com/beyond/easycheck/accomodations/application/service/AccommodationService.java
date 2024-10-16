@@ -62,7 +62,7 @@ public class AccommodationService {
         Page<AccommodationEntity> accommodationPage = accommodationRepository.findAll(pageable);
 
         return accommodationPage.getContent().stream()
-                .map(AccommodationView::of)
+                .map(entity -> AccommodationView.of(entity))
                 .collect(Collectors.toList());
     }
 
