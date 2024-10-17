@@ -25,6 +25,9 @@ public class AccommodationCreateRequest {
     @NotBlank
     private String longitude;
 
+    @NotBlank
+    private String responseTime;
+
     @Enumerated(EnumType.STRING)
     private AccommodationType accommodationType;
 }

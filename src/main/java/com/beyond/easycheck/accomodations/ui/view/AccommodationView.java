@@ -29,6 +29,8 @@ public class AccommodationView {
 
     private String longitude;
 
+    private String responseTime;
+
     private AccommodationType accommodationType;
 
     public static List<AccommodationView> listOf(List<AccommodationEntity> filteredAccommodation) {
@@ -49,6 +51,7 @@ public class AccommodationView {
                 accommodationEntity.getDirectionsUrl(),
                 accommodationEntity.getLatitude(),
                 accommodationEntity.getLongitude(),
+                accommodationEntity.getResponseTime(),
                 accommodationEntity.getAccommodationType()
         );
     }

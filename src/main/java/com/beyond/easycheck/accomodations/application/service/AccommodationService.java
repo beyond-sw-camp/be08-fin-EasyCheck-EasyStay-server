@@ -37,6 +37,7 @@ public class AccommodationService {
                 .address(accommodationCreateRequest.getAddress())
                 .latitude(accommodationCreateRequest.getLatitude())
                 .longitude(accommodationCreateRequest.getLongitude())
+                .responseTime(accommodationCreateRequest.getResponseTime())
                 .accommodationType(accommodationCreateRequest.getAccommodationType())
                 .build();
 

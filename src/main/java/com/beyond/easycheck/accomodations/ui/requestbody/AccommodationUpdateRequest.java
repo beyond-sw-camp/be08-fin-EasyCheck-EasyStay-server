@@ -19,6 +19,15 @@ public class AccommodationUpdateRequest {
     @NotBlank
     private String address;
 
+    @NotBlank
+    private String latitude;
+
+    @NotBlank
+    private String longitude;
+
+    @NotBlank
+    private String responseTime;
+
     @Enumerated(EnumType.STRING)
     private AccommodationType accommodationType;
 }

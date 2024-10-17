@@ -46,6 +46,9 @@ public class AccommodationEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private String longitude;
 
+    @Column(nullable = false)
+    private String responseTime;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AccommodationType accommodationType;
@@ -53,6 +56,9 @@ public class AccommodationEntity extends BaseTimeEntity {
     public void updateAccommodation(AccommodationUpdateRequest accommodationUpdateRequest) {
         Optional.ofNullable(accommodationUpdateRequest.getName()).ifPresent(name -> this.name = name);
         Optional.ofNullable(accommodationUpdateRequest.getAddress()).ifPresent(address -> this.address = address);
+        Optional.ofNullable(accommodationUpdateRequest.getLatitude()).ifPresent(latitude -> this.latitude = latitude);
+        Optional.ofNullable(accommodationUpdateRequest.getLongitude()).ifPresent(longitude -> this.longitude = longitude);
+        Optional.ofNullable(accommodationUpdateRequest.getResponseTime()).ifPresent(responseTime -> this.responseTime = responseTime);
         Optional.ofNullable(accommodationUpdateRequest.getAccommodationType()).ifPresent(accommodationType -> this.accommodationType = accommodationType);
     }
 
