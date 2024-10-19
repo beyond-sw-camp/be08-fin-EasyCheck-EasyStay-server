@@ -1,7 +1,6 @@
 package com.beyond.easycheck.payments.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
-import com.beyond.easycheck.payments.application.validator.PaymentValidator;
 import com.beyond.easycheck.payments.exception.PaymentMessageType;
 import com.beyond.easycheck.payments.infrastructure.entity.PaymentEntity;
 import com.beyond.easycheck.payments.infrastructure.repository.PaymentRepository;
@@ -12,23 +11,44 @@ import com.beyond.easycheck.reservationrooms.exception.ReservationRoomMessageTyp
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.PaymentStatus;
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationRoomEntity;
 import com.beyond.easycheck.reservationrooms.infrastructure.repository.ReservationRoomRepository;
-import com.beyond.easycheck.reservationrooms.ui.requestbody.ReservationRoomUpdateRequest;
+import com.siot.IamportRestClient.IamportClient;
+import com.siot.IamportRestClient.exception.IamportResponseException;
+import com.siot.IamportRestClient.response.IamportResponse;
+import com.siot.IamportRestClient.response.Payment;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final ReservationRoomRepository reservationRoomRepository;
+
+    private IamportClient iamportClient;
+
+    @Value("${portone.api-key}")
+    private String apiKey;
+
+    @Value("${portone.api-secret}")
+    private String secretKey;
+
+    @PostConstruct
+    public void init() {
+        this.iamportClient = new IamportClient(apiKey, secretKey);
+    }
 
     @Transactional
     public void processReservationPayment(Long reservationId, PaymentCreateRequest paymentCreateRequest) {
@@ -36,33 +56,48 @@ public class PaymentService {
         ReservationRoomEntity reservationRoomEntity = reservationRoomRepository.findById(reservationId)
                 .orElseThrow(() -> new EasyCheckException(ReservationRoomMessageType.RESERVATION_NOT_FOUND));
 
-        PaymentEntity paymentEntity = createPayment(paymentCreateRequest);
+        IamportResponse<Payment> paymentResponse = validatePortOnePayment(paymentCreateRequest.getImpUid());
 
-        PaymentValidator.validatePayment(paymentEntity, reservationRoomEntity);
+        if (paymentResponse != null && paymentResponse.getResponse().getAmount().intValue() == paymentCreateRequest.getAmount()) {
 
-        reservationRoomEntity.updateReservationRoomAndProcessPayment(new ReservationRoomUpdateRequest(), paymentEntity);
+            PaymentEntity paymentEntity = createPayment(paymentCreateRequest, reservationRoomEntity);
+            paymentRepository.save(paymentEntity);
 
-        reservationRoomEntity.updatePaymentStatus(PaymentStatus.PAID);
+            reservationRoomEntity.updatePaymentStatus(PaymentStatus.PAID);
+            reservationRoomRepository.save(reservationRoomEntity);
 
-        reservationRoomRepository.save(reservationRoomEntity);
+        } else {
+            throw new EasyCheckException(PaymentMessageType.PAYMENT_VERIFICATION_FAILED);
+        }
+    }
+
+    public IamportResponse<Payment> validatePortOnePayment(String impUid) {
+
+        try {
+            IamportResponse<Payment> paymentResponse = iamportClient.paymentByImpUid(impUid);
+
+            if (paymentResponse == null || paymentResponse.getResponse() == null) {
+                throw new EasyCheckException(PaymentMessageType.PORTONE_VERIFICATION_ERROR);
+            }
+
+            return paymentResponse;
+        } catch (IamportResponseException | IOException e) {
+            // 예외 발생 시 구체적인 에러 메시지와 함께 로깅 처리
+            log.error("PortOne 결제 검증 오류: impUid={}, message={}", impUid, e.getMessage());
+            throw new EasyCheckException(PaymentMessageType.PORTONE_VERIFICATION_ERROR);
+        }
     }
 
     @Transactional
-    public PaymentEntity createPayment(PaymentCreateRequest paymentCreateRequest) {
+    public PaymentEntity createPayment(PaymentCreateRequest paymentCreateRequest, ReservationRoomEntity reservationRoomEntity) {
 
-        ReservationRoomEntity reservationRoomEntity = reservationRoomRepository.findById(paymentCreateRequest.getReservationId()).orElseThrow(
-                () -> new EasyCheckException(ReservationRoomMessageType.RESERVATION_NOT_FOUND)
-        );
-
-        PaymentEntity paymentEntity = PaymentEntity.builder()
+        return PaymentEntity.builder()
                 .reservationRoomEntity(reservationRoomEntity)
                 .method(paymentCreateRequest.getMethod())
                 .amount(paymentCreateRequest.getAmount())
                 .paymentDate(paymentCreateRequest.getPaymentDate())
                 .completionStatus(paymentCreateRequest.getCompletionStatus())
                 .build();
-
-        return paymentRepository.save(paymentEntity);
     }
 
     @Transactional(readOnly = true)
