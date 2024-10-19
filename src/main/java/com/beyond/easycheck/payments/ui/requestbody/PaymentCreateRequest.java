@@ -18,6 +18,9 @@ import java.time.LocalDateTime;
 @Getter
 public class PaymentCreateRequest {
 
+    @NotBlank
+    private String impUid;
+
     @NotNull
     private Long reservationId;
 

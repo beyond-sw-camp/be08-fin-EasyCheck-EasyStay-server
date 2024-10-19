@@ -21,6 +21,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -45,6 +46,9 @@ dependencies {
 
     // sms
     implementation 'net.nurigo:sdk:4.3.0'
+
+    // portOne
+    implementation 'com.github.iamport:iamport-rest-client-java:0.2.23'
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
