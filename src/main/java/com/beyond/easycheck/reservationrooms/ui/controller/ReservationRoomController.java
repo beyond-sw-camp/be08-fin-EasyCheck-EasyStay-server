@@ -42,10 +42,11 @@ public class ReservationRoomController {
     @Operation(summary = "체크인, 체크아웃 날짜에 예약 가능한 객실 조회 API")
     @GetMapping("/available")
     public ResponseEntity<List<RoomAvailabilityView>> getAvailableRooms(
+            @RequestParam Long accommodationId,
             @RequestParam LocalDate checkinDate,
             @RequestParam LocalDate checkoutDate) {
 
-        List<RoomAvailabilityView> availableRooms = reservationRoomService.getAvailableRoomsByCheckInCheckOut(checkinDate, checkoutDate);
+        List<RoomAvailabilityView> availableRooms = reservationRoomService.getAvailableRoomsByCheckInCheckOut(accommodationId, checkinDate, checkoutDate);
         return ResponseEntity.ok(availableRooms);
     }
 
