@@ -116,7 +116,7 @@ public class ReservationRoomService {
     }
 
     @Transactional(readOnly = true)
-    public List<RoomAvailabilityView> getAvailableRoomsByCheckInCheckOut(LocalDate checkinDate, LocalDate checkoutDate) {
+    public List<RoomAvailabilityView> getAvailableRoomsByCheckInCheckOut(Long accommodationId, LocalDate checkinDate, LocalDate checkoutDate) {
 
         List<DailyRoomAvailabilityEntity> availableRoomsByDateRange = dailyRoomAvailabilityRepository.findAvailabilityByDateRange(
                 checkinDate.atStartOfDay(),
@@ -124,11 +124,14 @@ public class ReservationRoomService {
         );
 
         Map<Long, List<DailyRoomAvailabilityEntity>> roomAvailabilityMap = availableRoomsByDateRange.stream()
-                .filter(availability -> availability.getStatus() == RoomStatus.예약가능)
+                .filter(availability ->
+                        availability.getRoomEntity().getRoomTypeEntity().getAccommodationEntity().getId().equals(accommodationId) &&
+                                availability.getStatus() == RoomStatus.예약가능
+                )
                 .collect(Collectors.groupingBy(availability -> availability.getRoomEntity().getRoomId()));
 
         List<RoomAvailabilityView> availableRooms = roomAvailabilityMap.entrySet().stream()
-                .filter(entry -> entry.getValue().size() == checkinDate.datesUntil(checkoutDate.plusDays(1)).count()) // 모든 날짜가 존재하는지 확인
+                .filter(entry -> entry.getValue().size() == checkinDate.datesUntil(checkoutDate.plusDays(1)).count())
                 .map(entry -> {
                     DailyRoomAvailabilityEntity availability = entry.getValue().get(0);
 
