@@ -123,18 +123,19 @@ public class ReservationRoomService {
                 checkoutDate.atTime(23, 59)
         );
 
-        Map<Long, List<DailyRoomAvailabilityEntity>> roomAvailabilityMap = availableRoomsByDateRange.stream()
+        Map<Long, DailyRoomAvailabilityEntity> uniqueRoomAvailabilityMap = availableRoomsByDateRange.stream()
                 .filter(availability ->
                         availability.getRoomEntity().getRoomTypeEntity().getAccommodationEntity().getId().equals(accommodationId) &&
                                 availability.getStatus() == RoomStatus.예약가능
                 )
-                .collect(Collectors.groupingBy(availability -> availability.getRoomEntity().getRoomId()));
+                .collect(Collectors.toMap(
+                        availability -> availability.getRoomEntity().getRoomId(),
+                        availability -> availability,
+                        (existing, replacement) -> existing
+                ));
 
-        List<RoomAvailabilityView> availableRooms = roomAvailabilityMap.entrySet().stream()
-                .filter(entry -> entry.getValue().size() == checkinDate.datesUntil(checkoutDate.plusDays(1)).count())
-                .map(entry -> {
-                    DailyRoomAvailabilityEntity availability = entry.getValue().get(0);
-
+        List<RoomAvailabilityView> availableRooms = uniqueRoomAvailabilityMap.values().stream()
+                .map(availability -> {
                     RoomEntity roomEntity = availability.getRoomEntity();
 
                     List<String> imageUrls = roomEntity.getImages().stream()
