@@ -64,14 +64,9 @@ public class AccommodationService {
     }
 
     @Transactional(readOnly = true)
-    public List<AccommodationView> getAllAccommodations(int page, int size) {
+    public List<AccommodationView> getAllAccommodations() {
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<AccommodationEntity> accommodationPage = accommodationRepository.findAll(pageable);
-
-        return accommodationPage.getContent().stream()
-                .map(entity -> AccommodationView.of(entity))
-                .collect(Collectors.toList());
+        return accommodationRepository.findAll().stream().map(AccommodationView::of).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)

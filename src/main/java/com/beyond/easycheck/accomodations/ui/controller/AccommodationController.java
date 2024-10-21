@@ -40,11 +40,9 @@ public class AccommodationController {
 
     @Operation(summary = "모든 시설의 리스트를 반환하는 API")
     @GetMapping("")
-    public ResponseEntity<List<AccommodationView>> getAllAccommodations(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<List<AccommodationView>> getAllAccommodations() {
 
-        List<AccommodationView> accommodation = accommodationService.getAllAccommodations(page, size);
+        List<AccommodationView> accommodation = accommodationService.getAllAccommodations();
         return ResponseEntity.ok(accommodation);
     }
 
