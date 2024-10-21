@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ThemeParkRepository extends JpaRepository<ThemeParkEntity, Long> {
 
-    boolean existsByNameAndLocation(String name, String location);
+    boolean existsByName(String name);
 
     List<ThemeParkEntity> findByAccommodationId(Long accommodationId);
 }
