@@ -22,6 +22,8 @@ public interface ThemeParkReadUseCase {
 
         private final String name;
 
+        private final String guidePageName;
+
         private final String description;
 
         private final String ticketAvailable;
@@ -38,6 +40,7 @@ public interface ThemeParkReadUseCase {
             return FindThemeParkResult.builder()
                     .id(themePark.getId())
                     .name(themePark.getName())
+                    .guidePageName(themePark.getGuidePageName())
                     .description(themePark.getDescription())
                     .ticketAvailable(themePark.getTicketAvailable())
                     .imageUrls(imageUrls)

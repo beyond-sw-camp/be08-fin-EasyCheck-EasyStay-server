@@ -28,6 +28,9 @@ public class ThemeParkEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private String name;
 
+    @Column
+    private String guidePageName;
+
     @Column(nullable = false)
     private String description;
 
@@ -45,6 +48,7 @@ public class ThemeParkEntity extends BaseTimeEntity {
         return new ThemeParkEntity(
                 null,
                 command.getName(),
+                command.getGuidePageName(),
                 command.getDescription(),
                 accommodation,
                 command.getTicketAvailable(),

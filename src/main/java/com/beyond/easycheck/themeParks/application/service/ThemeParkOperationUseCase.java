@@ -24,6 +24,7 @@ public interface ThemeParkOperationUseCase {
     @Builder
     class ThemeParkCreateCommand {
         private String name;
+        private String guidePageName;
         private String description;
         private String ticketAvailable;
 
