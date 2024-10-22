@@ -15,6 +15,9 @@ public interface UserReadUseCase {
             String email
     ) {
 
+        public UserFindQuery(Long userId) {
+            this(userId, null);
+        }
     }
 
     record FindUserResult(

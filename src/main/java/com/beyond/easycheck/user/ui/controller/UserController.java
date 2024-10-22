@@ -3,12 +3,15 @@ package com.beyond.easycheck.user.ui.controller;
 import com.beyond.easycheck.user.application.service.admin.AdminOperationUseCase;
 import com.beyond.easycheck.user.application.service.admin.AdminOperationUseCase.UserStatusUpdateCommand;
 import com.beyond.easycheck.user.application.service.user.UserOperationUseCase;
+import com.beyond.easycheck.user.application.service.user.UserReadUseCase;
 import com.beyond.easycheck.user.ui.requestbody.ChangePasswordRequest;
 import com.beyond.easycheck.user.ui.requestbody.UserLoginRequest;
 import com.beyond.easycheck.user.ui.requestbody.UserRegisterRequest;
 import com.beyond.easycheck.user.ui.requestbody.UserStatusUpdateRequest;
 import com.beyond.easycheck.user.ui.view.UserLoginView;
 import com.beyond.easycheck.user.ui.view.UserView;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static com.beyond.easycheck.user.application.service.user.UserOperationUseCase.*;
+import static com.beyond.easycheck.user.application.service.user.UserReadUseCase.*;
 import static com.beyond.easycheck.user.application.service.user.UserReadUseCase.FindJwtResult;
 import static com.beyond.easycheck.user.application.service.user.UserReadUseCase.FindUserResult;
 
@@ -28,13 +32,17 @@ import static com.beyond.easycheck.user.application.service.user.UserReadUseCase
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
+@Tag(name = "User", description = "유저 관리 API")
 public class UserController {
+
+    private final UserReadUseCase userReadUseCase;
 
     private final UserOperationUseCase userOperationUseCase;
 
     private final AdminOperationUseCase adminOperationUseCase;
 
     @PostMapping("")
+    @Operation(summary = "일반 유저 회원가입 API")
     public ResponseEntity<Void> registerUser(@RequestBody @Validated UserRegisterRequest request) {
 
         UserRegisterCommand command = new UserRegisterCommand(
@@ -54,6 +62,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "일반 유저 로그인 API")
     public ResponseEntity<UserLoginView> login(@RequestBody @Validated UserLoginRequest request) {
 
         UserLoginCommand command = new UserLoginCommand(
@@ -68,6 +77,7 @@ public class UserController {
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "일반 유저 로그아웃 API")
     public ResponseEntity<Void> logout(HttpServletRequest request, @AuthenticationPrincipal Long userId) {
 
         String authorization = request.getHeader("Authorization");
@@ -86,7 +96,19 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @GetMapping("/info")
+    @Operation(summary = "로그인한 유저 정보 불러오기 API")
+    public ResponseEntity<UserView> getUserInfo(@AuthenticationPrincipal Long userId) {
+
+        UserFindQuery query = new UserFindQuery(userId);
+
+        FindUserResult result = userReadUseCase.getUserInfo(query);
+
+        return ResponseEntity.ok(new UserView(result));
+    }
+
     @PatchMapping("/change-password")
+    @Operation(summary = "비밀번호 변경 API")
     public ResponseEntity<Void> changePassword(@RequestBody @Validated ChangePasswordRequest request) {
 
         ChangePasswordCommand command = new ChangePasswordCommand(request.email(), request.oldPassword(), request.newPassword());
@@ -97,6 +119,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}/status")
+    @Operation(summary = "유저 정보 바꾸는 API")
     public ResponseEntity<UserView> changeUserStatus(@PathVariable Long id, @RequestBody @Validated UserStatusUpdateRequest request) {
         UserStatusUpdateCommand command = new UserStatusUpdateCommand(id, request.status());
 
