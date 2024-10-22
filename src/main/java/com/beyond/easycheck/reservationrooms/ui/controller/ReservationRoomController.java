@@ -30,13 +30,14 @@ public class ReservationRoomController {
 
     @Operation(summary = "객실을 예약하는 API")
     @PostMapping("")
-    public ResponseEntity<ReservationRoomEntity> createReservation(
+    public ResponseEntity<ReservationRoomView> createReservation(
             @AuthenticationPrincipal Long userId,
             @RequestBody @Valid ReservationRoomCreateRequest reservationRoomCreateRequest) {
 
-        reservationRoomService.createReservation(userId, reservationRoomCreateRequest);
+        ReservationRoomEntity result = reservationRoomService.createReservation(userId, reservationRoomCreateRequest);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ReservationRoomView.of(result));
     }
 
     @Operation(summary = "체크인, 체크아웃 날짜에 예약 가능한 객실 조회 API")
