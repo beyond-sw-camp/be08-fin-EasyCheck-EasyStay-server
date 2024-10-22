@@ -3,6 +3,7 @@ package com.beyond.easycheck.payments.application.service;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.mail.application.service.MailService;
 import com.beyond.easycheck.payments.exception.PaymentMessageType;
+import com.beyond.easycheck.payments.infrastructure.entity.CompletionStatus;
 import com.beyond.easycheck.payments.infrastructure.entity.PaymentEntity;
 import com.beyond.easycheck.payments.infrastructure.repository.PaymentRepository;
 import com.beyond.easycheck.payments.ui.requestbody.PaymentCreateRequest;
@@ -11,23 +12,26 @@ import com.beyond.easycheck.payments.ui.view.PaymentView;
 import com.beyond.easycheck.reservationrooms.exception.ReservationRoomMessageType;
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.PaymentStatus;
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationRoomEntity;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationStatus;
 import com.beyond.easycheck.reservationrooms.infrastructure.repository.ReservationRoomRepository;
 import com.beyond.easycheck.reservationrooms.ui.view.ReservationRoomView;
+import com.beyond.easycheck.rooms.infrastructure.entity.DailyRoomAvailabilityEntity;
+import com.beyond.easycheck.rooms.infrastructure.entity.RoomStatus;
+import com.beyond.easycheck.rooms.infrastructure.repository.DailyRoomAvailabilityRepository;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
+import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,6 +42,7 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final ReservationRoomRepository reservationRoomRepository;
+    private final DailyRoomAvailabilityRepository dailyRoomAvailabilityRepository;
 
     private final MailService mailService;
 
@@ -98,6 +103,7 @@ public class PaymentService {
     public PaymentEntity createPayment(PaymentCreateRequest paymentCreateRequest, ReservationRoomEntity reservationRoomEntity) {
 
         return PaymentEntity.builder()
+                .impUid(paymentCreateRequest.getImpUid())
                 .reservationRoomEntity(reservationRoomEntity)
                 .method(paymentCreateRequest.getMethod())
                 .amount(paymentCreateRequest.getAmount())
@@ -107,14 +113,9 @@ public class PaymentService {
     }
 
     @Transactional(readOnly = true)
-    public List<PaymentView> getAllPayments(int page, int size) {
+    public List<PaymentView> getAllPayments() {
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<PaymentEntity> paymentEntityPage = paymentRepository.findAll(pageable);
-
-        return paymentEntityPage.getContent().stream()
-                .map(PaymentView::of)
-                .collect(Collectors.toList());
+        return paymentRepository.findAll().stream().map(PaymentView::of).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -130,12 +131,48 @@ public class PaymentService {
     @Transactional
     public void cancelPayment(Long id, PaymentUpdateRequest paymentUpdateRequest) {
 
-        PaymentEntity paymentEntity = paymentRepository.findById(id).orElseThrow(
-                () -> new EasyCheckException(PaymentMessageType.PAYMENT_NOT_FOUND)
-        );
+        PaymentEntity paymentEntity = paymentRepository.findById(id)
+                .orElseThrow(() -> new EasyCheckException(PaymentMessageType.PAYMENT_NOT_FOUND));
 
-        paymentEntity.updatePayment(paymentUpdateRequest);
+        try {
+            CancelData cancelData = new CancelData(paymentUpdateRequest.getImpUid(), true);
+            IamportResponse<Payment> cancelResponse = iamportClient.cancelPaymentByImpUid(cancelData);
 
-        paymentRepository.save(paymentEntity);
+            if (cancelResponse == null || cancelResponse.getResponse() == null) {
+                throw new EasyCheckException(PaymentMessageType.PORTONE_REFUND_FAILED);
+            }
+
+            paymentEntity.updateCompletionStatus(CompletionStatus.REFUND);
+            paymentRepository.save(paymentEntity);
+
+            ReservationRoomEntity reservationRoomEntity = paymentEntity.getReservationRoomEntity();
+            reservationRoomEntity.updatePaymentStatus(PaymentStatus.UNPAID);
+            reservationRoomEntity.updateReservationStatus(ReservationStatus.CANCELED);
+
+            LocalDate checkinDate = reservationRoomEntity.getCheckinDate();
+            LocalDate checkoutDate = reservationRoomEntity.getCheckoutDate();
+
+            for (LocalDate date = checkinDate; !date.isEqual(checkoutDate); date = date.plusDays(1)) {
+                DailyRoomAvailabilityEntity dailyAvailability = dailyRoomAvailabilityRepository
+                        .findByRoomEntityAndDate(reservationRoomEntity.getRoomEntity(), date.atStartOfDay())
+                        .orElseThrow(() -> new EasyCheckException(ReservationRoomMessageType.ROOM_NOT_AVAILABLE));
+                dailyAvailability.incrementRemainingRoom();
+
+                if (dailyAvailability.getRemainingRoom() <= 0) {
+                    dailyAvailability.setStatus(RoomStatus.예약불가);
+                } else {
+                    dailyAvailability.setStatus(RoomStatus.예약가능);
+                }
+
+                dailyRoomAvailabilityRepository.save(dailyAvailability);
+            }
+
+            log.info("환불 성공: 결제 ID = {}, 환불 금액 = {}", paymentEntity.getId(), cancelResponse.getResponse().getCancelAmount());
+
+        } catch (IamportResponseException | IOException e) {
+            log.error("환불 실패: 결제 ID = {}, 오류 메시지 = {}", paymentEntity.getId(), e.getMessage());
+            throw new EasyCheckException(PaymentMessageType.PORTONE_REFUND_FAILED);
+        }
     }
 }
+

@@ -34,11 +34,9 @@ public class PaymentController {
 
     @Operation(summary = "결제 내역 리스트를 조회하는 API")
     @GetMapping("")
-    public ResponseEntity<List<PaymentView>> getAllPayments(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<List<PaymentView>> getAllPayments() {
 
-        List<PaymentView> payments = paymentService.getAllPayments(page, size);
+        List<PaymentView> payments = paymentService.getAllPayments();
 
         return ResponseEntity.ok(payments);
     }
@@ -52,7 +50,7 @@ public class PaymentController {
         return ResponseEntity.ok(paymentView);
     }
 
-    @Operation(summary = "결제를 취소하는 API")
+    @Operation(summary = "결제를 환불하는 API")
     @PutMapping("/{id}")
     public ResponseEntity<Void> cancelPayment(@PathVariable("id") Long id,
                                               @RequestBody @Valid PaymentUpdateRequest paymentUpdateRequest) {
@@ -62,3 +60,4 @@ public class PaymentController {
         return ResponseEntity.noContent().build();
     }
 }
+

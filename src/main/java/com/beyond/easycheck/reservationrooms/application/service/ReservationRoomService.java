@@ -117,8 +117,9 @@ public class ReservationRoomService {
                 checkinDate.atStartOfDay(),
                 checkoutDate.atTime(23, 59)
         );
+        log.info(availableRoomsByDateRange.toString());
 
-        Map<Long, DailyRoomAvailabilityEntity> uniqueRoomAvailabilityMap = availableRoomsByDateRange.stream()
+        /*Map<Long, DailyRoomAvailabilityEntity> uniqueRoomAvailabilityMap = availableRoomsByDateRange.stream()
                 .filter(availability ->
                         availability.getRoomEntity().getRoomTypeEntity().getAccommodationEntity().getId().equals(accommodationId) &&
                                 availability.getStatus() == RoomStatus.예약가능
@@ -127,8 +128,19 @@ public class ReservationRoomService {
                         availability -> availability.getRoomEntity().getRoomId(),
                         availability -> availability,
                         (existing, replacement) -> existing
+                ));*/
+        Map<Long, DailyRoomAvailabilityEntity> uniqueRoomAvailabilityMap = availableRoomsByDateRange.stream()
+                .filter(availability ->
+                        availability.getRoomEntity().getRoomTypeEntity().getAccommodationEntity().getId().equals(accommodationId) &&
+                                availability.getStatus() == RoomStatus.예약가능
+                )
+                .collect(Collectors.toMap(
+                        availability -> availability.getRoomEntity().getRoomId(),
+                        availability -> availability,
+                        (existing, replacement) -> existing.getRemainingRoom() <= replacement.getRemainingRoom() ? existing : replacement
                 ));
 
+        log.info(uniqueRoomAvailabilityMap.toString());
         List<RoomAvailabilityView> availableRooms = uniqueRoomAvailabilityMap.values().stream()
                 .map(availability -> {
                     RoomEntity roomEntity = availability.getRoomEntity();
@@ -147,7 +159,7 @@ public class ReservationRoomService {
                     );
                 })
                 .collect(Collectors.toList());
-
+        log.info(availableRooms.toString());
         return availableRooms;
     }
 
@@ -239,7 +251,6 @@ public class ReservationRoomService {
                 .orElseThrow(() -> new EasyCheckException(ReservationRoomMessageType.RESERVATION_NOT_FOUND));
 
         reservationRoomEntity.updateReservationRoom(reservationRoomUpdateRequest);
-        reservationRoomRepository.save(reservationRoomEntity);
 
         List<ReservationServiceEntity> additionalServices = reservationServiceRepository.findByReservationRoomEntity(reservationRoomEntity);
         for (ReservationServiceEntity service : additionalServices) {
@@ -267,3 +278,4 @@ public class ReservationRoomService {
         }
     }
 }
+
