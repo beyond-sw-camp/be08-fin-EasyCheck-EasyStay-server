@@ -52,7 +52,7 @@ public class PaymentController {
         return ResponseEntity.ok(paymentView);
     }
 
-    @Operation(summary = "결제를 취소하는 API")
+    @Operation(summary = "결제를 환불하는 API")
     @PutMapping("/{id}")
     public ResponseEntity<Void> cancelPayment(@PathVariable("id") Long id,
                                               @RequestBody @Valid PaymentUpdateRequest paymentUpdateRequest) {
@@ -62,3 +62,4 @@ public class PaymentController {
         return ResponseEntity.noContent().build();
     }
 }
+

@@ -239,7 +239,6 @@ public class ReservationRoomService {
                 .orElseThrow(() -> new EasyCheckException(ReservationRoomMessageType.RESERVATION_NOT_FOUND));
 
         reservationRoomEntity.updateReservationRoom(reservationRoomUpdateRequest);
-        reservationRoomRepository.save(reservationRoomEntity);
 
         List<ReservationServiceEntity> additionalServices = reservationServiceRepository.findByReservationRoomEntity(reservationRoomEntity);
         for (ReservationServiceEntity service : additionalServices) {
@@ -267,3 +266,4 @@ public class ReservationRoomService {
         }
     }
 }
+

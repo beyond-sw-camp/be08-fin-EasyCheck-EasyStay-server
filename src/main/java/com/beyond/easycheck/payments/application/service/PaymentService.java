@@ -3,6 +3,7 @@ package com.beyond.easycheck.payments.application.service;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.mail.application.service.MailService;
 import com.beyond.easycheck.payments.exception.PaymentMessageType;
+import com.beyond.easycheck.payments.infrastructure.entity.CompletionStatus;
 import com.beyond.easycheck.payments.infrastructure.entity.PaymentEntity;
 import com.beyond.easycheck.payments.infrastructure.repository.PaymentRepository;
 import com.beyond.easycheck.payments.ui.requestbody.PaymentCreateRequest;
@@ -11,10 +12,12 @@ import com.beyond.easycheck.payments.ui.view.PaymentView;
 import com.beyond.easycheck.reservationrooms.exception.ReservationRoomMessageType;
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.PaymentStatus;
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationRoomEntity;
+import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationStatus;
 import com.beyond.easycheck.reservationrooms.infrastructure.repository.ReservationRoomRepository;
 import com.beyond.easycheck.reservationrooms.ui.view.ReservationRoomView;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
+import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 import jakarta.annotation.PostConstruct;
@@ -98,6 +101,7 @@ public class PaymentService {
     public PaymentEntity createPayment(PaymentCreateRequest paymentCreateRequest, ReservationRoomEntity reservationRoomEntity) {
 
         return PaymentEntity.builder()
+                .impUid(paymentCreateRequest.getImpUid())
                 .reservationRoomEntity(reservationRoomEntity)
                 .method(paymentCreateRequest.getMethod())
                 .amount(paymentCreateRequest.getAmount())
@@ -130,12 +134,30 @@ public class PaymentService {
     @Transactional
     public void cancelPayment(Long id, PaymentUpdateRequest paymentUpdateRequest) {
 
-        PaymentEntity paymentEntity = paymentRepository.findById(id).orElseThrow(
-                () -> new EasyCheckException(PaymentMessageType.PAYMENT_NOT_FOUND)
-        );
+        PaymentEntity paymentEntity = paymentRepository.findById(id)
+                .orElseThrow(() -> new EasyCheckException(PaymentMessageType.PAYMENT_NOT_FOUND));
 
-        paymentEntity.updatePayment(paymentUpdateRequest);
+        try {
+            CancelData cancelData = new CancelData(paymentUpdateRequest.getImpUid(), true);
+            IamportResponse<Payment> cancelResponse = iamportClient.cancelPaymentByImpUid(cancelData);
 
-        paymentRepository.save(paymentEntity);
+            if (cancelResponse == null || cancelResponse.getResponse() == null) {
+                throw new EasyCheckException(PaymentMessageType.PORTONE_REFUND_FAILED);
+            }
+
+            paymentEntity.updateCompletionStatus(CompletionStatus.REFUND);
+            paymentRepository.save(paymentEntity);
+
+            ReservationRoomEntity reservationRoomEntity = paymentEntity.getReservationRoomEntity();
+            reservationRoomEntity.updatePaymentStatus(PaymentStatus.UNPAID);
+            reservationRoomEntity.updateReservationStatus(ReservationStatus.CANCELED);
+
+            log.info("환불 성공: 결제 ID = {}, 환불 금액 = {}", paymentEntity.getId(), cancelResponse.getResponse().getCancelAmount());
+
+        } catch (IamportResponseException | IOException e) {
+            log.error("환불 실패: 결제 ID = {}, 오류 메시지 = {}", paymentEntity.getId(), e.getMessage());
+            throw new EasyCheckException(PaymentMessageType.PORTONE_REFUND_FAILED);
+        }
     }
 }
+
