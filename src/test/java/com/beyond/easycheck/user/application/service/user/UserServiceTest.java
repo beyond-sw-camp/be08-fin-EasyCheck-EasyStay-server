@@ -9,6 +9,7 @@ import com.beyond.easycheck.sms.infrastructure.persistence.redis.repository.SmsV
 import com.beyond.easycheck.user.application.domain.EasyCheckUserDetails;
 import com.beyond.easycheck.user.application.domain.UserRole;
 import com.beyond.easycheck.user.application.domain.UserStatus;
+import com.beyond.easycheck.user.application.service.UserService;
 import com.beyond.easycheck.user.exception.UserMessageType;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.role.RoleEntity;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
@@ -25,8 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.beyond.easycheck.user.application.service.user.UserOperationUseCase.*;
-import static com.beyond.easycheck.user.application.service.user.UserReadUseCase.*;
+import static com.beyond.easycheck.user.application.service.UserOperationUseCase.*;
+import static com.beyond.easycheck.user.application.service.UserReadUseCase.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;

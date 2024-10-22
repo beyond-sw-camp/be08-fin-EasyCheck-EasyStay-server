@@ -1,7 +1,7 @@
-package com.beyond.easycheck.user.application.service.admin;
+package com.beyond.easycheck.admin.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
-import com.beyond.easycheck.user.application.service.user.UserReadUseCase;
+import com.beyond.easycheck.user.application.service.UserReadUseCase;
 import com.beyond.easycheck.user.exception.UserMessageType;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.repository.UserJpaRepository;
@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.beyond.easycheck.user.application.service.user.UserReadUseCase.FindUserResult;
+import static com.beyond.easycheck.user.application.service.UserReadUseCase.FindUserResult;
 
 @Slf4j
 @Service

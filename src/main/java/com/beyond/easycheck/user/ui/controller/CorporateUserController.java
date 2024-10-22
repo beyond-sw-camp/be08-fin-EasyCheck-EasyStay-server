@@ -2,7 +2,7 @@ package com.beyond.easycheck.user.ui.controller;
 
 
 import com.beyond.easycheck.corporate.ui.requestbody.CorporateCreateRequest;
-import com.beyond.easycheck.user.application.service.user.UserOperationUseCase;
+import com.beyond.easycheck.user.application.service.UserOperationUseCase;
 import com.beyond.easycheck.user.ui.requestbody.UserRegisterRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import static com.beyond.easycheck.user.application.service.user.UserOperationUseCase.UserRegisterCommand;
+import static com.beyond.easycheck.user.application.service.UserOperationUseCase.UserRegisterCommand;
 
 @Slf4j
 @RestController

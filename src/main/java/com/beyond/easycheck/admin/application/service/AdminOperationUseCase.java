@@ -1,7 +1,7 @@
-package com.beyond.easycheck.user.application.service.admin;
+package com.beyond.easycheck.admin.application.service;
 
 import com.beyond.easycheck.user.application.domain.UserStatus;
-import com.beyond.easycheck.user.application.service.user.UserReadUseCase.FindUserResult;
+import com.beyond.easycheck.user.application.service.UserReadUseCase.FindUserResult;
 
 public interface AdminOperationUseCase {
 

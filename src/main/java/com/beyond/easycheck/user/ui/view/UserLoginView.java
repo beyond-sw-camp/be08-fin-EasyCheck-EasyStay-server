@@ -3,7 +3,7 @@ package com.beyond.easycheck.user.ui.view;
 import lombok.Getter;
 import lombok.ToString;
 
-import static com.beyond.easycheck.user.application.service.user.UserReadUseCase.*;
+import static com.beyond.easycheck.user.application.service.UserReadUseCase.*;
 
 @Getter
 @ToString

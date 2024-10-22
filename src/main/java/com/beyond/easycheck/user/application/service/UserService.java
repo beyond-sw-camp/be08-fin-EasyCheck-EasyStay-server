@@ -1,4 +1,4 @@
-package com.beyond.easycheck.user.application.service.user;
+package com.beyond.easycheck.user.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.common.security.infrastructure.persistence.entity.ExpiredAccessToken;
