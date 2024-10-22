@@ -2,7 +2,7 @@ package com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user
 
 import com.beyond.easycheck.permissions.infrastructure.persistence.mariadb.entity.UserPermissionEntity;
 import com.beyond.easycheck.user.application.domain.UserStatus;
-import com.beyond.easycheck.user.application.service.user.UserOperationUseCase.UserRegisterCommand;
+import com.beyond.easycheck.user.application.service.UserOperationUseCase.UserRegisterCommand;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.corporate.CorporateEntity;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.role.RoleEntity;
 import jakarta.persistence.*;

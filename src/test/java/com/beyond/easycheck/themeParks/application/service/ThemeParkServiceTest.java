@@ -1,4 +1,4 @@
-package com.beyond.easycheck.themeparks.application.service;
+package com.beyond.easycheck.themeParks.application.service;
 
 import com.amazonaws.SdkClientException;
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
@@ -6,11 +6,11 @@ import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationTyp
 import com.beyond.easycheck.accomodations.infrastructure.repository.AccommodationRepository;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.s3.application.service.S3Service;
-import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUseCase.ThemeParkCreateCommand;
-import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUseCase.ThemeParkUpdateCommand;
-import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase.FindThemeParkResult;
-import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
-import com.beyond.easycheck.themeparks.infrastructure.repository.ThemeParkRepository;
+import com.beyond.easycheck.themeParks.application.service.ThemeParkOperationUseCase.ThemeParkCreateCommand;
+import com.beyond.easycheck.themeParks.application.service.ThemeParkOperationUseCase.ThemeParkUpdateCommand;
+import com.beyond.easycheck.themeParks.application.service.ThemeParkReadUseCase.FindThemeParkResult;
+import com.beyond.easycheck.themeParks.infrastructure.entity.ThemeParkEntity;
+import com.beyond.easycheck.themeParks.infrastructure.repository.ThemeParkRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ import java.util.Optional;
 
 import static com.beyond.easycheck.accomodations.exception.AccommodationMessageType.ACCOMMODATION_NOT_FOUND;
 import static com.beyond.easycheck.common.exception.CommonMessageType.IMAGE_UPDATE_FAILED;
-import static com.beyond.easycheck.themeparks.exception.ThemeParkMessageType.*;
+import static com.beyond.easycheck.themeParks.exception.ThemeParkMessageType.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;

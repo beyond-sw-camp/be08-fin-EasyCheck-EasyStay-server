@@ -1,8 +1,9 @@
 package com.beyond.easycheck.user.application.service.admin;
 
+import com.beyond.easycheck.admin.application.service.AdminService;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.user.application.domain.UserStatus;
-import com.beyond.easycheck.user.application.service.user.UserReadUseCase;
+import com.beyond.easycheck.user.application.service.UserReadUseCase;
 import com.beyond.easycheck.user.exception.UserMessageType;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.role.RoleEntity;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
@@ -16,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static com.beyond.easycheck.user.application.service.admin.AdminOperationUseCase.UserStatusUpdateCommand;
+import static com.beyond.easycheck.admin.application.service.AdminOperationUseCase.UserStatusUpdateCommand;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;

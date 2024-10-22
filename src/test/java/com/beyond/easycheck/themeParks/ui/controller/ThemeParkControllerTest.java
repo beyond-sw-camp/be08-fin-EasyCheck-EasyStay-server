@@ -1,10 +1,10 @@
-package com.beyond.easycheck.themeparks.ui.controller;
+package com.beyond.easycheck.themeParks.ui.controller;
 
-import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUseCase;
-import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase;
-import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase.FindThemeParkResult;
-import com.beyond.easycheck.themeparks.ui.requestbody.ThemeParkCreateRequest;
-import com.beyond.easycheck.themeparks.ui.requestbody.ThemeParkUpdateRequest;
+import com.beyond.easycheck.themeParks.application.service.ThemeParkOperationUseCase;
+import com.beyond.easycheck.themeParks.application.service.ThemeParkReadUseCase;
+import com.beyond.easycheck.themeParks.application.service.ThemeParkReadUseCase.FindThemeParkResult;
+import com.beyond.easycheck.themeParks.ui.requestbody.ThemeParkCreateRequest;
+import com.beyond.easycheck.themeParks.ui.requestbody.ThemeParkUpdateRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,7 +1,7 @@
 package com.beyond.easycheck.user.ui.controller;
 
-import com.beyond.easycheck.user.application.service.user.UserOperationUseCase;
-import com.beyond.easycheck.user.application.service.user.UserOperationUseCase.GuestUserLoginCommand;
+import com.beyond.easycheck.user.application.service.UserOperationUseCase;
+import com.beyond.easycheck.user.application.service.UserOperationUseCase.GuestUserLoginCommand;
 import com.beyond.easycheck.user.ui.requestbody.GuestUserLoginRequest;
 import com.beyond.easycheck.user.ui.view.UserLoginView;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.beyond.easycheck.user.application.service.user.UserReadUseCase.FindJwtResult;
+import static com.beyond.easycheck.user.application.service.UserReadUseCase.FindJwtResult;
 
 @Slf4j
 @RestController

@@ -1,13 +1,13 @@
 package com.beyond.easycheck.user.ui.controller;
 
-import com.beyond.easycheck.user.application.service.admin.AdminOperationUseCase;
-import com.beyond.easycheck.user.application.service.admin.AdminOperationUseCase.UserStatusUpdateCommand;
-import com.beyond.easycheck.user.application.service.user.UserOperationUseCase;
-import com.beyond.easycheck.user.application.service.user.UserReadUseCase;
+import com.beyond.easycheck.admin.application.service.AdminOperationUseCase;
+import com.beyond.easycheck.admin.application.service.AdminOperationUseCase.UserStatusUpdateCommand;
+import com.beyond.easycheck.user.application.service.UserOperationUseCase;
+import com.beyond.easycheck.user.application.service.UserReadUseCase;
 import com.beyond.easycheck.user.ui.requestbody.ChangePasswordRequest;
 import com.beyond.easycheck.user.ui.requestbody.UserLoginRequest;
 import com.beyond.easycheck.user.ui.requestbody.UserRegisterRequest;
-import com.beyond.easycheck.user.ui.requestbody.UserStatusUpdateRequest;
+import com.beyond.easycheck.admin.ui.requestbody.UserStatusUpdateRequest;
 import com.beyond.easycheck.user.ui.view.UserLoginView;
 import com.beyond.easycheck.user.ui.view.UserView;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,10 +23,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import static com.beyond.easycheck.user.application.service.user.UserOperationUseCase.*;
-import static com.beyond.easycheck.user.application.service.user.UserReadUseCase.*;
-import static com.beyond.easycheck.user.application.service.user.UserReadUseCase.FindJwtResult;
-import static com.beyond.easycheck.user.application.service.user.UserReadUseCase.FindUserResult;
+import static com.beyond.easycheck.user.application.service.UserOperationUseCase.*;
+import static com.beyond.easycheck.user.application.service.UserReadUseCase.*;
+import static com.beyond.easycheck.user.application.service.UserReadUseCase.FindJwtResult;
+import static com.beyond.easycheck.user.application.service.UserReadUseCase.FindUserResult;
 
 @Slf4j
 @RestController
@@ -116,17 +116,6 @@ public class UserController {
         userOperationUseCase.changePassword(command);
 
         return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    @PatchMapping("/{id}/status")
-    @Operation(summary = "유저 정보 바꾸는 API")
-    public ResponseEntity<UserView> changeUserStatus(@PathVariable Long id, @RequestBody @Validated UserStatusUpdateRequest request) {
-        UserStatusUpdateCommand command = new UserStatusUpdateCommand(id, request.status());
-
-        FindUserResult result = adminOperationUseCase.updateUserStatus(command);
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new UserView(result));
     }
 
     @GetMapping("/auth-test")

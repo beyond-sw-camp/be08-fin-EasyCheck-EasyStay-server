@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.ToString;
 
-import static com.beyond.easycheck.user.application.service.user.UserReadUseCase.FindUserResult;
+import static com.beyond.easycheck.user.application.service.UserReadUseCase.FindUserResult;
 
 @Getter
 @ToString
