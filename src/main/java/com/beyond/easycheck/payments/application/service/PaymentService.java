@@ -1,6 +1,7 @@
 package com.beyond.easycheck.payments.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
+import com.beyond.easycheck.mail.application.service.MailService;
 import com.beyond.easycheck.payments.exception.PaymentMessageType;
 import com.beyond.easycheck.payments.infrastructure.entity.PaymentEntity;
 import com.beyond.easycheck.payments.infrastructure.repository.PaymentRepository;
@@ -11,6 +12,7 @@ import com.beyond.easycheck.reservationrooms.exception.ReservationRoomMessageTyp
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.PaymentStatus;
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationRoomEntity;
 import com.beyond.easycheck.reservationrooms.infrastructure.repository.ReservationRoomRepository;
+import com.beyond.easycheck.reservationrooms.ui.view.ReservationRoomView;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.response.IamportResponse;
@@ -36,6 +38,8 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final ReservationRoomRepository reservationRoomRepository;
+
+    private final MailService mailService;
 
     private IamportClient iamportClient;
 
@@ -66,6 +70,9 @@ public class PaymentService {
             reservationRoomEntity.updatePaymentStatus(PaymentStatus.PAID);
             reservationRoomRepository.save(reservationRoomEntity);
 
+            ReservationRoomView reservationRoomView = ReservationRoomView.of(reservationRoomEntity);
+            mailService.sendReservationConfirmationEmail(reservationRoomEntity.getUserEntity().getEmail(), reservationRoomView);
+
         } else {
             throw new EasyCheckException(PaymentMessageType.PAYMENT_VERIFICATION_FAILED);
         }
@@ -82,7 +89,6 @@ public class PaymentService {
 
             return paymentResponse;
         } catch (IamportResponseException | IOException e) {
-            // 예외 발생 시 구체적인 에러 메시지와 함께 로깅 처리
             log.error("PortOne 결제 검증 오류: impUid={}, message={}", impUid, e.getMessage());
             throw new EasyCheckException(PaymentMessageType.PORTONE_VERIFICATION_ERROR);
         }
