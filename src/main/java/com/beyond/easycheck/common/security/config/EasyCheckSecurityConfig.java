@@ -66,6 +66,9 @@ public class EasyCheckSecurityConfig {
                     registry.requestMatchers("/api/v1/permissions/**")
                             .hasRole("SUPER_ADMIN");
 
+                    registry.requestMatchers(HttpMethod.GET, "/api/v1/users/info")
+                            .authenticated();
+
                     registry.anyRequest().authenticated();
                 });
 
