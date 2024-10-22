@@ -40,7 +40,6 @@ public class ThemeParkController {
         ThemeParkCreateCommand command = ThemeParkCreateCommand.builder()
                 .name(request.getName())
                 .description(request.getDescription())
-                .location(request.getLocation())
                 .build();
 
         FindThemeParkResult result = themeParkOperationUseCase.saveThemePark(command, accommodationId, imageFiles);
@@ -82,7 +81,6 @@ public class ThemeParkController {
         ThemeParkUpdateCommand command = ThemeParkUpdateCommand.builder()
                 .name(request.getName())
                 .description(request.getDescription())
-                .location(request.getLocation())
                 .build();
 
         themeParkOperationUseCase.updateThemePark(id, command, accommodationId);

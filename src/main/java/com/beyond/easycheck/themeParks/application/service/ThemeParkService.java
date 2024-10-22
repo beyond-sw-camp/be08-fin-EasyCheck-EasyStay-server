@@ -45,7 +45,7 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
         AccommodationEntity accommodation = accommodationRepository.findById(accommodationId)
                 .orElseThrow(() -> new EasyCheckException(ACCOMMODATION_NOT_FOUND));
 
-        boolean exists = themeParkRepository.existsByNameAndLocation(command.getName(), command.getLocation());
+        boolean exists = themeParkRepository.existsByName(command.getName());
         if (exists) {
             throw new EasyCheckException(ThemeParkMessageType.DUPLICATE_THEME_PARK);
         }
@@ -82,7 +82,7 @@ public class ThemeParkService implements ThemeParkReadUseCase, ThemeParkOperatio
         command.validate();
 
         try {
-            themeParkEntity.update(command.getName(), command.getDescription(), command.getLocation());
+            themeParkEntity.update(command.getName(), command.getDescription());
 
             return FindThemeParkResult.findByThemeParkEntity(themeParkRepository.save(themeParkEntity));
 

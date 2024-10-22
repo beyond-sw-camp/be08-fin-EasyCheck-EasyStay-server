@@ -11,7 +11,9 @@ public class AttractionRequest {
 
     public String name;
 
-    public String description;
-
     public String image;
+
+    public String introduction;
+    public String information;
+    public String standardUse;
 }
