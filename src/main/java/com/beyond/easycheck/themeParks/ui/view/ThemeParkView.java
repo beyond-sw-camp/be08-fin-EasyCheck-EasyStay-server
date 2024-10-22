@@ -13,6 +13,7 @@ public class ThemeParkView {
     private final Long id;
     private final String name;
     private final String description;
+    private final String ticketAvailable;
     private final List<String> imageUrls;
 
     public ThemeParkView(FindThemeParkResult themePark) {
@@ -20,5 +21,6 @@ public class ThemeParkView {
         this.name = themePark.getName();
         this.description = themePark.getDescription();
         this.imageUrls = themePark.getImageUrls();
+        this.ticketAvailable = themePark.getTicketAvailable();
     }
 }
