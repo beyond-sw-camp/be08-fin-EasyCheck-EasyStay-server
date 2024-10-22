@@ -21,7 +21,9 @@ public interface AttractionReadUseCase {
     class FindAttractionResult {
         private final Long id;
         private final String name;
-        private final String description;
+        private final String introduction;
+        private final String information;
+        private final String standardUse;
         private final Long themeParkId;
         private final List<String> imageUrls;
 
@@ -34,8 +36,10 @@ public interface AttractionReadUseCase {
             return FindAttractionResult.builder()
                     .id(attraction.getId())
                     .name(attraction.getName())
-                    .description(attraction.getDescription())
                     .themeParkId(attraction.getThemePark().getId())
+                    .introduction(attraction.getIntroduction())
+                    .information(attraction.getInformation())
+                    .standardUse(attraction.getStandardUse())
                     .imageUrls(imageUrls)
                     .build();
         }

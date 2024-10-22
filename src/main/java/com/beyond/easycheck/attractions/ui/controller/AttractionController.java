@@ -37,7 +37,9 @@ public class AttractionController {
         AttractionCreateCommand completeCommand = AttractionCreateCommand.builder()
                 .themeParkId(themeParkId)
                 .name(command.getName())
-                .description(command.getDescription())
+                .introduction(command.getIntroduction())
+                .information(command.getInformation())
+                .standardUse(command.getStandardUse())
                 .build();
 
         FindAttractionResult attraction = attractionOperationUseCase.createAttraction(completeCommand, imageFiles);

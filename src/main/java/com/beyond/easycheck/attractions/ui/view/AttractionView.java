@@ -11,14 +11,18 @@ import java.util.List;
 public class AttractionView {
     private final Long id;
     private final String name;
-    private final String description;
+    private final String introduction;
+    private final String information;
+    private final String standardUse;
     private final Long themeParkId;
     private final List<String> imageUrls;
 
     public AttractionView(FindAttractionResult result) {
         this.id = result.getId();
         this.name = result.getName();
-        this.description = result.getDescription();
+        this.introduction = result.getIntroduction();
+        this.information = result.getInformation();
+        this.standardUse = result.getStandardUse();
         this.themeParkId = result.getThemeParkId();
         this.imageUrls = result.getImageUrls();
     }

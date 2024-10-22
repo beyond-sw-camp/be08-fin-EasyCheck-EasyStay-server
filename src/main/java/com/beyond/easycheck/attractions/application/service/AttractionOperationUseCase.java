@@ -25,7 +25,9 @@ public interface AttractionOperationUseCase {
     class AttractionCreateCommand {
         private Long themeParkId;
         private String name;
-        private String description;
+        private final String introduction;
+        private final String information;
+        private final String standardUse;
 
         public void validate() {
             if (themeParkId == null || themeParkId <= 0) {
@@ -34,8 +36,14 @@ public interface AttractionOperationUseCase {
             if (name == null || name.trim().isEmpty()) {
                 throw new IllegalArgumentException("어트랙션 이름은 필수 입력 항목입니다.");
             }
-            if (description == null || description.trim().isEmpty()) {
-                throw new IllegalArgumentException("어트랙션 설명은 필수 입력 항목입니다.");
+            if (introduction == null || introduction.trim().isEmpty()) {
+                throw new IllegalArgumentException("어트랙션 소개는 필수 입력 항목입니다.");
+            }
+            if (information == null || information.trim().isEmpty()) {
+                throw new IllegalArgumentException("어트랙션 시설 정보는 필수 입력 항목입니다.");
+            }
+            if (standardUse == null || standardUse.trim().isEmpty()) {
+                throw new IllegalArgumentException("어트랙션 이용 기준은 필수 입력 항목입니다.");
             }
         }
     }
@@ -44,14 +52,22 @@ public interface AttractionOperationUseCase {
     @Builder
     class AttractionUpdateCommand {
         private final String name;
-        private final String description;
+        private final String introduction;
+        private final String information;
+        private final String standardUse;
 
         public void validate() {
             if (name == null || name.trim().isEmpty()) {
                 throw new IllegalArgumentException("어트랙션 이름은 필수 입력 항목입니다.");
             }
-            if (description == null || description.trim().isEmpty()) {
-                throw new IllegalArgumentException("어트랙션 설명은 필수 입력 항목입니다.");
+            if (introduction == null || introduction.trim().isEmpty()) {
+                throw new IllegalArgumentException("어트랙션 소개는 필수 입력 항목입니다.");
+            }
+            if (information == null || information.trim().isEmpty()) {
+                throw new IllegalArgumentException("어트랙션 시설 정보는 필수 입력 항목입니다.");
+            }
+            if (standardUse == null || standardUse.trim().isEmpty()) {
+                throw new IllegalArgumentException("어트랙션 이용 기준은 필수 입력 항목입니다.");
             }
         }
     }
