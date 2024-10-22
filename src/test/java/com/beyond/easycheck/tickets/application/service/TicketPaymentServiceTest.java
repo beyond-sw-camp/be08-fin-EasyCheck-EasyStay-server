@@ -2,8 +2,8 @@ package com.beyond.easycheck.tickets.application.service;
 
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.common.exception.EasyCheckException;
-import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUseCase;
-import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
+import com.beyond.easycheck.themeParks.application.service.ThemeParkOperationUseCase;
+import com.beyond.easycheck.themeParks.infrastructure.entity.ThemeParkEntity;
 import com.beyond.easycheck.tickets.application.service.TicketOperationUseCase.TicketCreateCommand;
 import com.beyond.easycheck.tickets.infrastructure.entity.*;
 import com.beyond.easycheck.tickets.infrastructure.repository.TicketOrderRepository;

@@ -1,8 +1,8 @@
 package com.beyond.easycheck.tickets.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
-import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
-import com.beyond.easycheck.themeparks.infrastructure.repository.ThemeParkRepository;
+import com.beyond.easycheck.themeParks.infrastructure.entity.ThemeParkEntity;
+import com.beyond.easycheck.themeParks.infrastructure.repository.ThemeParkRepository;
 import com.beyond.easycheck.tickets.application.service.TicketOperationUseCase.TicketCreateCommand;
 import com.beyond.easycheck.tickets.application.service.TicketOperationUseCase.TicketUpdateCommand;
 import com.beyond.easycheck.tickets.infrastructure.entity.TicketEntity;
@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static com.beyond.easycheck.themeparks.exception.ThemeParkMessageType.THEME_PARK_NOT_FOUND;
+import static com.beyond.easycheck.themeParks.exception.ThemeParkMessageType.THEME_PARK_NOT_FOUND;
 import static com.beyond.easycheck.tickets.exception.TicketMessageType.TICKET_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;

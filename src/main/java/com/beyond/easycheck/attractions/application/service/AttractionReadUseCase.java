@@ -1,13 +1,11 @@
 package com.beyond.easycheck.attractions.application.service;
 
 import com.beyond.easycheck.attractions.infrastructure.entity.AttractionEntity;
-import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public interface AttractionReadUseCase {
 
