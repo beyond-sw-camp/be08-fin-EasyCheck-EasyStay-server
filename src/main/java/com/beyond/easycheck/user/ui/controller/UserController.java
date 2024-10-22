@@ -7,7 +7,7 @@ import com.beyond.easycheck.user.application.service.UserReadUseCase;
 import com.beyond.easycheck.user.ui.requestbody.ChangePasswordRequest;
 import com.beyond.easycheck.user.ui.requestbody.UserLoginRequest;
 import com.beyond.easycheck.user.ui.requestbody.UserRegisterRequest;
-import com.beyond.easycheck.user.ui.requestbody.UserStatusUpdateRequest;
+import com.beyond.easycheck.admin.ui.requestbody.UserStatusUpdateRequest;
 import com.beyond.easycheck.user.ui.view.UserLoginView;
 import com.beyond.easycheck.user.ui.view.UserView;
 import io.swagger.v3.oas.annotations.Operation;
@@ -116,17 +116,6 @@ public class UserController {
         userOperationUseCase.changePassword(command);
 
         return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    @PatchMapping("/{id}/status")
-    @Operation(summary = "유저 정보 바꾸는 API")
-    public ResponseEntity<UserView> changeUserStatus(@PathVariable Long id, @RequestBody @Validated UserStatusUpdateRequest request) {
-        UserStatusUpdateCommand command = new UserStatusUpdateCommand(id, request.status());
-
-        FindUserResult result = adminOperationUseCase.updateUserStatus(command);
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new UserView(result));
     }
 
     @GetMapping("/auth-test")
