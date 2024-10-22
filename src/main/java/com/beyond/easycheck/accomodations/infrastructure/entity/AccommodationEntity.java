@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Getter
 @Builder
@@ -52,6 +51,26 @@ public class AccommodationEntity extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AccommodationType accommodationType;
+
+    public AccommodationEntity(Long id, String name, String address, AccommodationType accommodationType) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.accommodationType = accommodationType;
+    }
+
+    public AccommodationEntity(Long id, String name, List<String> thumbnailUrls, List<String> landscapeUrls, String directionsUrl, String address, String latitude, String longitude, String responseTime, AccommodationType accommodationType) {
+        this.id = id;
+        this.name = name;
+        this.thumbnailUrls = thumbnailUrls;
+        this.landscapeUrls = landscapeUrls;
+        this.directionsUrl = directionsUrl;
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.responseTime = responseTime;
+        this.accommodationType = accommodationType;
+    }
 
     public void updateAccommodation(AccommodationUpdateRequest accommodationUpdateRequest) {
         Optional.ofNullable(accommodationUpdateRequest.getName()).ifPresent(name -> this.name = name);
