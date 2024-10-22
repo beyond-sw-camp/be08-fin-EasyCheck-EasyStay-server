@@ -16,14 +16,12 @@ public class ThemeParkView {
     private final Long id;
     private final String name;
     private final String description;
-    private final String location;
     private final List<String> imageUrls;
 
     public ThemeParkView(FindThemeParkResult themePark) {
         this.id = themePark.id();
         this.name = themePark.name();
         this.description = themePark.description();
-        this.location = themePark.location();
         this.imageUrls = themePark.images();
     }
 }
