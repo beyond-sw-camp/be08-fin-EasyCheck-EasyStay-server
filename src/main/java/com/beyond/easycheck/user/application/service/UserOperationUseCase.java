@@ -1,8 +1,8 @@
-package com.beyond.easycheck.user.application.service.user;
+package com.beyond.easycheck.user.application.service;
 
 import com.beyond.easycheck.corporate.ui.requestbody.CorporateCreateRequest;
-import com.beyond.easycheck.user.application.service.user.UserReadUseCase.FindJwtResult;
-import com.beyond.easycheck.user.application.service.user.UserReadUseCase.FindUserResult;
+import com.beyond.easycheck.user.application.service.UserReadUseCase.FindJwtResult;
+import com.beyond.easycheck.user.application.service.UserReadUseCase.FindUserResult;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserOperationUseCase {

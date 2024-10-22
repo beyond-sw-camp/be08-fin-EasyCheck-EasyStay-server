@@ -66,6 +66,10 @@ public class EasyCheckSecurityConfig {
                     registry.requestMatchers("/api/v1/permissions/**")
                             .hasRole("SUPER_ADMIN");
 
+                    // 관리자 관련 설정
+                    registry.requestMatchers("/api/v1/admin/**")
+                            .hasAnyAuthority("ROLE_[0-9]+_ADMIN");
+
                     registry.requestMatchers(HttpMethod.GET, "/api/v1/users/info")
                             .authenticated();
 
@@ -90,7 +94,7 @@ public class EasyCheckSecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080","http://localhost:8081", "http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));

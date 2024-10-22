@@ -1,6 +1,6 @@
-package com.beyond.easycheck.themeparks.application.service;
+package com.beyond.easycheck.themeParks.application.service;
 
-import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
+import com.beyond.easycheck.themeParks.infrastructure.entity.ThemeParkEntity;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
