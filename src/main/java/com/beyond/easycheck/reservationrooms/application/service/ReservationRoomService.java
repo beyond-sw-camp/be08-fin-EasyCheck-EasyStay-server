@@ -1,7 +1,6 @@
 package com.beyond.easycheck.reservationrooms.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
-import com.beyond.easycheck.mail.application.service.MailService;
 import com.beyond.easycheck.reservationrooms.exception.ReservationRoomMessageType;
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationRoomEntity;
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationStatus;
@@ -50,7 +49,6 @@ public class ReservationRoomService {
     private final ReservationRoomRepository reservationRoomRepository;
     private final RoomRepository roomRepository;
     private final UserJpaRepository userJpaRepository;
-    private final MailService mailService;
     private final ReservationServiceRepository reservationServiceRepository;
     private final DailyRoomAvailabilityRepository dailyRoomAvailabilityRepository;
 
@@ -108,9 +106,6 @@ public class ReservationRoomService {
                 dailyRoomAvailabilityRepository.save(dailyAvailability);
             }
         }
-
-        ReservationRoomView reservationRoomView = ReservationRoomView.of(reservationRoomEntity);
-        mailService.sendReservationConfirmationEmail(userEntity.getEmail(), reservationRoomView);
 
         return reservationRoomEntity;
     }
