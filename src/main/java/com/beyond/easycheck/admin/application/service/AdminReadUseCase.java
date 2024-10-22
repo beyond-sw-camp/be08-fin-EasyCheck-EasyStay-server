@@ -62,7 +62,6 @@ public interface AdminReadUseCase {
             Long id,
             String name,
             String description,
-            String location,
             List<String> images
     ) {
         static public FindThemeParkResult findByThemeParkEntity(ThemeParkEntity themePark) {
@@ -70,7 +69,6 @@ public interface AdminReadUseCase {
                     themePark.getId(),
                     themePark.getName(),
                     themePark.getDescription(),
-                    themePark.getLocation(),
                     themePark.getImages().stream().map(ThemeParkEntity.ImageEntity::getUrl).toList(
                     ));
         }
