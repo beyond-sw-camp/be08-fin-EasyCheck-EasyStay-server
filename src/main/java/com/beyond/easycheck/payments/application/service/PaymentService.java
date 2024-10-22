@@ -15,6 +15,9 @@ import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationRo
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationStatus;
 import com.beyond.easycheck.reservationrooms.infrastructure.repository.ReservationRoomRepository;
 import com.beyond.easycheck.reservationrooms.ui.view.ReservationRoomView;
+import com.beyond.easycheck.rooms.infrastructure.entity.DailyRoomAvailabilityEntity;
+import com.beyond.easycheck.rooms.infrastructure.entity.RoomStatus;
+import com.beyond.easycheck.rooms.infrastructure.repository.DailyRoomAvailabilityRepository;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
@@ -24,13 +27,11 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,6 +42,7 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final ReservationRoomRepository reservationRoomRepository;
+    private final DailyRoomAvailabilityRepository dailyRoomAvailabilityRepository;
 
     private final MailService mailService;
 
@@ -111,14 +113,9 @@ public class PaymentService {
     }
 
     @Transactional(readOnly = true)
-    public List<PaymentView> getAllPayments(int page, int size) {
+    public List<PaymentView> getAllPayments() {
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<PaymentEntity> paymentEntityPage = paymentRepository.findAll(pageable);
-
-        return paymentEntityPage.getContent().stream()
-                .map(PaymentView::of)
-                .collect(Collectors.toList());
+        return paymentRepository.findAll().stream().map(PaymentView::of).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -151,6 +148,24 @@ public class PaymentService {
             ReservationRoomEntity reservationRoomEntity = paymentEntity.getReservationRoomEntity();
             reservationRoomEntity.updatePaymentStatus(PaymentStatus.UNPAID);
             reservationRoomEntity.updateReservationStatus(ReservationStatus.CANCELED);
+
+            LocalDate checkinDate = reservationRoomEntity.getCheckinDate();
+            LocalDate checkoutDate = reservationRoomEntity.getCheckoutDate();
+
+            for (LocalDate date = checkinDate; !date.isEqual(checkoutDate); date = date.plusDays(1)) {
+                DailyRoomAvailabilityEntity dailyAvailability = dailyRoomAvailabilityRepository
+                        .findByRoomEntityAndDate(reservationRoomEntity.getRoomEntity(), date.atStartOfDay())
+                        .orElseThrow(() -> new EasyCheckException(ReservationRoomMessageType.ROOM_NOT_AVAILABLE));
+                dailyAvailability.incrementRemainingRoom();
+
+                if (dailyAvailability.getRemainingRoom() <= 0) {
+                    dailyAvailability.setStatus(RoomStatus.예약불가);
+                } else {
+                    dailyAvailability.setStatus(RoomStatus.예약가능);
+                }
+
+                dailyRoomAvailabilityRepository.save(dailyAvailability);
+            }
 
             log.info("환불 성공: 결제 ID = {}, 환불 금액 = {}", paymentEntity.getId(), cancelResponse.getResponse().getCancelAmount());
 

@@ -34,11 +34,9 @@ public class PaymentController {
 
     @Operation(summary = "결제 내역 리스트를 조회하는 API")
     @GetMapping("")
-    public ResponseEntity<List<PaymentView>> getAllPayments(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<List<PaymentView>> getAllPayments() {
 
-        List<PaymentView> payments = paymentService.getAllPayments(page, size);
+        List<PaymentView> payments = paymentService.getAllPayments();
 
         return ResponseEntity.ok(payments);
     }

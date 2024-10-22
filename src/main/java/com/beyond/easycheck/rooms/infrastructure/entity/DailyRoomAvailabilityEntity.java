@@ -1,10 +1,7 @@
 package com.beyond.easycheck.rooms.infrastructure.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @Table(name = "daily_room_availability_entity",
         uniqueConstraints = @UniqueConstraint(columnNames = {"room_id", "date"}))
+@ToString(of = {"id", "date", "remainingRoom"})
 public class DailyRoomAvailabilityEntity {
 
     @Id
