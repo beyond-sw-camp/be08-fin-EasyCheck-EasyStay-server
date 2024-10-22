@@ -41,7 +41,7 @@ public class AttractionService implements AttractionOperationUseCase, Attraction
         ThemeParkEntity themePark = themeParkRepository.findById(command.getThemeParkId())
                 .orElseThrow(() -> new EasyCheckException(THEME_PARK_NOT_FOUND));
 
-        AttractionEntity attraction = AttractionEntity.createAttraction(command.getName(), command.getDescription(), themePark);
+        AttractionEntity attraction = AttractionEntity.createAttraction(command.getName(), command.getIntroduction(), command.getInformation(), command.getStandardUse(), themePark);
 
         try {
             List<String> imageUrls = s3Service.uploadFiles(imageFiles, FileManagementCategory.ATTRACTION);
@@ -63,7 +63,7 @@ public class AttractionService implements AttractionOperationUseCase, Attraction
         AttractionEntity attraction = attractionRepository.findById(attractionId)
                 .orElseThrow(() -> new EasyCheckException(AttractionMessageType.ATTRACTION_NOT_FOUND));
 
-        attraction.update(command.getName(), command.getDescription());
+        attraction.update(command.getName(), command.getIntroduction(), command.getInformation(), command.getStandardUse());
         return FindAttractionResult.fromEntity(attraction);
     }
 

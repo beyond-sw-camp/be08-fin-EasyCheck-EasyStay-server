@@ -31,31 +31,30 @@ public class ThemeParkEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false)
-    private String location;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "accommodation_id", nullable = false)
     private AccommodationEntity accommodation;
 
+    private String ticketAvailable;
+
     @OneToMany(mappedBy = "themePark", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImageEntity> images = new ArrayList<>();
+
 
     public static ThemeParkEntity createThemePark(ThemeParkCreateCommand command, AccommodationEntity accommodation) {
         return new ThemeParkEntity(
                 null,
                 command.getName(),
                 command.getDescription(),
-                command.getLocation(),
                 accommodation,
+                command.getTicketAvailable(),
                 new ArrayList<>()
         );
     }
 
-    public void update(String name, String description, String location) {
+    public void update(String name, String description) {
         this.name = name;
         this.description = description;
-        this.location = location;
     }
 
     public void addImage(ImageEntity imageEntity) {

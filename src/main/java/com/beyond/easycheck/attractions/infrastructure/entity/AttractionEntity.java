@@ -25,8 +25,11 @@ public class AttractionEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String description;
+    private String introduction;
+
+    private String information;
+
+    private String standardUse;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theme_park_id", nullable = false)
@@ -35,13 +38,15 @@ public class AttractionEntity {
     @OneToMany(mappedBy = "attraction", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImageEntity> images = new ArrayList<>();
 
-    public static AttractionEntity createAttraction(String name, String description, ThemeParkEntity themePark) {
-        return new AttractionEntity(null, name, description, themePark, new ArrayList<>());
+    public static AttractionEntity createAttraction(String name, String introduction, String information, String standardUse, ThemeParkEntity themePark) {
+        return new AttractionEntity(null, name, introduction, information, standardUse, themePark, new ArrayList<>());
     }
 
-    public void update(String name, String description) {
+    public void update(String name, String introduction, String information, String standardUse) {
         this.name = name;
-        this.description = description;
+        this.introduction = introduction;
+        this.information = information;
+        this.standardUse = standardUse;
     }
 
     public void addImage(ImageEntity imageEntity) {

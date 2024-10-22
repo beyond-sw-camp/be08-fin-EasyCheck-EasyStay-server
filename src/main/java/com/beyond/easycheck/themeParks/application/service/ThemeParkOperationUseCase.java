@@ -25,7 +25,7 @@ public interface ThemeParkOperationUseCase {
     class ThemeParkCreateCommand {
         private String name;
         private String description;
-        private String location;
+        private String ticketAvailable;
 
         private List<MultipartFile> imageFiles;
         public void validate() {
@@ -33,9 +33,6 @@ public interface ThemeParkOperationUseCase {
                 throw new EasyCheckException(VALIDATION_FAILED);
             }
             if (description == null || description.trim().isEmpty()) {
-                throw new EasyCheckException(VALIDATION_FAILED);
-            }
-            if (location == null || location.trim().isEmpty()) {
                 throw new EasyCheckException(VALIDATION_FAILED);
             }
         }
@@ -46,7 +43,6 @@ public interface ThemeParkOperationUseCase {
     class ThemeParkUpdateCommand {
         private final String name;
         private final String description;
-        private final String location;
 
         private List<MultipartFile> imageFiles;
 
@@ -55,9 +51,6 @@ public interface ThemeParkOperationUseCase {
                 throw new EasyCheckException(VALIDATION_FAILED);
             }
             if (description == null || description.trim().isEmpty()) {
-                throw new EasyCheckException(VALIDATION_FAILED);
-            }
-            if (location == null || location.trim().isEmpty()) {
                 throw new EasyCheckException(VALIDATION_FAILED);
             }
         }

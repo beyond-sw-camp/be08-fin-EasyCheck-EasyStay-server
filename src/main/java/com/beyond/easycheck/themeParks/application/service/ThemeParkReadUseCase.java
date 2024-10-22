@@ -24,7 +24,7 @@ public interface ThemeParkReadUseCase {
 
         private final String description;
 
-        private final String location;
+        private final String ticketAvailable;
 
         private final List<String> imageUrls;
 
@@ -39,7 +39,7 @@ public interface ThemeParkReadUseCase {
                     .id(themePark.getId())
                     .name(themePark.getName())
                     .description(themePark.getDescription())
-                    .location(themePark.getLocation())
+                    .ticketAvailable(themePark.getTicketAvailable())
                     .imageUrls(imageUrls)
                     .build();
         }

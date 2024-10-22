@@ -83,7 +83,9 @@ public class UserService implements UserOperationUseCase, UserReadUseCase {
     public FindUserResult registerCorporateUser(UserRegisterCommand userRegisterCommand, CorporateCreateRequest corporateCreateRequest, MultipartFile verificationFilesZip) {
 
         // 이메일 중복확인
-        checkEmailIsDuplicated(userRegisterCommand.email());
+        // 회원가입 할 때 이메일 중복확인은 하지 않기로 변경
+        // checkEmailIsDuplicated(userRegisterCommand.email());
+
         // 이메일 인증여부 확인
         checkEmailIsVerified(userRegisterCommand.email());
         // 핸드폰 인증여부 확인

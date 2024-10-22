@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -15,6 +14,8 @@ import java.time.LocalDateTime;
 public class PaymentView {
 
     private Long id;
+
+    private String impUid;
 
     private Long reservationRoomId;
 
@@ -33,6 +34,7 @@ public class PaymentView {
         return new PaymentView(
 
                 paymentEntity.getId(),
+                paymentEntity.getImpUid(),
                 paymentEntity.getReservationRoomEntity().getId(),
                 paymentEntity.getReservationRoomEntity().getCheckinDate().atStartOfDay(),
                 paymentEntity.getReservationRoomEntity().getCheckoutDate().atStartOfDay(),
@@ -42,3 +44,4 @@ public class PaymentView {
         );
     }
 }
+

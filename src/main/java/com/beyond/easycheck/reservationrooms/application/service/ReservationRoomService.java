@@ -1,7 +1,6 @@
 package com.beyond.easycheck.reservationrooms.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
-import com.beyond.easycheck.mail.application.service.MailService;
 import com.beyond.easycheck.reservationrooms.exception.ReservationRoomMessageType;
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationRoomEntity;
 import com.beyond.easycheck.reservationrooms.infrastructure.entity.ReservationStatus;
@@ -50,7 +49,6 @@ public class ReservationRoomService {
     private final ReservationRoomRepository reservationRoomRepository;
     private final RoomRepository roomRepository;
     private final UserJpaRepository userJpaRepository;
-    private final MailService mailService;
     private final ReservationServiceRepository reservationServiceRepository;
     private final DailyRoomAvailabilityRepository dailyRoomAvailabilityRepository;
 
@@ -109,9 +107,6 @@ public class ReservationRoomService {
             }
         }
 
-        ReservationRoomView reservationRoomView = ReservationRoomView.of(reservationRoomEntity);
-        mailService.sendReservationConfirmationEmail(userEntity.getEmail(), reservationRoomView);
-
         return reservationRoomEntity;
     }
 
@@ -122,8 +117,9 @@ public class ReservationRoomService {
                 checkinDate.atStartOfDay(),
                 checkoutDate.atTime(23, 59)
         );
+        log.info(availableRoomsByDateRange.toString());
 
-        Map<Long, DailyRoomAvailabilityEntity> uniqueRoomAvailabilityMap = availableRoomsByDateRange.stream()
+        /*Map<Long, DailyRoomAvailabilityEntity> uniqueRoomAvailabilityMap = availableRoomsByDateRange.stream()
                 .filter(availability ->
                         availability.getRoomEntity().getRoomTypeEntity().getAccommodationEntity().getId().equals(accommodationId) &&
                                 availability.getStatus() == RoomStatus.예약가능
@@ -132,8 +128,19 @@ public class ReservationRoomService {
                         availability -> availability.getRoomEntity().getRoomId(),
                         availability -> availability,
                         (existing, replacement) -> existing
+                ));*/
+        Map<Long, DailyRoomAvailabilityEntity> uniqueRoomAvailabilityMap = availableRoomsByDateRange.stream()
+                .filter(availability ->
+                        availability.getRoomEntity().getRoomTypeEntity().getAccommodationEntity().getId().equals(accommodationId) &&
+                                availability.getStatus() == RoomStatus.예약가능
+                )
+                .collect(Collectors.toMap(
+                        availability -> availability.getRoomEntity().getRoomId(),
+                        availability -> availability,
+                        (existing, replacement) -> existing.getRemainingRoom() <= replacement.getRemainingRoom() ? existing : replacement
                 ));
 
+        log.info(uniqueRoomAvailabilityMap.toString());
         List<RoomAvailabilityView> availableRooms = uniqueRoomAvailabilityMap.values().stream()
                 .map(availability -> {
                     RoomEntity roomEntity = availability.getRoomEntity();
@@ -152,7 +159,7 @@ public class ReservationRoomService {
                     );
                 })
                 .collect(Collectors.toList());
-
+        log.info(availableRooms.toString());
         return availableRooms;
     }
 
@@ -244,7 +251,6 @@ public class ReservationRoomService {
                 .orElseThrow(() -> new EasyCheckException(ReservationRoomMessageType.RESERVATION_NOT_FOUND));
 
         reservationRoomEntity.updateReservationRoom(reservationRoomUpdateRequest);
-        reservationRoomRepository.save(reservationRoomEntity);
 
         List<ReservationServiceEntity> additionalServices = reservationServiceRepository.findByReservationRoomEntity(reservationRoomEntity);
         for (ReservationServiceEntity service : additionalServices) {
@@ -272,3 +278,4 @@ public class ReservationRoomService {
         }
     }
 }
+
