@@ -1,6 +1,5 @@
 package com.beyond.easycheck.attractions.application.service;
 
-import com.beyond.easycheck.attractions.infrastructure.entity.AttractionEntity;
 import com.beyond.easycheck.attractions.application.service.AttractionReadUseCase.FindAttractionResult;
 import lombok.Builder;
 import lombok.Getter;
