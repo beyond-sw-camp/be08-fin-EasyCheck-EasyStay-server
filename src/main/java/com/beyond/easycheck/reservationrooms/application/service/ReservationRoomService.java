@@ -119,16 +119,6 @@ public class ReservationRoomService {
         );
         log.info(availableRoomsByDateRange.toString());
 
-        /*Map<Long, DailyRoomAvailabilityEntity> uniqueRoomAvailabilityMap = availableRoomsByDateRange.stream()
-                .filter(availability ->
-                        availability.getRoomEntity().getRoomTypeEntity().getAccommodationEntity().getId().equals(accommodationId) &&
-                                availability.getStatus() == RoomStatus.예약가능
-                )
-                .collect(Collectors.toMap(
-                        availability -> availability.getRoomEntity().getRoomId(),
-                        availability -> availability,
-                        (existing, replacement) -> existing
-                ));*/
         Map<Long, DailyRoomAvailabilityEntity> uniqueRoomAvailabilityMap = availableRoomsByDateRange.stream()
                 .filter(availability ->
                         availability.getRoomEntity().getRoomTypeEntity().getAccommodationEntity().getId().equals(accommodationId) &&
