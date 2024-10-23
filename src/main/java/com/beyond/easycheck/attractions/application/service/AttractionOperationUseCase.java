@@ -6,18 +6,16 @@ import lombok.Getter;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 public interface AttractionOperationUseCase {
 
-    FindAttractionResult createAttraction(AttractionCreateCommand command, List<MultipartFile> imageFiles);
+    FindAttractionResult createAttraction(AttractionCreateCommand command, MultipartFile imageFile);
 
     FindAttractionResult updateAttraction(Long attractionId, AttractionUpdateCommand command);
 
     void deleteAttraction(Long attractionId);
 
     @Transactional
-    void updateAttractionImages(Long attractionId, List<MultipartFile> imageFiles, List<Long> imageIdsToDelete);
+    void updateAttractionImage(Long attractionId, MultipartFile imageFile);  // 이미지 업데이트 메서드도 단일 파일 처리로 변경
 
     @Getter
     @Builder

@@ -31,7 +31,7 @@ public class AttractionController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponseView<FindAttractionResult>> createAttraction(
             @PathVariable Long themeParkId,
-            @RequestPart("imageFiles") List<MultipartFile> imageFiles,
+            @RequestPart("imageFile") MultipartFile imageFile,  // 이미지 파일을 단일 파일로 변경
             @RequestPart("request") AttractionCreateCommand command) {
 
         AttractionCreateCommand completeCommand = AttractionCreateCommand.builder()
@@ -42,7 +42,7 @@ public class AttractionController {
                 .standardUse(command.getStandardUse())
                 .build();
 
-        FindAttractionResult attraction = attractionOperationUseCase.createAttraction(completeCommand, imageFiles);
+        FindAttractionResult attraction = attractionOperationUseCase.createAttraction(completeCommand, imageFile);  // 단일 파일 처리
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponseView<>(attraction));
@@ -60,13 +60,12 @@ public class AttractionController {
     }
 
     @Operation(summary = "어트랙션 시설의 이미지를 수정하는 API")
-    @PatchMapping(value = "/{attractionId}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> updateAttractionImages(
+    @PatchMapping(value = "/{attractionId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)  // 단일 이미지 처리
+    public ResponseEntity<Void> updateAttractionImage(
             @PathVariable Long attractionId,
-            @RequestPart("imageFiles") List<MultipartFile> imageFiles,
-            @RequestPart("imageIdsToDelete") List<Long> imageIdsToDelete) {
+            @RequestPart("imageFile") MultipartFile imageFile) {  // 단일 파일 처리
 
-        attractionOperationUseCase.updateAttractionImages(attractionId, imageFiles, imageIdsToDelete);
+        attractionOperationUseCase.updateAttractionImage(attractionId, imageFile);
 
         return ResponseEntity.noContent().build();
     }

@@ -4,8 +4,6 @@ import com.beyond.easycheck.attractions.application.service.AttractionReadUseCas
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 
-import java.util.List;
-
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AttractionView {
@@ -15,7 +13,7 @@ public class AttractionView {
     private final String information;
     private final String standardUse;
     private final Long themeParkId;
-    private final List<String> imageUrls;
+    private final String imageUrl;
 
     public AttractionView(FindAttractionResult result) {
         this.id = result.getId();
@@ -24,6 +22,6 @@ public class AttractionView {
         this.information = result.getInformation();
         this.standardUse = result.getStandardUse();
         this.themeParkId = result.getThemeParkId();
-        this.imageUrls = result.getImageUrls();
+        this.imageUrl = result.getImageUrl();
     }
 }

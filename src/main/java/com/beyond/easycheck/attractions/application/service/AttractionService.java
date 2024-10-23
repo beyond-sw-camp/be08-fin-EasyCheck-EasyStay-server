@@ -34,18 +34,18 @@ public class AttractionService implements AttractionOperationUseCase, Attraction
 
     @Override
     @Transactional
-    public FindAttractionResult createAttraction(AttractionCreateCommand command, List<MultipartFile> imageFiles) {
+    public FindAttractionResult createAttraction(AttractionCreateCommand command, MultipartFile imageFile) {
 
-        command.validate(); // 입력값 검증 로직 추가
+        command.validate();
 
         ThemeParkEntity themePark = themeParkRepository.findById(command.getThemeParkId())
                 .orElseThrow(() -> new EasyCheckException(THEME_PARK_NOT_FOUND));
 
-        AttractionEntity attraction = AttractionEntity.createAttraction(command.getName(), command.getIntroduction(), command.getInformation(), command.getStandardUse(), themePark);
+        AttractionEntity attraction = AttractionEntity.createAttraction(command.getName(), command.getIntroduction(), command.getInformation(), command.getStandardUse(), themePark, null);
 
         try {
-            List<String> imageUrls = s3Service.uploadFiles(imageFiles, FileManagementCategory.ATTRACTION);
-            addImagesToAttraction(attraction, imageUrls);
+            String imageUrl = s3Service.uploadFile(imageFile, FileManagementCategory.ATTRACTION);
+            attraction.updateImage(imageUrl); // 이미지 URL 업데이트
         } catch (SdkClientException e) {
             log.error("S3 이미지 업로드 실패: {}", e.getMessage(), e);
             throw new EasyCheckException(IMAGE_UPDATE_FAILED); // S3 이미지 업로드 실패 시 예외 처리
@@ -69,43 +69,26 @@ public class AttractionService implements AttractionOperationUseCase, Attraction
 
     @Override
     @Transactional
-    public void updateAttractionImages(Long attractionId, List<MultipartFile> imageFiles, List<Long> imageIdsToDelete) {
+    public void updateAttractionImage(Long attractionId, MultipartFile imageFile) {
         AttractionEntity attraction = attractionRepository.findById(attractionId)
                 .orElseThrow(() -> new EasyCheckException(AttractionMessageType.ATTRACTION_NOT_FOUND));
 
-        if (imageFiles == null || imageFiles.isEmpty()) {
+        if (imageFile == null || imageFile.isEmpty()) {
             throw new EasyCheckException(NO_IMAGES_PROVIDED);
         }
 
-        List<AttractionEntity.ImageEntity> existingImages = attraction.getImages();
-
         try {
-            List<String> newImageUrls = s3Service.uploadFiles(imageFiles, FileManagementCategory.ATTRACTION);
-            List<String> imagesToDelete = existingImages.stream()
-                    .filter(image -> imageIdsToDelete.contains(image.getId()))
-                    .map(AttractionEntity.ImageEntity::getUrl)
-                    .toList();
+            String newImageUrl = s3Service.uploadFile(imageFile, FileManagementCategory.ATTRACTION);
 
-            s3Service.deleteFiles(imagesToDelete.stream().map(this::extractFileNameFromUrl).collect(Collectors.toList()));
-
-            attraction.getImages().removeIf(image -> imagesToDelete.contains(image.getUrl()));
-            addImagesToAttraction(attraction, newImageUrls);
+            String existingImageUrl = attraction.getImageUrl();
+            if (existingImageUrl != null) {
+                s3Service.deleteFile(extractFileNameFromUrl(existingImageUrl));
+            }
+            attraction.updateImage(newImageUrl);
 
         } catch (SdkClientException e) {
             log.error("S3 이미지 삭제/업로드 오류", e);
             throw new EasyCheckException(IMAGE_UPDATE_FAILED); // S3 업로드/삭제 실패 시 예외 처리
-        }
-    }
-
-    private void addImagesToAttraction(AttractionEntity attraction, List<String> imageUrls) {
-        List<AttractionEntity.ImageEntity> newImageEntities = imageUrls.stream()
-                .map(url -> AttractionEntity.ImageEntity.createImage(url, attraction))
-                .toList();
-
-        for (AttractionEntity.ImageEntity newImage : newImageEntities) {
-            if (!attraction.getImages().contains(newImage)) {
-                attraction.addImage(newImage);
-            }
         }
     }
 

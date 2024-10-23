@@ -23,14 +23,9 @@ public interface AttractionReadUseCase {
         private final String information;
         private final String standardUse;
         private final Long themeParkId;
-        private final List<String> imageUrls;
+        private final String imageUrl;
 
         public static FindAttractionResult fromEntity(AttractionEntity attraction) {
-
-            List<String> imageUrls = attraction.getImages().stream()
-                    .map(AttractionEntity.ImageEntity::getUrl)
-                    .toList();
-
             return FindAttractionResult.builder()
                     .id(attraction.getId())
                     .name(attraction.getName())
@@ -38,9 +33,8 @@ public interface AttractionReadUseCase {
                     .introduction(attraction.getIntroduction())
                     .information(attraction.getInformation())
                     .standardUse(attraction.getStandardUse())
-                    .imageUrls(imageUrls)
+                    .imageUrl(attraction.getImageUrl())
                     .build();
         }
     }
 }
-
