@@ -2,12 +2,16 @@ package com.beyond.easycheck.admin.application.service;
 
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.additionalservices.infrastructure.entity.AdditionalServiceEntity;
+import com.beyond.easycheck.attractions.infrastructure.entity.AttractionEntity;
 import com.beyond.easycheck.events.infrastructure.entity.EventEntity;
 import com.beyond.easycheck.facilities.infrastructure.entity.AvailableStatus;
 import com.beyond.easycheck.facilities.infrastructure.entity.FacilityEntity;
 import com.beyond.easycheck.notices.infrastructure.persistence.entity.NoticesEntity;
+import com.beyond.easycheck.payments.infrastructure.entity.CompletionStatus;
+import com.beyond.easycheck.payments.infrastructure.entity.PaymentEntity;
 import com.beyond.easycheck.suggestion.infrastructure.persistence.entity.SuggestionEntity;
 import com.beyond.easycheck.themeParks.infrastructure.entity.ThemeParkEntity;
+import com.beyond.easycheck.user.application.domain.UserRole;
 import com.beyond.easycheck.user.application.service.UserReadUseCase.FindUserResult;
 import com.beyond.easycheck.user.application.service.UserReadUseCase.UserFindQuery;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
@@ -15,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,13 +37,21 @@ public interface AdminReadUseCase {
 
     List<FindNoticeResult> getAllNotices();
 
+    List<FindPaymentResult> getAllPayments();
+
     List<FindThemeParkResult> getAllThemeParks();
 
     List<FindFacilitiesResult> getAllFacilities();
 
     List<FindSuggestionResult> getAllSuggestions();
 
+    List<FindAttractionResult> getAllAttractions();
+
     List<FindAdditionalServiceResult> getAllAdditionalServices();
+
+    record FindQuery(Long themeParkId) {
+
+    }
 
     record FindNoticeResult(
             Long id,
@@ -123,6 +136,28 @@ public interface AdminReadUseCase {
 
     }
 
+    record FindAttractionResult(
+            Long id,
+            String name,
+            String introduction,
+            String information,
+            String standardUse,
+            Long themeParkId,
+            String imageUrl
+    ) {
+        static public FindAttractionResult findByAttractionEntity(AttractionEntity attraction) {
+            return new FindAttractionResult(
+                    attraction.getId(),
+                    attraction.getName(),
+                    attraction.getIntroduction(),
+                    attraction.getInformation(),
+                    attraction.getStandardUse(),
+                    attraction.getThemePark().getId(),
+                    attraction.getImageUrl()
+            );
+        }
+    }
+
     record FindFacilitiesResult(
             Long id,
             String name,
@@ -155,6 +190,34 @@ public interface AdminReadUseCase {
                     additionalService.getName(),
                     additionalService.getDescription(),
                     additionalService.getPrice()
+            );
+        }
+    }
+
+    record FindPaymentResult(
+            Long id,
+            String impUid,
+            String username,
+            String userRole,
+            Long reservationRoomId,
+            LocalDateTime checkinDate,
+            LocalDateTime checkoutDate,
+            String method,
+            Integer amount,
+            CompletionStatus completionStatus
+    ) {
+        static public FindPaymentResult findByPaymentEntity(PaymentEntity payment) {
+            return new FindPaymentResult(
+                    payment.getId(),
+                    payment.getImpUid(),
+                    payment.getReservationRoomEntity().getUserEntity().getName(),
+                    payment.getReservationRoomEntity().getUserEntity().getRole().getName(),
+                    payment.getReservationRoomEntity().getRoomEntity().getRoomId(),
+                    payment.getReservationRoomEntity().getCheckinDate().atStartOfDay(),
+                    payment.getReservationRoomEntity().getCheckoutDate().atStartOfDay(),
+                    payment.getMethod(),
+                    payment.getAmount(),
+                    payment.getCompletionStatus()
             );
         }
     }

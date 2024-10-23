@@ -111,4 +111,29 @@ public class AdminController {
                         .map(ThemeParkView::new).toList()
         );
     }
+
+    @GetMapping("/attractions")
+    @Operation(summary = "관리자 담당 업체 어트랙션 모두 조회")
+    public ResponseEntity<List<AttractionView>> getAllAttractions() {
+        return ResponseEntity.ok(
+                adminReadUseCase
+                        .getAllAttractions()
+                        .stream()
+                        .map(AttractionView::new).toList()
+        );
+    }
+
+    @GetMapping("/payments")
+    @Operation(summary = "관리자 담당 업체 결제 내역 모두 조회")
+    public ResponseEntity<List<PaymentView>> getAllPayments() {
+        return ResponseEntity.ok(
+                adminReadUseCase
+                        .getAllPayments()
+                        .stream()
+                        .map(PaymentView::new).toList()
+        );
+    }
+
+
 }
+
