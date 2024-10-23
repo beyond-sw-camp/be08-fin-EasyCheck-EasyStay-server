@@ -23,7 +23,7 @@ import static com.beyond.easycheck.admin.application.service.AdminReadUseCase.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "관리자 관련 API")
+@Tag(name = "Admin", description = "관리자 관련 API")
 @RequestMapping("/api/v1/admin")
 public class AdminController {
 
