@@ -8,6 +8,8 @@ import com.beyond.easycheck.sms.infrastructure.persistence.redis.repository.SmsV
 import com.beyond.easycheck.sms.infrastructure.persistence.redis.repository.SmsVerifiedPhoneRepository;
 import com.beyond.easycheck.sms.ui.requestbody.SmsCodeVerifyRequest;
 import com.beyond.easycheck.sms.ui.requestbody.SmsVerificationCodeRequest;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.Message;
@@ -27,6 +29,7 @@ import java.security.SecureRandom;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/sms")
+@Tag(name = "Sms", description = "휴대폰 인증 API")
 public class SmsController {
 
     @Value("${coolsms.easycheck.representative-number}")
@@ -55,6 +58,7 @@ public class SmsController {
     }
 
     @PostMapping("/code")
+    @Operation(summary = "인증번호 받기")
     public ResponseEntity<Void> getVerificationCode(@RequestBody @Validated SmsVerificationCodeRequest request) {
 
         Message message = new Message();
@@ -77,6 +81,7 @@ public class SmsController {
 
     @Transactional
     @PostMapping("/verify")
+    @Operation(summary = "인증번호 확인하기")
     public ResponseEntity<Void> verifyCode(@RequestBody @Validated SmsCodeVerifyRequest request) {
 
         log.info("[SmsController - verifyCode] request = {}", request);

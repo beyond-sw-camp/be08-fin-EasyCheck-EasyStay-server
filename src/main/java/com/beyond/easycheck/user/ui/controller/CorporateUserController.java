@@ -4,6 +4,8 @@ package com.beyond.easycheck.user.ui.controller;
 import com.beyond.easycheck.corporate.ui.requestbody.CorporateCreateRequest;
 import com.beyond.easycheck.user.application.service.UserOperationUseCase;
 import com.beyond.easycheck.user.ui.requestbody.UserRegisterRequest;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,11 +23,13 @@ import static com.beyond.easycheck.user.application.service.UserOperationUseCase
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/corp-users")
+@Tag(name = "CorporateUser", description = "법인회원 관련 API")
 public class CorporateUserController {
 
     private final UserOperationUseCase userOperationUseCase;
 
     @PostMapping("")
+    @Operation(summary = "법인회원 회원가입")
     public ResponseEntity<Void> register(
             @RequestPart(name = "user") @Validated UserRegisterRequest userRegisterRequest,
             @RequestPart(name = "corporate") @Validated CorporateCreateRequest corporateCreateRequest,
