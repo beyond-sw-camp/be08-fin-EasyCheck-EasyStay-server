@@ -2,10 +2,12 @@ package com.beyond.easycheck.admin.application.service;
 
 import com.beyond.easycheck.additionalservices.infrastructure.repository.AdditionalServiceRepository;
 import com.beyond.easycheck.admin.exception.AdminMessageType;
+import com.beyond.easycheck.attractions.infrastructure.repository.AttractionRepository;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.events.infrastructure.repository.EventRepository;
 import com.beyond.easycheck.facilities.infrastructure.repository.FacilityRepository;
 import com.beyond.easycheck.notices.infrastructure.persistence.repository.NoticesRepository;
+import com.beyond.easycheck.payments.infrastructure.repository.PaymentRepository;
 import com.beyond.easycheck.suggestion.infrastructure.persistence.repository.SuggestionsRepository;
 import com.beyond.easycheck.themeParks.infrastructure.repository.ThemeParkRepository;
 import com.beyond.easycheck.user.exception.UserMessageType;
@@ -21,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.beyond.easycheck.user.application.service.UserReadUseCase.*;
 import static com.beyond.easycheck.user.application.service.UserReadUseCase.FindUserResult;
@@ -38,9 +39,13 @@ public class AdminService implements AdminOperationUseCase, AdminReadUseCase {
 
     private final NoticesRepository noticesRepository;
 
+    private final PaymentRepository paymentRepository;
+
     private final FacilityRepository facilityRepository;
 
     private final ThemeParkRepository themeParkRepository;
+
+    private final AttractionRepository attractionRepository;
 
     private final SuggestionsRepository suggestionsRepository;
 
@@ -122,6 +127,23 @@ public class AdminService implements AdminOperationUseCase, AdminReadUseCase {
                 .toList();
     }
 
+    @Override
+    public List<FindAttractionResult> getAllAttractions() {
+        return attractionRepository
+                .findAllByAccommodationId(getManagerAccommodationId())
+                .stream()
+                .map(FindAttractionResult::findByAttractionEntity)
+                .toList();
+    }
+
+    @Override
+    public List<FindPaymentResult> getAllPayments() {
+        return paymentRepository.findAllByAccommodationId(getManagerAccommodationId())
+                .stream()
+                .map(FindPaymentResult::findByPaymentEntity)
+                .toList();
+    }
+
     public Long getManagerAccommodationId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -139,6 +161,5 @@ public class AdminService implements AdminOperationUseCase, AdminReadUseCase {
 
         // 해당하는 권한이 없을 경우 예외
         throw new EasyCheckException(AdminMessageType.ACCOMMODATION_ADMIN_AUTHORITY_NOT_FOUND);
-
     }
 }
