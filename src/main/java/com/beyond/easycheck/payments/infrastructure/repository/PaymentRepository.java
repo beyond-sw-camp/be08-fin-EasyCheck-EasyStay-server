@@ -13,7 +13,7 @@ import java.util.List;
 public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
 
     @Query("SELECT DISTINCT p FROM PaymentEntity p " +
-            "JOIN FETCH p.reservationRo78omEntity r " +
+            "JOIN FETCH p.reservationRoomEntity r " +
             "JOIN FETCH r.userEntity u " +
             "LEFT JOIN FETCH u.corporate c " +   // Corporate 정보 fetch join
             "LEFT JOIN FETCH u.role " +          // Role 정보 fetch join
