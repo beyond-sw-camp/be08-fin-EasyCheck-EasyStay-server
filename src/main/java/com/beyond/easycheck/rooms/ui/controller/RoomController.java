@@ -1,6 +1,7 @@
 package com.beyond.easycheck.rooms.ui.controller;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
+import com.beyond.easycheck.rooms.application.dto.RoomFindQuery;
 import com.beyond.easycheck.rooms.application.service.RoomService;
 import com.beyond.easycheck.rooms.exception.RoomMessageType;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
@@ -54,8 +55,13 @@ public class RoomController {
 
     @GetMapping("")
     @Operation(summary = "객실 전체 조회 API")
-    public ResponseEntity<List<RoomView>> readRooms() {
-        List<RoomView> roomViews = roomService.readRooms();
+    public ResponseEntity<List<RoomView>> readRooms(
+            @RequestParam(required = false) Long accommodationId
+    ) {
+        RoomFindQuery query = new RoomFindQuery(accommodationId);
+
+        List<RoomView> roomViews = roomService.readRooms(query);
+
         return ResponseEntity.ok().body(roomViews);
     }
 

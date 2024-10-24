@@ -1,12 +1,14 @@
 package com.beyond.easycheck.rooms.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
+import com.beyond.easycheck.rooms.application.dto.RoomFindQuery;
 import com.beyond.easycheck.rooms.infrastructure.entity.DailyRoomAvailabilityEntity;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomEntity;
 import com.beyond.easycheck.rooms.infrastructure.entity.RoomStatus;
 import com.beyond.easycheck.rooms.infrastructure.repository.DailyRoomAvailabilityRepository;
 import com.beyond.easycheck.rooms.infrastructure.repository.RoomImageRepository;
 import com.beyond.easycheck.rooms.infrastructure.repository.RoomRepository;
+import com.beyond.easycheck.rooms.infrastructure.repository.RoomRepositoryCustom;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomCreateRequest;
 import com.beyond.easycheck.rooms.ui.requestbody.RoomUpdateRequest;
 import com.beyond.easycheck.rooms.ui.view.RoomView;
@@ -35,6 +37,7 @@ import static com.beyond.easycheck.s3.application.domain.FileManagementCategory.
 public class RoomService {
 
     private final RoomRepository roomRepository;
+
     private final RoomtypeRepository roomTypeRepository;
     private final RoomImageRepository roomImageRepository;
     private final DailyRoomAvailabilityRepository dailyRoomAvailabilityRepository;
@@ -130,10 +133,9 @@ public class RoomService {
                 .build();
     }
 
-    @Transactional
-    public List<RoomView> readRooms() {
+    public List<RoomView> readRooms(RoomFindQuery query) {
 
-        List<RoomEntity> roomEntities = roomRepository.findAll();
+        List<RoomEntity> roomEntities = roomRepository.findAllRooms(query);
 
         if (roomEntities.isEmpty()) {
             throw new EasyCheckException(ROOMS_NOT_FOUND);
