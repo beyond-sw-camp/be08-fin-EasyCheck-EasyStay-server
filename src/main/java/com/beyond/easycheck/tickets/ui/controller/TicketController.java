@@ -6,7 +6,6 @@ import com.beyond.easycheck.tickets.application.service.TicketOperationUseCase.T
 import com.beyond.easycheck.tickets.application.service.TicketOperationUseCase.TicketUpdateCommand;
 import com.beyond.easycheck.tickets.application.service.TicketReadUseCase;
 import com.beyond.easycheck.tickets.application.service.TicketReadUseCase.FindTicketResult;
-import com.beyond.easycheck.tickets.infrastructure.entity.TicketEntity;
 import com.beyond.easycheck.tickets.ui.requestbody.TicketRequest;
 import com.beyond.easycheck.tickets.ui.view.TicketView;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Tag(name = "Ticket", description = "입장권 정보 관리 API")
 @RestController
@@ -42,17 +42,17 @@ public class TicketController {
                 .validToDate(request.getValidToDate())
                 .build();
 
-        TicketEntity ticket = ticketOperationUseCase.createTicket(command);
+        FindTicketResult result = FindTicketResult.fromEntity(ticketOperationUseCase.createTicket(command));
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponseView<>(new TicketView(ticket)));
+                .body(new ApiResponseView<>(new TicketView(result)));
     }
 
     @Operation(summary = "입장권 종류를 수정하는 API")
     @PutMapping("/{ticketId}")
     public ResponseEntity<ApiResponseView<TicketView>> updateTicket(@PathVariable Long themeParkId,
                                                                     @PathVariable Long ticketId,
-                                                                    @RequestBody TicketRequest request) {
+                                                                    @RequestBody @Validated TicketRequest request) {
 
         TicketUpdateCommand command = TicketUpdateCommand.builder()
                 .ticketName(request.getTicketName())
@@ -63,10 +63,10 @@ public class TicketController {
                 .validToDate(request.getValidToDate())
                 .build();
 
-        TicketEntity updatedTicket = ticketOperationUseCase.updateTicket(themeParkId, ticketId, command);
+        FindTicketResult updatedResult = FindTicketResult.fromEntity(ticketOperationUseCase.updateTicket(themeParkId, ticketId, command));
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponseView<>(new TicketView(updatedTicket)));
+                .body(new ApiResponseView<>(new TicketView(updatedResult)));
     }
 
     @Operation(summary = "입장권 종류를 삭제하는 API")
@@ -85,7 +85,7 @@ public class TicketController {
 
         List<TicketView> ticketViews = results.stream()
                 .map(TicketView::new)
-                .toList();
+                .collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponseView<>(ticketViews));
@@ -98,7 +98,7 @@ public class TicketController {
 
         List<TicketView> ticketViews = results.stream()
                 .map(TicketView::new)
-                .toList();
+                .collect(Collectors.toList());
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponseView<>(ticketViews));
