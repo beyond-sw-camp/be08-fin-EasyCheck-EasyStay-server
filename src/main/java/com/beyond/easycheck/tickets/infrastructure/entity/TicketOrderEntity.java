@@ -1,5 +1,6 @@
 package com.beyond.easycheck.tickets.infrastructure.entity;
 
+import com.beyond.easycheck.common.entity.BaseTimeEntity;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -15,7 +16,7 @@ import static com.beyond.easycheck.tickets.infrastructure.entity.OrderStatus.*;
 @Getter
 @NoArgsConstructor
 @Table(name = "ticket_order")
-public class TicketOrderEntity {
+public class TicketOrderEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
