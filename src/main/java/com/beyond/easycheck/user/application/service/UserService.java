@@ -119,6 +119,11 @@ public class UserService implements UserOperationUseCase, UserReadUseCase {
     }
 
     @Override
+    public void checkEmailDuplicated(UserFindQuery query) {
+        checkEmailIsDuplicated(query.email());
+    }
+
+    @Override
     public FindJwtResult login(UserLoginCommand command) {
 
         log.info("[login] - login command = {}", command);
@@ -167,7 +172,7 @@ public class UserService implements UserOperationUseCase, UserReadUseCase {
     public void changePassword(ChangePasswordCommand command) {
 
         // 비밀번호 변경 전 이메일 인증 과정을 거쳐야 한다.
-        checkEmailIsVerified(command.email());
+        // checkEmailIsVerified(command.email());
 
         UserEntity user = findUserByEmail(command.email());
 
