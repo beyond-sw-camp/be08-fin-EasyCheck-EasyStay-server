@@ -1,7 +1,7 @@
 package com.beyond.easycheck.tickets.infrastructure.entity;
 
 import com.beyond.easycheck.common.entity.BaseTimeEntity;
-import com.beyond.easycheck.themeParks.infrastructure.entity.ThemeParkEntity;
+import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
 import com.beyond.easycheck.tickets.application.service.TicketOperationUseCase.TicketCreateCommand;
 import jakarta.persistence.*;
 import lombok.Getter;

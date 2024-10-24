@@ -1,8 +1,6 @@
 package com.beyond.easycheck.admin.ui.view;
 
-import com.beyond.easycheck.admin.application.service.AdminReadUseCase;
 import com.beyond.easycheck.admin.application.service.AdminReadUseCase.FindThemeParkResult;
-import com.beyond.easycheck.themeParks.application.service.ThemeParkReadUseCase;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.ToString;

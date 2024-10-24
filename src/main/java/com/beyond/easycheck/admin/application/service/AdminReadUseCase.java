@@ -1,6 +1,5 @@
 package com.beyond.easycheck.admin.application.service;
 
-import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.additionalservices.infrastructure.entity.AdditionalServiceEntity;
 import com.beyond.easycheck.attractions.infrastructure.entity.AttractionEntity;
 import com.beyond.easycheck.events.infrastructure.entity.EventEntity;
@@ -10,17 +9,12 @@ import com.beyond.easycheck.notices.infrastructure.persistence.entity.NoticesEnt
 import com.beyond.easycheck.payments.infrastructure.entity.CompletionStatus;
 import com.beyond.easycheck.payments.infrastructure.entity.PaymentEntity;
 import com.beyond.easycheck.suggestion.infrastructure.persistence.entity.SuggestionEntity;
-import com.beyond.easycheck.themeParks.infrastructure.entity.ThemeParkEntity;
-import com.beyond.easycheck.user.application.domain.UserRole;
+import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
 import com.beyond.easycheck.user.application.service.UserReadUseCase.FindUserResult;
 import com.beyond.easycheck.user.application.service.UserReadUseCase.UserFindQuery;
-import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public interface AdminReadUseCase {

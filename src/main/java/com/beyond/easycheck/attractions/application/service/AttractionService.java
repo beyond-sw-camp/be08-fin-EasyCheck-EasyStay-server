@@ -7,8 +7,8 @@ import com.beyond.easycheck.attractions.infrastructure.repository.AttractionRepo
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.s3.application.domain.FileManagementCategory;
 import com.beyond.easycheck.s3.application.service.S3Service;
-import com.beyond.easycheck.themeParks.infrastructure.entity.ThemeParkEntity;
-import com.beyond.easycheck.themeParks.infrastructure.repository.ThemeParkRepository;
+import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
+import com.beyond.easycheck.themeparks.infrastructure.repository.ThemeParkRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 import static com.beyond.easycheck.common.exception.CommonMessageType.IMAGE_UPDATE_FAILED;
 import static com.beyond.easycheck.common.exception.CommonMessageType.NO_IMAGES_PROVIDED;
-import static com.beyond.easycheck.themeParks.exception.ThemeParkMessageType.THEME_PARK_NOT_FOUND;
+import static com.beyond.easycheck.themeparks.exception.ThemeParkMessageType.THEME_PARK_NOT_FOUND;
 
 @Slf4j
 @Service
