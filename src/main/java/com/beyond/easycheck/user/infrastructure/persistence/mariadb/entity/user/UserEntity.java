@@ -2,6 +2,7 @@ package com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user
 
 import com.beyond.easycheck.permissions.infrastructure.persistence.mariadb.entity.UserPermissionEntity;
 import com.beyond.easycheck.user.application.domain.UserStatus;
+import com.beyond.easycheck.user.application.service.UserOperationUseCase;
 import com.beyond.easycheck.user.application.service.UserOperationUseCase.UserRegisterCommand;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.corporate.CorporateEntity;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.role.RoleEntity;
@@ -14,6 +15,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
 import java.util.List;
+
+import static com.beyond.easycheck.user.application.service.UserOperationUseCase.*;
 
 @Getter
 @Entity
@@ -102,6 +105,13 @@ public class  UserEntity {
 
     public static UserEntity createGuestUser(String name, String phone) {
         return new UserEntity(name, phone);
+    }
+
+    public void updateUser(UserUpdateCommand command) {
+        this.email = command.email();
+        this.phone = command.phone();
+        this.addr = command.addr();
+        this.addrDetail = command.addrDetail();
     }
 
     public void setRole(RoleEntity role) {

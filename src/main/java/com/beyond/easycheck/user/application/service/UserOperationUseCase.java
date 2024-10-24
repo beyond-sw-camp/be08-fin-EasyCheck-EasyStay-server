@@ -17,6 +17,10 @@ public interface UserOperationUseCase {
 
     void logout(UserLogoutCommand command);
 
+    FindUserResult updateUserInfo(UserUpdateCommand command);
+
+    void deactivateUser(DeactivateUserCommand command);
+
     void changePassword(ChangePasswordCommand command);
 
     record UserRegisterCommand(
@@ -27,6 +31,15 @@ public interface UserOperationUseCase {
             String addr,
             String addrDetail,
             char marketingConsent
+    ) {
+    }
+
+    record UserUpdateCommand(
+            Long userId,
+            String email,
+            String phone,
+            String addr,
+            String addrDetail
     ) {
     }
 
@@ -53,5 +66,9 @@ public interface UserOperationUseCase {
             String oldPassword,
             String newPassword
     ) {
+    }
+
+    record DeactivateUserCommand(Long userId) {
+
     }
 }
