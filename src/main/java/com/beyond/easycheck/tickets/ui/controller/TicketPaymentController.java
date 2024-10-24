@@ -38,22 +38,10 @@ public class TicketPaymentController {
     @PatchMapping("/{orderId}/cancel")
     public ResponseEntity<ApiResponseView<TicketPaymentEntity>> cancelPayment(
             @PathVariable Long orderId,
-            @RequestBody String cancelReason,
             @AuthenticationPrincipal Long userId) {
 
-        TicketPaymentEntity cancelledPayment = ticketPaymentService.cancelPayment(orderId, userId, cancelReason);
+        TicketPaymentEntity cancelledPayment = ticketPaymentService.cancelPayment(orderId, userId);
         return ResponseEntity.ok(new ApiResponseView<>(cancelledPayment));
-    }
-
-    @Operation(summary = "입장권 결제 환불 API")
-    @PatchMapping("/{orderId}/refund")
-    public ResponseEntity<ApiResponseView<TicketPaymentEntity>> refundPayment(
-            @PathVariable Long orderId,
-            @RequestBody String refundReason,
-            @AuthenticationPrincipal Long userId) {
-
-        TicketPaymentEntity refundedPayment = ticketPaymentService.refundPayment(orderId, userId, refundReason);
-        return ResponseEntity.ok(new ApiResponseView<>(refundedPayment));
     }
 
     @Operation(summary = "입장권 결제 상태 조회 API")
@@ -72,16 +60,5 @@ public class TicketPaymentController {
 
         List<TicketPaymentEntity> paymentHistory = ticketPaymentService.getPaymentHistory(userId);
         return ResponseEntity.ok(new ApiResponseView<>(paymentHistory));
-    }
-
-    @Operation(summary = "입장권 결제 재시도 API")
-    @PatchMapping("/{orderId}/retry")
-    public ResponseEntity<ApiResponseView<TicketPaymentEntity>> retryPayment(
-            @PathVariable Long orderId,
-            @RequestBody TicketPaymentRequest request,
-            @AuthenticationPrincipal Long userId) {
-
-        TicketPaymentEntity retriedPayment = ticketPaymentService.retryPayment(orderId, userId, request);
-        return ResponseEntity.ok(new ApiResponseView<>(retriedPayment));
     }
 }

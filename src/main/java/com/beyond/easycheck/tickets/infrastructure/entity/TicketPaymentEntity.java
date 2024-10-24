@@ -2,6 +2,8 @@ package com.beyond.easycheck.tickets.infrastructure.entity;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +14,9 @@ import static com.beyond.easycheck.tickets.exception.TicketOrderMessageType.*;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "ticket_payment")
 public class TicketPaymentEntity {
 
@@ -24,6 +28,9 @@ public class TicketPaymentEntity {
     @JoinColumn(name = "ticket_order_id", nullable = false)
     private TicketOrderEntity ticketOrder;
 
+    @Column(nullable = false)
+    private String impUid;
+
     @Column(name = "amount", nullable = false)
     private BigDecimal paymentAmount;
 
@@ -34,11 +41,11 @@ public class TicketPaymentEntity {
     @Column(nullable = false)
     private PaymentStatus paymentStatus;
 
-    private String cancelReason;
+
+    @Column(nullable = false)
+    private LocalDateTime paymentDate;
 
     private LocalDateTime cancelDate;
-
-    private LocalDateTime paymentDate;
 
     public TicketPaymentEntity(TicketOrderEntity order, BigDecimal amount, String method) {
         if (order == null) {
@@ -64,23 +71,4 @@ public class TicketPaymentEntity {
         }
         this.paymentStatus = PaymentStatus.FAILED;
     }
-
-    public void cancelPayment(String reason) {
-        if (this.paymentStatus != PaymentStatus.PENDING && this.paymentStatus != PaymentStatus.COMPLETED) {
-            throw new EasyCheckException(INVALID_PAYMENT_STATUS_FOR_CANCELLATION);
-        }
-        this.paymentStatus = PaymentStatus.CANCELLED;
-        this.cancelReason = reason;
-        this.cancelDate = LocalDateTime.now();
-    }
-
-    public void markAsRefunded(String reason) {
-        if (this.paymentStatus != PaymentStatus.COMPLETED) {
-            throw new EasyCheckException(INVALID_STATUS_FOR_REFUND);
-        }
-        this.paymentStatus = PaymentStatus.REFUNDED;
-        this.cancelReason = reason;
-        this.cancelDate = LocalDateTime.now();
-    }
-
 }
