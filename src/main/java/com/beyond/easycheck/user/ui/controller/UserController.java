@@ -4,11 +4,8 @@ import com.beyond.easycheck.admin.application.service.AdminOperationUseCase;
 import com.beyond.easycheck.admin.application.service.AdminOperationUseCase.UserStatusUpdateCommand;
 import com.beyond.easycheck.user.application.service.UserOperationUseCase;
 import com.beyond.easycheck.user.application.service.UserReadUseCase;
-import com.beyond.easycheck.user.ui.requestbody.ChangePasswordRequest;
-import com.beyond.easycheck.user.ui.requestbody.UserLoginRequest;
-import com.beyond.easycheck.user.ui.requestbody.UserRegisterRequest;
+import com.beyond.easycheck.user.ui.requestbody.*;
 import com.beyond.easycheck.admin.ui.requestbody.UserStatusUpdateRequest;
-import com.beyond.easycheck.user.ui.requestbody.UserUpdateRequest;
 import com.beyond.easycheck.user.ui.view.UserLoginView;
 import com.beyond.easycheck.user.ui.view.UserView;
 import io.swagger.v3.oas.annotations.Operation;
@@ -143,6 +140,17 @@ public class UserController {
         ChangePasswordCommand command = new ChangePasswordCommand(request.email(), request.oldPassword(), request.newPassword());
 
         userOperationUseCase.changePassword(command);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PatchMapping("/check-duplicate")
+    @Operation(summary = "이메일 중복확인 API")
+    public ResponseEntity<Void> checkDuplicate(@RequestBody @Validated EmailDuplicatedCheckRequest request) {
+
+        UserFindQuery query = new UserFindQuery(null, request.email());
+
+        userReadUseCase.checkEmailDuplicated(query);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }

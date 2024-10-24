@@ -46,6 +46,7 @@ public class EasyCheckSecurityConfig {
                     registry.requestMatchers(
                                     "/api/v1/users",
                                     "/api/v1/users/login",
+                                    "/api/v1/users/check-duplicate",
                                     "/api/v1/users/change-password",
                                     "/api/v1/verification-code",
                                     "/api/v1/verify-code",
