@@ -8,6 +8,7 @@ import com.beyond.easycheck.user.ui.requestbody.ChangePasswordRequest;
 import com.beyond.easycheck.user.ui.requestbody.UserLoginRequest;
 import com.beyond.easycheck.user.ui.requestbody.UserRegisterRequest;
 import com.beyond.easycheck.admin.ui.requestbody.UserStatusUpdateRequest;
+import com.beyond.easycheck.user.ui.requestbody.UserUpdateRequest;
 import com.beyond.easycheck.user.ui.view.UserLoginView;
 import com.beyond.easycheck.user.ui.view.UserView;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,8 +40,6 @@ public class UserController {
 
     private final UserOperationUseCase userOperationUseCase;
 
-    private final AdminOperationUseCase adminOperationUseCase;
-
     @PostMapping("")
     @Operation(summary = "일반 유저 회원가입 API")
     public ResponseEntity<Void> registerUser(@RequestBody @Validated UserRegisterRequest request) {
@@ -60,6 +59,36 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .build();
     }
+
+    @PutMapping("")
+    @Operation(summary = "일반 유저 정보 수정 API")
+    public ResponseEntity<UserView> updateUser(@RequestBody @Validated UserUpdateRequest request, @AuthenticationPrincipal Long userId) {
+
+        UserUpdateCommand command = new UserUpdateCommand(
+                userId,
+                request.email(),
+                request.phone(),
+                request.addr(),
+                request.addrDetail()
+        );
+
+        FindUserResult result = userOperationUseCase.updateUserInfo(command);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new UserView(result));
+    }
+
+    @DeleteMapping("")
+    @Operation(summary = "일반 유저 탈퇴 API")
+    public ResponseEntity<Void> deactivateUser(@AuthenticationPrincipal Long userId) {
+        DeactivateUserCommand command = new DeactivateUserCommand(userId);
+
+        userOperationUseCase.deactivateUser(command);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+
 
     @PostMapping("/login")
     @Operation(summary = "일반 유저 로그인 API")

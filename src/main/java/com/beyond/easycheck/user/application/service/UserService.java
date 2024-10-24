@@ -181,6 +181,26 @@ public class UserService implements UserOperationUseCase, UserReadUseCase {
 
     }
 
+    @Override
+    @Transactional
+    public FindUserResult updateUserInfo(UserUpdateCommand command) {
+        checkPhoneIsVerified(command.phone());
+
+        UserEntity user = findUserById(command.userId());
+
+        user.updateUser(command);
+
+        return FindUserResult.findByUserEntity(user);
+    }
+
+    @Override
+    @Transactional
+    public void deactivateUser(DeactivateUserCommand command) {
+        UserEntity user = findUserById(command.userId());
+
+        user.setUserStatus(UserStatus.DEACTIVATED);
+    }
+
     private FindJwtResult generateJwt(EasyCheckUserDetails userDetails) {
         return FindJwtResult.findByTokenString(
                 jwtUtil.createAccessToken(userDetails),
