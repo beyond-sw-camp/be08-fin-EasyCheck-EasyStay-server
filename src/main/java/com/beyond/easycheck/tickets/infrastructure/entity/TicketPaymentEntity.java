@@ -71,21 +71,4 @@ public class TicketPaymentEntity {
         }
         this.paymentStatus = PaymentStatus.FAILED;
     }
-
-    public void cancelPayment(String reason) {
-        if (this.paymentStatus != PaymentStatus.PENDING && this.paymentStatus != PaymentStatus.COMPLETED) {
-            throw new EasyCheckException(INVALID_PAYMENT_STATUS_FOR_CANCELLATION);
-        }
-        this.paymentStatus = PaymentStatus.CANCELLED;
-        this.cancelDate = LocalDateTime.now();
-    }
-
-    public void markAsRefunded(String reason) {
-        if (this.paymentStatus != PaymentStatus.COMPLETED) {
-            throw new EasyCheckException(INVALID_STATUS_FOR_REFUND);
-        }
-        this.paymentStatus = PaymentStatus.REFUNDED;
-        this.cancelDate = LocalDateTime.now();
-    }
-
 }
