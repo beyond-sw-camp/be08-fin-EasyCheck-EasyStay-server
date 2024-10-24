@@ -9,7 +9,7 @@ import com.beyond.easycheck.notices.infrastructure.persistence.entity.NoticesEnt
 import com.beyond.easycheck.payments.infrastructure.entity.CompletionStatus;
 import com.beyond.easycheck.payments.infrastructure.entity.PaymentEntity;
 import com.beyond.easycheck.suggestion.infrastructure.persistence.entity.SuggestionEntity;
-import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
+import com.beyond.easycheck.adasfas.infrastructure.entity.ThemeParkEntity;
 import com.beyond.easycheck.user.application.service.UserReadUseCase.FindUserResult;
 import com.beyond.easycheck.user.application.service.UserReadUseCase.UserFindQuery;
 

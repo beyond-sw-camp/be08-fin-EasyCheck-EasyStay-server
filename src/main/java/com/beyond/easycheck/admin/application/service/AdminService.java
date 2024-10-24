@@ -9,7 +9,7 @@ import com.beyond.easycheck.facilities.infrastructure.repository.FacilityReposit
 import com.beyond.easycheck.notices.infrastructure.persistence.repository.NoticesRepository;
 import com.beyond.easycheck.payments.infrastructure.repository.PaymentRepository;
 import com.beyond.easycheck.suggestion.infrastructure.persistence.repository.SuggestionsRepository;
-import com.beyond.easycheck.themeparks.infrastructure.repository.ThemeParkRepository;
+import com.beyond.easycheck.adasfas.infrastructure.repository.ThemeParkRepository;
 import com.beyond.easycheck.user.exception.UserMessageType;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.entity.user.UserEntity;
 import com.beyond.easycheck.user.infrastructure.persistence.mariadb.repository.UserJpaRepository;

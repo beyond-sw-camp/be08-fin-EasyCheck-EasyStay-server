@@ -1,6 +1,6 @@
 package com.beyond.easycheck.attractions.infrastructure.entity;
 
-import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
+import com.beyond.easycheck.adasfas.infrastructure.entity.ThemeParkEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
