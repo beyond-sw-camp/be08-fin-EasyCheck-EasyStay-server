@@ -1,9 +1,9 @@
-package com.beyond.easycheck.adasfas.infrastructure.entity;
+package com.beyond.easycheck.themeparks.infrastructure.entity;
 
 
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
 import com.beyond.easycheck.common.entity.BaseTimeEntity;
-import com.beyond.easycheck.adasfas.application.service.ThemeParkOperationUseCase.ThemeParkCreateCommand;
+import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUseCase.ThemeParkCreateCommand;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

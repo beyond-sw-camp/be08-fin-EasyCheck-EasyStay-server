@@ -1,4 +1,4 @@
-package com.beyond.easycheck.adasfas.ui.requestbody;
+package com.beyond.easycheck.themeparks.ui.requestbody;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

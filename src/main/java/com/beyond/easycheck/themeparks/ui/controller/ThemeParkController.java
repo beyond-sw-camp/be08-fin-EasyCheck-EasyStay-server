@@ -1,14 +1,14 @@
-package com.beyond.easycheck.adasfas.ui.controller;
+package com.beyond.easycheck.themeparks.ui.controller;
 
-import com.beyond.easycheck.adasfas.application.service.ThemeParkOperationUseCase;
-import com.beyond.easycheck.adasfas.application.service.ThemeParkOperationUseCase.ThemeParkCreateCommand;
-import com.beyond.easycheck.adasfas.application.service.ThemeParkOperationUseCase.ThemeParkUpdateCommand;
-import com.beyond.easycheck.adasfas.application.service.ThemeParkReadUseCase;
-import com.beyond.easycheck.adasfas.application.service.ThemeParkReadUseCase.FindThemeParkResult;
-import com.beyond.easycheck.adasfas.ui.requestbody.ThemeParkCreateRequest;
-import com.beyond.easycheck.adasfas.ui.requestbody.ThemeParkUpdateRequest;
+import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUseCase;
+import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUseCase.ThemeParkCreateCommand;
+import com.beyond.easycheck.themeparks.application.service.ThemeParkOperationUseCase.ThemeParkUpdateCommand;
+import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase;
+import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase.FindThemeParkResult;
+import com.beyond.easycheck.themeparks.ui.requestbody.ThemeParkCreateRequest;
+import com.beyond.easycheck.themeparks.ui.requestbody.ThemeParkUpdateRequest;
 import com.beyond.easycheck.common.ui.view.ApiResponseView;
-import com.beyond.easycheck.adasfas.ui.view.ThemeParkView;
+import com.beyond.easycheck.themeparks.ui.view.ThemeParkView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

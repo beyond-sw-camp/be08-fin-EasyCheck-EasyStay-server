@@ -1,14 +1,14 @@
-package com.beyond.easycheck.adasfas.application.service;
+package com.beyond.easycheck.themeparks.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
-import com.beyond.easycheck.adasfas.application.service.ThemeParkReadUseCase.FindThemeParkResult;
+import com.beyond.easycheck.themeparks.application.service.ThemeParkReadUseCase.FindThemeParkResult;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-import static com.beyond.easycheck.adasfas.exception.ThemeParkMessageType.VALIDATION_FAILED;
+import static com.beyond.easycheck.themeparks.exception.ThemeParkMessageType.VALIDATION_FAILED;
 
 public interface ThemeParkOperationUseCase {
 

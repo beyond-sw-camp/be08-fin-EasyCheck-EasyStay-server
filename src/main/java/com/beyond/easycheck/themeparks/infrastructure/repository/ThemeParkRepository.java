@@ -1,6 +1,6 @@
-package com.beyond.easycheck.adasfas.infrastructure.repository;
+package com.beyond.easycheck.themeparks.infrastructure.repository;
 
-import com.beyond.easycheck.adasfas.infrastructure.entity.ThemeParkEntity;
+import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
 import org.springframework.data.jpa.repository.EntityGraph;
 
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,8 +1,8 @@
 package com.beyond.easycheck.tickets.application.service;
 
 import com.beyond.easycheck.common.exception.EasyCheckException;
-import com.beyond.easycheck.adasfas.infrastructure.entity.ThemeParkEntity;
-import com.beyond.easycheck.adasfas.infrastructure.repository.ThemeParkRepository;
+import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
+import com.beyond.easycheck.themeparks.infrastructure.repository.ThemeParkRepository;
 import com.beyond.easycheck.tickets.exception.TicketMessageType;
 import com.beyond.easycheck.tickets.infrastructure.entity.TicketEntity;
 import com.beyond.easycheck.tickets.infrastructure.repository.TicketRepository;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.beyond.easycheck.adasfas.exception.ThemeParkMessageType.THEME_PARK_NOT_FOUND;
+import static com.beyond.easycheck.themeparks.exception.ThemeParkMessageType.THEME_PARK_NOT_FOUND;
 import static com.beyond.easycheck.tickets.exception.TicketMessageType.TICKET_NOT_BELONG_TO_THEME_PARK;
 import static com.beyond.easycheck.tickets.exception.TicketMessageType.TICKET_NOT_FOUND;
 import static com.beyond.easycheck.tickets.exception.TicketMessageType.DUPLICATE_TICKET;

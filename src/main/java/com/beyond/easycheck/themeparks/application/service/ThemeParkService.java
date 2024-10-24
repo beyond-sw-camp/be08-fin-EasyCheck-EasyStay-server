@@ -1,4 +1,4 @@
-package com.beyond.easycheck.adasfas.application.service;
+package com.beyond.easycheck.themeparks.application.service;
 
 import com.amazonaws.SdkClientException;
 import com.beyond.easycheck.accomodations.infrastructure.entity.AccommodationEntity;
@@ -6,9 +6,9 @@ import com.beyond.easycheck.accomodations.infrastructure.repository.Accommodatio
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import com.beyond.easycheck.s3.application.domain.FileManagementCategory;
 import com.beyond.easycheck.s3.application.service.S3Service;
-import com.beyond.easycheck.adasfas.exception.ThemeParkMessageType;
-import com.beyond.easycheck.adasfas.infrastructure.entity.ThemeParkEntity;
-import com.beyond.easycheck.adasfas.infrastructure.repository.ThemeParkRepository;
+import com.beyond.easycheck.themeparks.exception.ThemeParkMessageType;
+import com.beyond.easycheck.themeparks.infrastructure.entity.ThemeParkEntity;
+import com.beyond.easycheck.themeparks.infrastructure.repository.ThemeParkRepository;
 import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 import static com.beyond.easycheck.accomodations.exception.AccommodationMessageType.ACCOMMODATION_NOT_FOUND;
 import static com.beyond.easycheck.common.exception.CommonMessageType.IMAGE_UPDATE_FAILED;
 import static com.beyond.easycheck.common.exception.CommonMessageType.NO_IMAGES_PROVIDED;
-import static com.beyond.easycheck.adasfas.exception.ThemeParkMessageType.*;
+import static com.beyond.easycheck.themeparks.exception.ThemeParkMessageType.*;
 
 @Slf4j
 @Service
