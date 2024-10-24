@@ -97,7 +97,7 @@ public class TicketPaymentService {
     }
 
     @Transactional
-    public TicketPaymentEntity cancelPayment(Long orderId, Long userId, String reason) {
+    public TicketPaymentEntity cancelPayment(Long orderId, Long userId) {
         TicketOrderEntity order = getOrderById(orderId);
         validateUserAccess(order, userId);
         validateOrderStatusForCancellation(order);
@@ -112,12 +112,10 @@ public class TicketPaymentService {
             if (Objects.isNull(cancelResponse) || Objects.isNull(cancelResponse.getResponse())) {
                 throw new EasyCheckException(PAYMENT_CANCELLATION_FAILED);
             }
-
-            payment.cancelPayment(reason);
             order.cancelOrder();
             ticketOrderRepository.save(order);
 
-            log.info("주문 ID: {} 결제 취소 성공, 취소 사유: {}", order.getId(), reason);
+            log.info("주문 ID: {} 결제 취소 성공", order.getId());
         } catch (IamportResponseException | IOException e) {
             log.error("결제 취소 실패: 주문 ID = {}, 오류 메시지 = {}", order.getId(), e.getMessage());
             throw new EasyCheckException(PAYMENT_CANCELLATION_FAILED);

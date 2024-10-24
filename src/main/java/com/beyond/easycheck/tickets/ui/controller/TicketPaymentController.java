@@ -3,7 +3,6 @@ package com.beyond.easycheck.tickets.ui.controller;
 import com.beyond.easycheck.common.ui.view.ApiResponseView;
 import com.beyond.easycheck.tickets.application.service.TicketPaymentService;
 import com.beyond.easycheck.tickets.infrastructure.entity.TicketPaymentEntity;
-import com.beyond.easycheck.tickets.ui.requestbody.CancelReasonRequest;
 import com.beyond.easycheck.tickets.ui.requestbody.TicketPaymentRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,10 +38,9 @@ public class TicketPaymentController {
     @PatchMapping("/{orderId}/cancel")
     public ResponseEntity<ApiResponseView<TicketPaymentEntity>> cancelPayment(
             @PathVariable Long orderId,
-            @RequestBody CancelReasonRequest cancelReason,
             @AuthenticationPrincipal Long userId) {
 
-        TicketPaymentEntity cancelledPayment = ticketPaymentService.cancelPayment(orderId, userId, cancelReason.getReason());
+        TicketPaymentEntity cancelledPayment = ticketPaymentService.cancelPayment(orderId, userId);
         return ResponseEntity.ok(new ApiResponseView<>(cancelledPayment));
     }
 
