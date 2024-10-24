@@ -23,8 +23,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
-import static com.beyond.easycheck.payments.exception.PaymentMessageType.PAYMENT_VERIFICATION_FAILED;
+import static com.beyond.easycheck.payments.exception.PaymentMessageType.*;
 import static com.beyond.easycheck.tickets.exception.TicketOrderMessageType.*;
+import static com.beyond.easycheck.tickets.exception.TicketOrderMessageType.PAYMENT_NOT_FOUND;
 
 @Slf4j
 @Service
@@ -59,7 +60,7 @@ public class TicketPaymentService {
         if (paymentResponse != null && paymentResponse.getResponse().getAmount().compareTo(request.getPaymentAmount()) == 0) {
             return createAndCompletePayment(order, request);
         } else {
-            throw new EasyCheckException(PAYMENT_VERIFICATION_FAILED);
+            throw new EasyCheckException(PORTONE_VERIFICATION_ERROR);
         }
     }
 
@@ -86,13 +87,13 @@ public class TicketPaymentService {
             IamportResponse<Payment> paymentResponse = iamportClient.paymentByImpUid(impUid);
 
             if (Objects.isNull(paymentResponse) || Objects.isNull(paymentResponse.getResponse())) {
-                throw new EasyCheckException(PAYMENT_VERIFICATION_FAILED);
+                throw new EasyCheckException(PORTONE_VERIFICATION_ERROR);
             }
 
             return paymentResponse;
         } catch (IamportResponseException | IOException e) {
             log.error("IamPort 결제 검증 오류: impUid={}, message={}", impUid, e.getMessage());
-            throw new EasyCheckException(PAYMENT_VERIFICATION_FAILED);
+            throw new EasyCheckException(PORTONE_VERIFICATION_ERROR);
         }
     }
 
@@ -110,7 +111,7 @@ public class TicketPaymentService {
             IamportResponse<Payment> cancelResponse = iamportClient.cancelPaymentByImpUid(cancelData);
 
             if (Objects.isNull(cancelResponse) || Objects.isNull(cancelResponse.getResponse())) {
-                throw new EasyCheckException(PAYMENT_CANCELLATION_FAILED);
+                throw new EasyCheckException(PORTONE_REFUND_FAILED);
             }
             order.cancelOrder();
             ticketOrderRepository.save(order);
@@ -118,7 +119,7 @@ public class TicketPaymentService {
             log.info("주문 ID: {} 결제 취소 성공", order.getId());
         } catch (IamportResponseException | IOException e) {
             log.error("결제 취소 실패: 주문 ID = {}, 오류 메시지 = {}", order.getId(), e.getMessage());
-            throw new EasyCheckException(PAYMENT_CANCELLATION_FAILED);
+            throw new EasyCheckException(PORTONE_REFUND_FAILED);
         }
 
         return ticketPaymentRepository.save(payment);
