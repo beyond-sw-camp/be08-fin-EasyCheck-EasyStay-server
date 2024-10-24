@@ -1,5 +1,6 @@
 package com.beyond.easycheck.tickets.infrastructure.entity;
 
+import com.beyond.easycheck.common.entity.BaseTimeEntity;
 import com.beyond.easycheck.common.exception.EasyCheckException;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,7 +19,7 @@ import static com.beyond.easycheck.tickets.exception.TicketOrderMessageType.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "ticket_payment")
-public class TicketPaymentEntity {
+public class TicketPaymentEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
